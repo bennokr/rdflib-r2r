@@ -58,12 +58,14 @@ def yield_database_testcases(path: pathlib.Path):
         # conn.execute(text(sql_script))
 
         for testspec in g.objects(dbspec, rdb2rdftest.relatedTestCase):
-            yield TestCase(
-                id=str(g.value(testspec, dcterms.identifier)),
-                db=db,
-                path=path,
-                meta=dict(g[testspec:]),
-            )
+            id = g.value(testspec, dcterms.identifier)
+            if id:
+                yield TestCase(
+                    id=str(id),
+                    db=db,
+                    path=path,
+                    meta=dict(g[testspec:]),
+                )
 
 
 def setup_engine():
@@ -74,7 +76,7 @@ PATHS = sorted(
     path
     for path in pathlib.Path(__file__).parent.joinpath("rdb2rdf-ts").iterdir()
     if path.name[0] != "."
-)[:7]
+)  # [:7]
 
 TESTS = [
     testcase
@@ -113,12 +115,30 @@ def test_rdb2rdf(testcase: TestCase):
         #     logging.warn(("g1", t))
         # logging.warn(("g1", len(l1), s1))
         # logging.warn(("g2", len(list(g2)), g2.serialize(format="turtle")))
-        
+
         iso1, iso2 = to_isomorphic(g1), to_isomorphic(g2)
         in_both, in_1, in_2 = graph_diff(iso1, iso2)
+
         def dump_nt_sorted(g):
             return sorted(g.serialize(format="nt").splitlines())
+
         logging.warn(("in_both", len(list(in_both)), dump_nt_sorted(in_both)))
         logging.warn(("in_1", len(list(in_1)), dump_nt_sorted(in_1)))
         logging.warn(("in_2", len(list(in_2)), dump_nt_sorted(in_2)))
         assert iso1 == iso2
+
+
+def test_synthesis(module_results_df):
+    df = module_results_df
+    ids = df.testcase.apply(lambda x: x.id)
+    df["link"] = (
+        "[" + ids + "]" + "(https://www.w3.org/TR/rdb2rdf-test-cases/#" + ids + ")"
+    )
+    status_emoji = {
+        "passed": "✅",
+        "failed": "❌",
+    }
+    df["status"] = df["status"].apply(lambda s: status_emoji.get(s) + " " + s)
+    with open("test-results.md", "w") as fw:
+        print("# Test results\n", file=fw)
+        print(df[["link", "status", "duration_ms"]].to_markdown(index=False), file=fw)

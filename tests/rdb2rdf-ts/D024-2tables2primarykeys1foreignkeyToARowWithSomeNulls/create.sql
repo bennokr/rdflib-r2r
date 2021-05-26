@@ -1,17 +1,15 @@
 CREATE TABLE "Target" (
-	"PK" INT,
-	PRIMARY KEY("PK"),
+	"PK" INT PRIMARY KEY,
 	"key1attr1" CHAR(5),
 	"key1attr2" CHAR(5),
-	UNIQUE ("key1attr1", "key1attr2"),
 	"key2attr1" CHAR(5),
 	"key2attr2" CHAR(5),
+	UNIQUE ("key1attr1", "key1attr2"),
 	UNIQUE ("key2attr2", "key2attr1")
 );
 
 CREATE TABLE "Source" (
-	"ID" INT,
-	PRIMARY KEY("ID"),
+	"ID" INT PRIMARY KEY,
 	"attrA" CHAR(5),
 	"attrB" CHAR(5),
 	FOREIGN KEY ("attrA", "attrB") REFERENCES "Target"("key2attr2", "key2attr1")

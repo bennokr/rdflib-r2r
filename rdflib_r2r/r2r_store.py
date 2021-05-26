@@ -64,7 +64,7 @@ class Mapping(NamedTuple):
                     o_map = BNode()
                     mg.add([po_map, rr.objectMap, o_map])
                     mg.add([o_map, rr.column, Literal(f'"{column.name}"')])
-                    logging.warn(('column.type', column.type))
+                    logging.warn(("column.type", column.type))
                     if isinstance(column.type, sqltypes.Integer):
                         mg.add([o_map, rr.datatype, XSD.integer])
 
@@ -147,7 +147,6 @@ class R2RStore(Store):
             except KeyError:
                 # rr.sqlQuery is set
                 return literal_column(colname)
-
 
         def template_to_function(dbtable, template):
             # TODO: IRI-encode
@@ -260,28 +259,28 @@ class R2RStore(Store):
                 query = union_all(*qunion) if len(qunion) > 1 else qunion[0]
                 for s, p, o, g in conn.execute(query):
                     logging.warn(("spog", (s, p, o, g)))
-                    if s.startswith('<'):
+                    if s.startswith("<"):
                         snode = URIRef(self._iri_encode(s[1:-1]))
                     else:
                         snode = BNode(hex(hash(s) ** 2)[2:])
-                    
+
                     pnode = URIRef(self._iri_encode(p[1:-1]))
 
                     if (not isinstance(o, str)) or (o[0] not in '"<_'):
                         onode = Literal(o)
-                    elif o.startswith('<'):
+                    elif o.startswith("<"):
                         onode = URIRef(self._iri_encode(o[1:-1]))
                     else:
                         onode = from_n3(o)
-                    
+
                     yield (snode, pnode, onode), from_n3(g)
 
     @staticmethod
     def _iri_encode(iri):
-        parts = iri.split('/', 3)
-        logging.warn(('parts', parts))
-        parts[-1] = quote(parts[-1], safe='/#;')
-        return '/'.join(parts)
+        parts = iri.split("/", 3)
+        logging.warn(("parts", parts))
+        parts[-1] = quote(parts[-1], safe="/#;")
+        return "/".join(parts)
 
     def create(self, configuration):
         raise TypeError("The DB mapping is read only!")
