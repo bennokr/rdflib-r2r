@@ -10,7 +10,7 @@ from typing import NamedTuple
 
 import rdflib
 from rdflib.namespace import RDF, Namespace
-from rdflib.compare import to_isomorphic
+from rdflib.compare import to_isomorphic, graph_diff
 from sqlalchemy import create_engine, text, engine as sqlengine
 
 from rdflib_r2r.r2r_store import R2RStore, Mapping
@@ -74,7 +74,7 @@ PATHS = sorted(
     path
     for path in pathlib.Path(__file__).parent.joinpath("rdb2rdf-ts").iterdir()
     if path.name[0] != "."
-)[:20]
+)[:7]
 
 TESTS = [
     testcase
@@ -104,11 +104,21 @@ def test_rdb2rdf(testcase: TestCase):
 
         # logging.warn(('g1.contexts()', g1.contexts()))
 
-        l1 = list(g1)
-        s1 = g1.serialize(format="turtle")
-        for t in l1:
-            logging.warn(("g1", t))
-        logging.warn(("g1", len(l1), s1))
-        logging.warn(("g2", len(list(g2)), g2.serialize(format="turtle")))
-
-        assert to_isomorphic(g1) == to_isomorphic(g2)
+        # l1 = list(g1)
+        # g1 = rdflib.Graph()
+        # for t in l1:
+        #     g1.add(t)
+        # s1 = g1.serialize(format="turtle")
+        # for t in l1:
+        #     logging.warn(("g1", t))
+        # logging.warn(("g1", len(l1), s1))
+        # logging.warn(("g2", len(list(g2)), g2.serialize(format="turtle")))
+        
+        iso1, iso2 = to_isomorphic(g1), to_isomorphic(g2)
+        in_both, in_1, in_2 = graph_diff(iso1, iso2)
+        def dump_nt_sorted(g):
+            return sorted(g.serialize(format="nt").splitlines())
+        logging.warn(("in_both", len(list(in_both)), dump_nt_sorted(in_both)))
+        logging.warn(("in_1", len(list(in_1)), dump_nt_sorted(in_1)))
+        logging.warn(("in_2", len(list(in_2)), dump_nt_sorted(in_2)))
+        assert iso1 == iso2
