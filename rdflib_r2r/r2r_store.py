@@ -226,8 +226,11 @@ class R2RStore(Store):
                         p_func = literal_column("'<%s>'" % p_const)
 
                         o_map = mg.value(po_map, rr.objectMap)
-                        if mg.value(o_map, rr.constant):
-                            o_const = mg.value(o_map, rr.constant).toPython()
+                        if not o_map:
+                            o_const = mg.value(po_map, rr.object)
+                            o_func = literal_column("'<%s>'" % o_const)
+                        elif mg.value(o_map, rr.constant):
+                            o_const = mg.value(o_map, rr.constant)
                             o_func = literal_column("'<%s>'" % o_const)
                         else:
                             o_template = mg.value(o_map, rr.template)

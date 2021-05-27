@@ -134,6 +134,7 @@ def test_synthesis(module_results_df):
     df["link"] = (
         "[" + ids + "]" + "(https://www.w3.org/TR/rdb2rdf-test-cases/#" + ids + ")"
     )
+    df["title"] = df.testcase.apply(lambda x: x.meta.get(dcterms.title))
     status_emoji = {
         "passed": "✅",
         "failed": "❌",
@@ -141,4 +142,5 @@ def test_synthesis(module_results_df):
     df["status"] = df["status"].apply(lambda s: status_emoji.get(s) + " " + s)
     with open("test-results.md", "w") as fw:
         print("# Test results\n", file=fw)
-        print(df[["link", "status", "duration_ms"]].to_markdown(index=False), file=fw)
+        df = df[["link", "status", "duration_ms", "title"]]
+        print(df.to_markdown(index=False), file=fw)

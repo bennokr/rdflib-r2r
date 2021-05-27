@@ -1,90 +1,90 @@
 # Test results
 
-| link                                                                             | status   |   duration_ms |
-|:---------------------------------------------------------------------------------|:---------|--------------:|
-| [DirectGraphTC0000](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0000) | ✅ passed |      18.4443  |
-| [R2RMLTC0000](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0000)             | ✅ passed |      12.3375  |
-| [DirectGraphTC0001](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0001) | ✅ passed |      15.4398  |
-| [R2RMLTC0001a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0001a)           | ✅ passed |       9.3687  |
-| [R2RMLTC0001b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0001b)           | ✅ passed |      10.0333  |
-| [DirectGraphTC0002](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0002) | ✅ passed |      16.7769  |
-| [R2RMLTC0002a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002a)           | ✅ passed |      11.7382  |
-| [R2RMLTC0002b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002b)           | ✅ passed |      11.5692  |
-| [R2RMLTC0002c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002c)           | ✅ passed |       1.99775 |
-| [R2RMLTC0002d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002d)           | ✅ passed |       9.37211 |
-| [R2RMLTC0002e](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002e)           | ✅ passed |       2.10521 |
-| [R2RMLTC0002f](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002f)           | ✅ passed |       2.56149 |
-| [R2RMLTC0002g](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002g)           | ✅ passed |       1.74794 |
-| [R2RMLTC0002h](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002h)           | ✅ passed |       1.80979 |
-| [R2RMLTC0002i](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002i)           | ✅ passed |      10.2753  |
-| [R2RMLTC0002j](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002j)           | ✅ passed |       9.39153 |
-| [DirectGraphTC0003](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0003) | ✅ passed |      21.0995  |
-| [R2RMLTC0003a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0003a)           | ✅ passed |       1.95188 |
-| [R2RMLTC0003b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0003b)           | ✅ passed |       9.79386 |
-| [R2RMLTC0003c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0003c)           | ✅ passed |      10.5686  |
-| [DirectGraphTC0004](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0004) | ✅ passed |      16.9313  |
-| [R2RMLTC0004a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0004a)           | ✅ passed |      13.3375  |
-| [R2RMLTC0004b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0004b)           | ✅ passed |       1.98572 |
-| [DirectGraphTC0005](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0005) | ❌ failed |      22.8821  |
-| [R2RMLTC0005a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0005a)           | ✅ passed |      11.1622  |
-| [R2RMLTC0005b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0005b)           | ✅ passed |      17.8045  |
-| [DirectGraphTC0006](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0006) | ❌ failed |      14.8551  |
-| [R2RMLTC0006a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0006a)           | ❌ failed |       8.19263 |
-| [DirectGraphTC0007](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0007) | ❌ failed |      17.5495  |
-| [R2RMLTC0007a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007a)           | ❌ failed |       8.40688 |
-| [R2RMLTC0007b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007b)           | ❌ failed |       6.90584 |
-| [R2RMLTC0007c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007c)           | ✅ passed |      31.0178  |
-| [R2RMLTC0007d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007d)           | ❌ failed |       8.03383 |
-| [R2RMLTC0007e](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007e)           | ❌ failed |      12.7041  |
-| [R2RMLTC0007f](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007f)           | ❌ failed |       8.98789 |
-| [R2RMLTC0007g](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007g)           | ❌ failed |       8.51681 |
-| [R2RMLTC0007h](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007h)           | ✅ passed |       2.13959 |
-| [DirectGraphTC0008](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0008) | ❌ failed |      19.8353  |
-| [R2RMLTC0008a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0008a)           | ❌ failed |       7.93621 |
-| [R2RMLTC0008b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0008b)           | ❌ failed |       8.21577 |
-| [R2RMLTC0008c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0008c)           | ❌ failed |       9.22961 |
-| [DirectGraphTC0009](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0009) | ❌ failed |      27.1712  |
-| [R2RMLTC0009a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009a)           | ❌ failed |      10.0327  |
-| [R2RMLTC0009b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009b)           | ❌ failed |      11.6731  |
-| [R2RMLTC0009c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009c)           | ✅ passed |      12.9516  |
-| [R2RMLTC0009d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009d)           | ✅ passed |      15.6992  |
-| [DirectGraphTC0010](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0010) | ❌ failed |       7.85394 |
-| [R2RMLTC0010a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0010a)           | ✅ passed |      11.4061  |
-| [R2RMLTC0010b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0010b)           | ✅ passed |      12.2181  |
-| [R2RMLTC0010c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0010c)           | ❌ failed |       8.38139 |
-| [DirectGraphTC0011](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0011) | ❌ failed |      53.4588  |
-| [R2RMLTC0011a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0011a)           | ❌ failed |      20.3776  |
-| [R2RMLTC0011b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0011b)           | ✅ passed |      26.286   |
-| [DirectGraphTC0012](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0012) | ❌ failed |      43.8148  |
-| [R2RMLTC0012a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0012a)           | ✅ passed |      17.1733  |
-| [R2RMLTC0012b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0012b)           | ✅ passed |      18.0541  |
-| [R2RMLTC0012c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0012c)           | ✅ passed |       2.11479 |
-| [R2RMLTC0012d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0012d)           | ✅ passed |       2.24213 |
-| [R2RMLTC0012e](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0012e)           | ❌ failed |      14.5048  |
-| [DirectGraphTC0013](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0013) | ❌ failed |      17.1691  |
-| [R2RMLTC0013a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0013a)           | ❌ failed |       8.32927 |
-| [DirectGraphTC0014](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0014) | ❌ failed |      50.9356  |
-| [R2RMLTC0014a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0014a)           | ✅ passed |      14.4571  |
-| [R2RMLTC0014b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0014b)           | ❌ failed |      21.7103  |
-| [R2RMLTC0014c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0014c)           | ❌ failed |      22.0891  |
-| [R2RMLTC0014d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0014d)           | ✅ passed |      16.4057  |
-| [DirectGraphTC0015](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0015) | ❌ failed |      26.6257  |
-| [R2RMLTC0015a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0015a)           | ❌ failed |      11.203   |
-| [R2RMLTC0015b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0015b)           | ✅ passed |       2.62803 |
-| [DirectGraphTC0016](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0016) | ❌ failed |      40.3623  |
-| [R2RMLTC0016a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016a)           | ❌ failed |       8.87341 |
-| [R2RMLTC0016b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016b)           | ❌ failed |      10.273   |
-| [R2RMLTC0016c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016c)           | ❌ failed |       8.72662 |
-| [R2RMLTC0016d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016d)           | ❌ failed |       7.71938 |
-| [R2RMLTC0016e](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016e)           | ❌ failed |      11.7235  |
-| [DirectGraphTC0018](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0018) | ❌ failed |      22.378   |
-| [R2RMLTC0018a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0018a)           | ❌ failed |      14.2198  |
-| [R2RMLTC0019a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0019a)           | ❌ failed |      10.8935  |
-| [R2RMLTC0019b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0019b)           | ✅ passed |       1.77803 |
-| [R2RMLTC0020a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0020a)           | ❌ failed |       7.7742  |
-| [R2RMLTC0020b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0020b)           | ✅ passed |       2.55036 |
-| [DirectGraphTC0021](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0021) | ❌ failed |      37.4673  |
-| [DirectGraphTC0022](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0022) | ❌ failed |      35.9229  |
-| [DirectGraphTC0023](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0023) | ❌ failed |      37.1608  |
-| [DirectGraphTC0024](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0024) | ❌ failed |      32.2949  |
-| [DirectGraphTC0025](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0025) | ❌ failed |      74.7984  |
+| link                                                                             | status   |   duration_ms | title                                                                                                                |
+|:---------------------------------------------------------------------------------|:---------|--------------:|:---------------------------------------------------------------------------------------------------------------------|
+| [DirectGraphTC0000](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0000) | ✅ passed |      17.0294  | Direct mapping of an empty table                                                                                     |
+| [R2RMLTC0000](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0000)             | ✅ passed |       9.02054 | one table, one column, zero rows                                                                                     |
+| [DirectGraphTC0001](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0001) | ✅ passed |      14.5482  | Direct mapping that generates a BlankNode                                                                            |
+| [R2RMLTC0001a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0001a)           | ✅ passed |       9.45619 | One column mapping, subject URI generation by using rr:template                                                      |
+| [R2RMLTC0001b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0001b)           | ✅ passed |       8.63051 | One column mapping, generation of a BlankNode subject by using rr:termType                                           |
+| [DirectGraphTC0002](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0002) | ✅ passed |      18.5239  | Two columns mapping, generation of a BlankNode subject                                                               |
+| [R2RMLTC0002a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002a)           | ✅ passed |      11.3435  | Two columns mapping, generation of a subject URI by the concatenation of two column values                           |
+| [R2RMLTC0002b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002b)           | ✅ passed |      10.1123  | Two columns mapping, generation of a BlankNode subject by using rr:template and rr:termType                          |
+| [R2RMLTC0002c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002c)           | ✅ passed |       1.9254  | Two columns mapping, an undefined SQL identifier                                                                     |
+| [R2RMLTC0002d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002d)           | ✅ passed |       9.52111 | Two columns mapping, generation of a BlankNode subject by using a SQL Query that concatenates two columns            |
+| [R2RMLTC0002e](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002e)           | ✅ passed |       1.75915 | Two columns mapping, an undefined rr:tableName                                                                       |
+| [R2RMLTC0002f](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002f)           | ✅ passed |       2.23911 | Two columns mapping, delimited identifiers referenced as regular identifiers                                         |
+| [R2RMLTC0002g](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002g)           | ✅ passed |       1.88151 | Two columns mapping, invalid SQL query                                                                               |
+| [R2RMLTC0002h](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002h)           | ✅ passed |       2.33683 | Two columns mapping, duplicate column name in SELECT                                                                 |
+| [R2RMLTC0002i](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002i)           | ✅ passed |       9.54696 | Two columns mapping, SQL Version identifier                                                                          |
+| [R2RMLTC0002j](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002j)           | ✅ passed |      10.5876  | Two columns mapping, qualified column names                                                                          |
+| [DirectGraphTC0003](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0003) | ✅ passed |      19.9405  | Three columns mapping, generation of a BlankNode                                                                     |
+| [R2RMLTC0003a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0003a)           | ✅ passed |       1.8756  | Three columns mapping, undefined SQL Version identifier                                                              |
+| [R2RMLTC0003b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0003b)           | ✅ passed |      10.1061  | Three columns mapping, concatenation of columns, by using a rr:sqlQuery to produce literal                           |
+| [R2RMLTC0003c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0003c)           | ✅ passed |       9.45929 | Three columns mapping, by using a rr:template to produce literal                                                     |
+| [DirectGraphTC0004](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0004) | ✅ passed |      16.7506  | Two column mapping, generation of a BlankNode subject                                                                |
+| [R2RMLTC0004a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0004a)           | ✅ passed |      14.379   | Two column mapping, from one row table to two different triples                                                      |
+| [R2RMLTC0004b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0004b)           | ✅ passed |       2.38111 | Two column mapping, presence of rr:termType rr:Literal on rr:subjectMap                                              |
+| [DirectGraphTC0005](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0005) | ❌ failed |      22.8952  | Generation of BlankNodes from duplicate tuples                                                                       |
+| [R2RMLTC0005a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0005a)           | ✅ passed |      11.417   | Typing of resources                                                                                                  |
+| [R2RMLTC0005b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0005b)           | ✅ passed |      16.3334  | Default mapping                                                                                                      |
+| [DirectGraphTC0006](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0006) | ❌ failed |      13.5651  | Generation of subjects                                                                                               |
+| [R2RMLTC0006a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0006a)           | ❌ failed |       7.93302 | Long form of R2RML by using rr:constant in rr:subjectMap, rr:predicateMap, rr:objectMap and rr:graphMap              |
+| [DirectGraphTC0007](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0007) | ❌ failed |      16.393   | Generation of a subject                                                                                              |
+| [R2RMLTC0007a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007a)           | ✅ passed |       9.11483 | Typing resources by relying on rdf:type predicate                                                                    |
+| [R2RMLTC0007b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007b)           | ❌ failed |      10.5929  | Assigning triples to Named Graphs                                                                                    |
+| [R2RMLTC0007c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007c)           | ✅ passed |      12.4292  | One column mapping, using rr:class                                                                                   |
+| [R2RMLTC0007d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007d)           | ✅ passed |      13.4742  | One column mapping, specifying an rr:predicateObjectMap with rdf:type                                                |
+| [R2RMLTC0007e](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007e)           | ❌ failed |      12.4834  | One column mapping, using rr:graphMap and rr:class                                                                   |
+| [R2RMLTC0007f](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007f)           | ❌ failed |      12.7115  | One column mapping, using rr:graphMap and specifying an rr:predicateObjectMap with rdf:type                          |
+| [R2RMLTC0007g](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007g)           | ✅ passed |      11.1146  | Assigning triples to the default graph                                                                               |
+| [R2RMLTC0007h](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007h)           | ✅ passed |       2.42287 | Assigning triples to a non-IRI named graph                                                                           |
+| [DirectGraphTC0008](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0008) | ❌ failed |      18.6915  | Generation of direct graph from a table with composite primary key                                                   |
+| [R2RMLTC0008a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0008a)           | ❌ failed |      14.584   | Generation of triples to a target graph by using rr:graphMap and rr:template                                         |
+| [R2RMLTC0008b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0008b)           | ❌ failed |       8.84789 | Generation of triples referencing object map                                                                         |
+| [R2RMLTC0008c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0008c)           | ❌ failed |       8.06557 | Generation of triples by using multiple predicateMaps within a rr:predicateObjectMap                                 |
+| [DirectGraphTC0009](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0009) | ❌ failed |      26.0719  | Two tables 1 primary key 1 foreign key                                                                               |
+| [R2RMLTC0009a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009a)           | ❌ failed |       9.77424 | Generation of triples from foreign key relations                                                                     |
+| [R2RMLTC0009b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009b)           | ❌ failed |      11.9183  | Generation of triples to multiple graphs                                                                             |
+| [R2RMLTC0009c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009c)           | ✅ passed |      12.0929  | Unnamed column in a logical table                                                                                    |
+| [R2RMLTC0009d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009d)           | ✅ passed |      16.5332  | Named column in logical table                                                                                        |
+| [DirectGraphTC0010](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0010) | ❌ failed |       5.89947 | Generation of direct graph for table names with spaces                                                               |
+| [R2RMLTC0010a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0010a)           | ✅ passed |       9.40534 | Template with table column with special chars                                                                        |
+| [R2RMLTC0010b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0010b)           | ✅ passed |      13.3404  | Template with table columns with special chars                                                                       |
+| [R2RMLTC0010c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0010c)           | ❌ failed |      11.2073  | Template with table columns with special chars and backslashes                                                       |
+| [DirectGraphTC0011](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0011) | ❌ failed |      91.8974  | Many to Many relations                                                                                               |
+| [R2RMLTC0011a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0011a)           | ❌ failed |      21.362   | M to M relation, by using a SQL query                                                                                |
+| [R2RMLTC0011b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0011b)           | ✅ passed |      25.3825  | M to M relation, by using an additional Triples Map                                                                  |
+| [DirectGraphTC0012](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0012) | ❌ failed |      44.9116  | Generation of direct graph from a database without primary keys                                                      |
+| [R2RMLTC0012a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0012a)           | ✅ passed |      16.5823  | Duplicate tuples generate same blank node                                                                            |
+| [R2RMLTC0012b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0012b)           | ✅ passed |      16.9773  | Duplicate tuples generate same blank node                                                                            |
+| [R2RMLTC0012c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0012c)           | ✅ passed |       1.95134 | TriplesMap without subjectMap                                                                                        |
+| [R2RMLTC0012d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0012d)           | ✅ passed |       2.26347 | TriplesMap with two subjectMap                                                                                       |
+| [R2RMLTC0012e](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0012e)           | ✅ passed |      28.4716  | Default mapping                                                                                                      |
+| [DirectGraphTC0013](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0013) | ❌ failed |      16.7598  | Generation of a direct graph from a table with NULL values                                                           |
+| [R2RMLTC0013a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0013a)           | ❌ failed |       8.02054 | Generation of empty triples from referenced columns that have null values                                            |
+| [DirectGraphTC0014](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0014) | ❌ failed |      50.6718  | Generation of direct graph from a database with primary key referencing candidate key                                |
+| [R2RMLTC0014a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0014a)           | ✅ passed |      15.0235  | Subjectmap with rr:inverseExpression                                                                                 |
+| [R2RMLTC0014b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0014b)           | ❌ failed |      21.5825  | Triplesmaps with rr:inverseExpression and rr:joinCondition                                                           |
+| [R2RMLTC0014c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0014c)           | ❌ failed |      19.7555  | Triplesmaps with rr:inverseExpression, rr:joinCondition, and referencing object maps                                 |
+| [R2RMLTC0014d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0014d)           | ✅ passed |      15.3915  | three tables, one primary key, one foreign key                                                                       |
+| [DirectGraphTC0015](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0015) | ❌ failed |      24.5041  | Generation of direct graph from multi-column primary keys                                                            |
+| [R2RMLTC0015a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0015a)           | ❌ failed |      10.5039  | Generation of language tags from a table with language information                                                   |
+| [R2RMLTC0015b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0015b)           | ✅ passed |       2.50249 | Generation of language tags from a table with language information, and a term map with invalid rr:language value    |
+| [DirectGraphTC0016](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0016) | ❌ failed |      33.768   | Generation of direct graph from a database with sql datatypes                                                        |
+| [R2RMLTC0016a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016a)           | ✅ passed |      18.3527  | Table with datatypes: string and integer                                                                             |
+| [R2RMLTC0016b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016b)           | ✅ passed |      16.6229  | Table with datatypes: real and float                                                                                 |
+| [R2RMLTC0016c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016c)           | ❌ failed |      16.2055  | Table with datatypes: date and timestamp                                                                             |
+| [R2RMLTC0016d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016d)           | ❌ failed |      13.9193  | Table with datatypes, boolean conversions                                                                            |
+| [R2RMLTC0016e](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016e)           | ❌ failed |      10.8141  | Table with datatypes, binary column                                                                                  |
+| [DirectGraphTC0018](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0018) | ❌ failed |      19.4077  | Generation of triples by using CHAR datatype column                                                                  |
+| [R2RMLTC0018a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0018a)           | ❌ failed |      14.768   | Generation of triples by using CHAR datatype column                                                                  |
+| [R2RMLTC0019a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0019a)           | ❌ failed |      10.652   | Generation of triples by using IRI value in columns                                                                  |
+| [R2RMLTC0019b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0019b)           | ✅ passed |       1.72005 | Generation of triples by using IRI value in columns, with data error                                                 |
+| [R2RMLTC0020a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0020a)           | ❌ failed |      12.5062  | Generation of triples by using IRI value in columns                                                                  |
+| [R2RMLTC0020b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0020b)           | ✅ passed |       1.8306  | Generation of triples by using IRI value in columns, with data errors                                                |
+| [DirectGraphTC0021](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0021) | ❌ failed |      35.0987  | Generation of triples for two tables, two primary keys, a foreign key, references all nulls                          |
+| [DirectGraphTC0022](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0022) | ❌ failed |      35.2496  | Generation of triples from two tables, a primary key, a foreign key, references no primary keys                      |
+| [DirectGraphTC0023](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0023) | ❌ failed |      37.9382  | Generation of triples for two tables, two primary keys, two foreign keys, references to a key other than primary key |
+| [DirectGraphTC0024](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0024) | ❌ failed |      34.4948  | Generation of triples from two tables, two primary keys, a foreign key to a row with some NULLs in the key.          |
+| [DirectGraphTC0025](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0025) | ❌ failed |      72.2027  | Generation of triples from three tables, three primary keys, three foreign keys                                      |
