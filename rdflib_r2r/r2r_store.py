@@ -54,17 +54,27 @@ class Mapping(NamedTuple):
 
                 s_map = BNode()
                 mg.add([tm, rr.subjectMap, s_map])
-                mg.add([s_map, rr.termType, rr.BlankNode])
                 mg.add([s_map, rr["class"], base[table.name]])
+                
+                if table.primary_key:
+                    parts = ['%s={%s}' % (c.name,c.name) for c in table.primary_key]
+                    template = baseuri + table.name + '/' + ';'.join(parts)
+                    mg.add([s_map, rr.template, Literal(template)])
+                else:
+                    mg.add([s_map, rr.termType, rr.BlankNode])
+
+                # if table.foreign_keys:
+
+
                 for column in table.c:
                     po_map = BNode()
                     mg.add([tm, rr.predicateObjectMap, po_map])
                     pred = base[f"{table.name}#{column.name}"]
                     mg.add([po_map, rr.predicate, pred])
+
                     o_map = BNode()
                     mg.add([po_map, rr.objectMap, o_map])
                     mg.add([o_map, rr.column, Literal(f'"{column.name}"')])
-                    logging.warn(("column.type", column.type))
                     if isinstance(column.type, sqltypes.Integer):
                         mg.add([o_map, rr.datatype, XSD.integer])
 
@@ -151,7 +161,7 @@ class R2RStore(Store):
         elif graph.value(parent, mapper):
             for tmap in graph[parent:mapper]:
                 if graph.value(tmap, rr.constant):
-                    yield literal_column("'<%s>'" % graph.value(tmap, rr.constant))
+                    yield literal_column("'%s'" % graph.value(tmap, rr.constant).n3())
                 else:
                     termtype = graph.value(tmap, rr.termType) or rr.IRI
                     if graph.value(tmap, rr.column):
@@ -161,6 +171,14 @@ class R2RStore(Store):
                     elif graph.value(tmap, rr.template):
                         template = graph.value(tmap, rr.template)
                         urifunc = cls._template_to_function(template)
+                    elif graph.value(tmap, rr.parentTriplesMap):
+                        ref = graph.value(tmap, rr.parentTriplesMap)
+                        if graph.value(tmap, rr.joinCondition):
+                            continue
+                        else:
+                            rs = cls._term_map(graph, ref, rr.subjectMap, rr.subject)
+                            yield from rs
+                            continue
                     else:
                         yield literal_column("'_:'")
                         continue
@@ -279,12 +297,14 @@ class R2RStore(Store):
                                             for g2 in v.get('g', ['_:']):
                                                 if g2 != g:
                                                     gnode = from_n3(g2)
+                                                
+                                                logging.warn(('spog', s, p, o, g))
                                                 yield (snode, pnode, onode), gnode
 
     @staticmethod
     def _iri_encode(iri):
         parts = iri.split("/", 3)
-        parts[-1] = quote(parts[-1], safe="/#;")
+        parts[-1] = quote(parts[-1], safe="/#;=")
         return "/".join(parts)
 
     def create(self, configuration):

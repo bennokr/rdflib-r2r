@@ -3,14 +3,17 @@ Run tests from [https://www.w3.org/TR/2012/NOTE-rdb2rdf-test-cases-20120814/]
 
 Downloaded from [https://dvcs.w3.org/hg/rdb2rdf-tests/raw-file/default/rdb2rdf-ts.zip]
 """
-import pytest
+
 import pathlib
 import logging
 from typing import NamedTuple
+import re
 
+import pytest
 import rdflib
 from rdflib.namespace import RDF, Namespace
 from rdflib.compare import to_isomorphic, graph_diff
+from rdflib.util import from_n3
 from sqlalchemy import create_engine, text, engine as sqlengine
 
 from rdflib_r2r.r2r_store import R2RStore, Mapping
@@ -83,7 +86,7 @@ PATHS = sorted(
     path
     for path in pathlib.Path(__file__).parent.joinpath("rdb2rdf-ts").iterdir()
     if path.name[0] != "."
-)[:7]
+)#[:10]
 
 TESTS = [
     testcase
@@ -108,11 +111,20 @@ def test_rdb2rdf(testcase: TestCase):
 
     outfile = testcase.path.joinpath(testcase.meta[rdb2rdftest.output])
     fmt = rdflib.util.guess_format(str(outfile))
-    g2 = rdflib.ConjunctiveGraph().parse(str(outfile), format=fmt)
-    logging.warn(("g2", type(g2), len(list(g2)), g2.serialize(format='turtle')))
-
-    if hasattr(g2, 'quads'):
-        logging.warn(('g2.quads()', len(g2.quads())))
+    if fmt == 'nquads':
+        rx = re.compile(r'([^ ]+) ([^ ]+) (.+?) ?(?: (<[^>]+>))? \.$')
+        g2 = rdflib.ConjunctiveGraph()
+        for li, l in enumerate(open(outfile).read().splitlines()):
+            if l.strip():
+                m = rx.match(l.strip())
+                if m:
+                    g2.add(tuple(from_n3(n) for n in m.groups()))
+                else:
+                    logging.warn(f"bad nquads line {li} in {outfile}: {l}")
+        logging.warn(("g2", type(g2), len(list(g2)), list(g2)))
+    else:
+        g2 = rdflib.Graph().parse(str(outfile), format=fmt)
+        logging.warn(("g2", type(g2), len(list(g2)), g2.serialize(format='turtle')))
 
     # l1 = list(g1)
     # g1 = rdflib.Graph()
