@@ -13,7 +13,7 @@ from rdflib.namespace import RDF, XSD, Namespace
 from rdflib.store import Store
 from rdflib.util import from_n3
 
-from sqlalchemy import MetaData, select, text, literal, literal_column, union_all
+from sqlalchemy import MetaData, select, text, null, literal_column, union_all
 from sqlalchemy import types as sqltypes, func as sqlfunc
 
 from urllib.parse import quote
@@ -73,7 +73,6 @@ class Mapping(NamedTuple):
 
     @staticmethod
     def cols_to_rownode(cols):
-        # TODO: IRI-encode
         vals = [
             x
             for c in cols
@@ -131,6 +130,90 @@ class R2RStore(Store):
         """The number of shared subject-object in the DB mapping."""
         raise NotImplementedError
 
+    @staticmethod
+    def _template_to_function(template):
+        prefix, *rest = template.split("{")
+        parts = [prefix] + [
+            x
+            for part in rest
+            for col, _, suffix in [part.partition("}")]
+            for x in (literal_column(col).cast(sqltypes.String), suffix)
+            if x != ""
+        ]
+        logging.warn(("template_to_function", parts))
+        return functools.reduce(operator.add, parts)
+
+    @classmethod
+    def _term_map(cls, graph, parent, mapper, shortcut, obj=False):
+        if graph.value(parent, shortcut):
+            for column in graph[parent:shortcut]:
+                yield literal_column("'<%s>'" % column)
+        elif graph.value(parent, mapper):
+            for tmap in graph[parent:mapper]:
+                if graph.value(tmap, rr.constant):
+                    yield literal_column("'<%s>'" % graph.value(tmap, rr.constant))
+                else:
+                    termtype = graph.value(tmap, rr.termType) or rr.IRI
+                    if graph.value(tmap, rr.column):
+                        urifunc = literal_column(graph.value(tmap, rr.column))
+                        if obj:
+                            termtype = rr.Literal
+                    elif graph.value(tmap, rr.template):
+                        template = graph.value(tmap, rr.template)
+                        urifunc = cls._template_to_function(template)
+                    else:
+                        yield literal_column("'_:'")
+                        continue
+                    
+                    if termtype == rr.IRI:
+                        yield "<" + urifunc + ">"
+                    elif termtype == rr.BlankNode:
+                        yield "_:" + urifunc
+                    elif obj:
+                        if graph.value(tmap, rr.language):
+                            lang = graph.value(tmap, rr.language)
+                            yield '"' + urifunc + '"@' + str(lang)
+                        elif graph.value(tmap, rr.datatype):
+                            dtype = graph.value(tmap, rr.datatype)
+                            yield '"' + urifunc + '"^^' + dtype.n3()
+                        else:
+                            yield urifunc # keep original datatype
+                    else:
+                        yield literal_column("'_:'")
+    
+    @classmethod
+    def _triplesmap_select(cls, mg, tmap):
+        logtable = mg.value(tmap, rr.logicalTable)
+        if mg.value(logtable, rr.tableName):
+            dbtable = text(mg.value(logtable, rr.tableName).toPython())
+        else:
+            sqlquery = mg.value(logtable, rr.sqlQuery)
+            dbtable = text(f"({sqlquery})")
+
+        terms = {}
+        for s in cls._term_map(mg, tmap, rr.subjectMap, rr.subject):
+            terms['s'] = s
+        s_map = mg.value(tmap, rr.subjectMap)
+        gs = cls._term_map(mg, s_map, rr.graphMap, rr.graph)
+        for gi, g in enumerate(gs):
+            terms[f'g{gi}'] = g
+        for ci, c in enumerate(mg[s_map : rr["class"]]):
+            terms[f'c{ci}'] = literal_column("'%s'" % c.n3())
+
+        # Predicate-Object Maps
+        for po_i, po_map in enumerate(mg[tmap : rr.predicateObjectMap :]):
+            ps = cls._term_map(mg, po_map, rr.predicateMap, rr.predicate)
+            for pi, p in enumerate(ps):
+                terms[f'v{po_i}-p{pi}'] = p
+            os = cls._term_map(mg, po_map, rr.objectMap, rr.object, True)
+            for oi, o in enumerate(os):
+                terms[f'v{po_i}-o{oi}'] = o
+            gs = cls._term_map(mg, po_map, rr.graphMap, rr.graph)
+            for gi, g in enumerate(gs):
+                terms[f'v{po_i}-g{gi}'] = g
+        
+        return select(*[v.label(k) for k,v in terms.items()]).select_from(dbtable)
+
     def triples(self, pattern, context) -> Iterable[Triple]:
         """Search for a triple pattern in a DB mapping.
 
@@ -141,33 +224,6 @@ class R2RStore(Store):
         Returns: An iterator that produces RDF triples matching the input triple pattern.
         """
 
-        def get_col(dbtable, colname):
-            try:
-                return dbtable.c[colname[1:-1]]
-            except KeyError:
-                # rr.sqlQuery is set
-                return literal_column(colname)
-
-        def template_to_function(dbtable, template):
-            # TODO: IRI-encode
-            prefix, *rest = template.split("{")
-            parts = [prefix] + [
-                x
-                for part in rest
-                for colname, _, suffix in [part.partition("}")]
-                for x in (get_col(dbtable, colname).cast(sqltypes.String), suffix)
-                if x != ""
-            ]
-            logging.warn(("template_to_function", parts))
-            return functools.reduce(operator.add, parts)
-
-        def quad_query(dbtable, s_func, p_func, o_func, g_func):
-            return select(
-                s_func.label("s"),
-                p_func.label("p"),
-                o_func.label("o"),
-                g_func.label("g"),
-            ).select_from(dbtable)
 
         mg = self.mapping.graph
         with self.db.connect() as conn:
@@ -178,110 +234,56 @@ class R2RStore(Store):
 
                 # Triple Maps
                 for tm in mg[: RDF.type : rr.TriplesMap]:
-                    logtable = mg.value(tm, rr.logicalTable)
-                    if mg.value(logtable, rr.tableName):
-                        tablename = mg.value(logtable, rr.tableName).toPython()[1:-1]
-                        dbtable = metadata.tables[tablename]
-                    else:
-                        sqlquery = mg.value(logtable, rr.sqlQuery)
-                        dbtable = select(text(f"* FROM ({sqlquery})")).subquery()
+                    
+                    query = self._triplesmap_select(mg, tm)
 
-                    g_func = literal_column("'<graph>'")
-
-                    # Subject Map
-                    s_map = mg.value(tm, rr.subjectMap)
-                    s_termtype: Optional[URIRef] = mg.value(s_map, rr.termType)
-                    if mg.value(s_map, rr.constant):
-                        s_const = mg.value(s_map, rr.constant).toPython()
-                        s_func = literal_column("'<%s>'" % s_const)
-                    elif mg.value(s_map, rr.template) or mg.value(s_map, rr.column):
-                        s_template = mg.value(s_map, rr.template)
-                        if s_template:
-                            s_urifunc = template_to_function(dbtable, s_template)
-                            s_termtype = s_termtype or rr.IRI
-                        else:
-                            s_column = mg.value(s_map, rr.column).toPython()
-                            s_urifunc = literal_column(s_column)
-                            s_termtype = s_termtype or rr.Literal
-                        if s_termtype == rr.IRI:
-                            s_func = "<" + s_urifunc + ">"
-                        else:
-                            s_func = "_:" + s_urifunc
-                    elif s_termtype == rr.BlankNode:
-                        s_func = "_:" + Mapping.cols_to_rownode(dbtable.c)
-
-                    for s_class in mg[s_map : rr["class"]]:
-                        type_func = literal_column("'%s'" % RDF.type.n3())
-                        cls_func = literal_column("'%s'" % s_class.n3())
-                        q = quad_query(dbtable, s_func, type_func, cls_func, g_func)
-                        qunion.append(q)
-
-                    # Predicate-Object Maps
-                    for po_map in mg[tm : rr.predicateObjectMap :]:
-                        if mg.value(po_map, rr.predicate):
-                            p_const = mg.value(po_map, rr.predicate)
-                        else:
-                            p_map = mg.value(po_map, rr.predicateMap)
-                            p_const = mg.value(p_map, rr.constant)
-                        p_func = literal_column("'<%s>'" % p_const)
-
-                        o_map = mg.value(po_map, rr.objectMap)
-                        if not o_map:
-                            o_const = mg.value(po_map, rr.object)
-                            o_func = literal_column("'<%s>'" % o_const)
-                        elif mg.value(o_map, rr.constant):
-                            o_const = mg.value(o_map, rr.constant)
-                            o_func = literal_column("'<%s>'" % o_const)
-                        else:
-                            o_template = mg.value(o_map, rr.template)
-                            o_termtype: Optional[URIRef] = mg.value(o_map, rr.termType)
-                            if o_template:
-                                o_urifunc = template_to_function(dbtable, o_template)
-                                o_termtype = o_termtype or rr.IRI
+                    for row in conn.execute(query):
+                        fields = {}
+                        for k, v in row._mapping.items():
+                            a, _, b = k.partition('-')
+                            if not b:
+                                fields.setdefault(a[0], []).append(v)
                             else:
-                                o_column = mg.value(o_map, rr.column).toPython()
-                                o_urifunc = literal_column(o_column)
-                                o_termtype = o_termtype or rr.Literal
-
-                            if o_termtype == rr.IRI:
-                                o_func = "<" + o_urifunc + ">"
-                            else:
-                                if mg.value(o_map, rr.language):
-                                    o_func = '"' + o_urifunc + '"'
-                                    o_func += "@" + str(mg.value(o_map, rr.language))
-                                elif mg.value(o_map, rr.datatype):
-                                    o_func = '"' + o_urifunc + '"'
-                                    o_func += "^^" + mg.value(o_map, rr.datatype).n3()
+                                field = fields.setdefault(a[0], {}) \
+                                    .setdefault(a[1:], {}) \
+                                    .setdefault(b[0], []).append(v)
+                        
+                        for s in fields['s']:
+                            for g in fields.get('g', ['_:']):
+                                gnode = from_n3(g)
+                                if s.startswith("<"):
+                                    snode = URIRef(self._iri_encode(s[1:-1]))
+                                elif s == '_:':
+                                    snode = BNode()
                                 else:
-                                    o_func = o_urifunc
+                                    snode = BNode(hex(hash(s) ** 2)[2:])
+                                
+                                for c in fields.get('c', []):
+                                    cnode = from_n3(c)
+                                    yield (snode, RDF.type, cnode), gnode
+                                
+                                for v in fields['v'].values():
+                                    for p in v['p']:
+                                        pnode = URIRef(self._iri_encode(p[1:-1]))
 
-                        q = quad_query(dbtable, s_func, p_func, o_func, g_func)
-                        qunion.append(q)
+                                        for o in v['o']:
+                                            o_isstr = isinstance(o, str)
+                                            if (not o_isstr) or (o[0] not in '"<_'):
+                                                onode = Literal(o)
+                                            elif o.startswith("<"):
+                                                o_uri = self._iri_encode(o[1:-1])
+                                                onode = URIRef(o_uri)
+                                            else:
+                                                onode = from_n3(o)
 
-            if qunion:
-                query = union_all(*qunion) if len(qunion) > 1 else qunion[0]
-                for s, p, o, g in conn.execute(query):
-                    logging.warn(("spog", (s, p, o, g)))
-                    if s.startswith("<"):
-                        snode = URIRef(self._iri_encode(s[1:-1]))
-                    else:
-                        snode = BNode(hex(hash(s) ** 2)[2:])
-
-                    pnode = URIRef(self._iri_encode(p[1:-1]))
-
-                    if (not isinstance(o, str)) or (o[0] not in '"<_'):
-                        onode = Literal(o)
-                    elif o.startswith("<"):
-                        onode = URIRef(self._iri_encode(o[1:-1]))
-                    else:
-                        onode = from_n3(o)
-
-                    yield (snode, pnode, onode), from_n3(g)
+                                            for g2 in v.get('g', ['_:']):
+                                                if g2 != g:
+                                                    gnode = from_n3(g2)
+                                                yield (snode, pnode, onode), gnode
 
     @staticmethod
     def _iri_encode(iri):
         parts = iri.split("/", 3)
-        logging.warn(("parts", parts))
         parts[-1] = quote(parts[-1], safe="/#;")
         return "/".join(parts)
 
