@@ -27,7 +27,7 @@ base = Namespace("http://www.w3.org/2001/sw/rdb2rdf/test-cases/#")
 
 class TestCase(NamedTuple):
     id: str
-    db: sqlengine.Engine
+    sql_fname: str
     path: pathlib.Path
     meta: dict
 
@@ -45,21 +45,6 @@ def yield_database_testcases(path: pathlib.Path):
     for dbspec in g[: RDF.type : rdb2rdftest.DataBase]:
         logging.warn("Loading DB: '%s'", g.value(dbspec, dcterms.title))
         sql_fname = g.value(dbspec, rdb2rdftest.sqlScriptFile)
-        sql_script = path.joinpath(sql_fname).open().read()
-        db = setup_engine()
-        connection = db.raw_connection()
-        try:
-            cursor = connection.cursor()
-            cursor.execute(sql_script)
-        except:
-            try:
-                cursor.executescript(sql_script)
-            except Exception as e:
-                raise Exception(f"Problem with {path}")
-        finally:
-            connection.close()
-        # with db.connect() as conn:
-        # conn.execute(text(sql_script))
 
         for testspec in g.objects(dbspec, rdb2rdftest.relatedTestCase):
             id = g.value(testspec, dcterms.identifier)
@@ -70,7 +55,7 @@ def yield_database_testcases(path: pathlib.Path):
                 yield pytest.param(
                     TestCase(
                         id=str(id),
-                        db=db,
+                        sql_fname=sql_fname,
                         path=path,
                         meta=dict(g[testspec:]),
                     ),
@@ -79,20 +64,48 @@ def yield_database_testcases(path: pathlib.Path):
                 )
 
 
-def setup_engine():
-    import sqlite3
+def setup_engine(name):
+    if name == "sqlite":
+        import sqlite3
 
-    sqlite3.register_adapter(bool, int)
-    sqlite3.register_converter("BOOLEAN", lambda v: bool(int(v)))
+        sqlite3.register_adapter(bool, int)
+        sqlite3.register_converter("BOOLEAN", lambda v: bool(int(v)))
 
-    return create_engine(
-        "sqlite:///:memory:",
-        echo=True,
-        future=True,
-        connect_args={"detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES},
-        native_datetime=True,
-    )
+        return create_engine(
+            "sqlite:///:memory:",
+            echo=True,
+            future=True,
+            connect_args={
+                "detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
+            },
+            native_datetime=True,
+        )
+    
+    if name == "duckdb":
+        return create_engine("duckdb:///:memory:", connect_args={
+            'read_only':False
+        })
 
+def create_database(db, path, sql_fname):
+    sql_script = path.joinpath(sql_fname).open().read()
+    connection = db.raw_connection()
+    logging.warn(connection.connection)
+    try:
+        connection.execute(sql_script, (), None)
+    except Exception as e:
+        logging.warn(e)
+        try:
+            cursor = connection.cursor()
+            cursor.execute(sql_script)
+        except Exception as e:
+            logging.warn(e)
+            try:
+                cursor = connection.cursor()
+                cursor.executescript(sql_script)
+            except Exception as e:
+                raise Exception(f"Problem with {path}: {e}")
+    finally:
+        connection.close()
 
 PATHS = sorted(
     path
@@ -108,7 +121,13 @@ TESTS = [
 
 
 @pytest.mark.parametrize("testcase", TESTS, ids=[t.id for t in TESTS])
-def test_rdb2rdf(testcase: TestCase):
+@pytest.mark.parametrize("engine_name", ["sqlite", "duckdb"])
+# @pytest.mark.parametrize("engine_name", ["duckdb"])
+def test_rdb2rdf(testcase: TestCase, engine_name: str):
+    # Create database
+    db = setup_engine(engine_name)
+    create_database(db, testcase.path, testcase.sql_fname)
+
     # Create mapped R2RStore
     mapping = None
     if rdb2rdftest.mappingDocument in testcase.meta:
@@ -117,9 +136,9 @@ def test_rdb2rdf(testcase: TestCase):
         mapping = Mapping(rdflib.Graph().parse(str(mapfile), format=fmt))
     else:
         # Make direct mapping
-        mapping = Mapping.from_db(testcase.db)
+        mapping = Mapping.from_db(db)
 
-    g_made = rdflib.Graph(R2RStore(db=testcase.db, mapping=mapping))
+    g_made = rdflib.Graph(R2RStore(db=db, mapping=mapping))
 
     outfile = testcase.path.joinpath(testcase.meta[rdb2rdftest.output])
     fmt = rdflib.util.guess_format(str(outfile))
@@ -187,5 +206,5 @@ def test_synthesis(module_results_df):
     df["status"] = df["status"].apply(lambda s: status_emoji.get(s, "") + " " + s)
     with open("test-results.md", "w") as fw:
         print("# Test results\n", file=fw)
-        df = df[["link", "status", "duration_ms", "title"]]
+        df = df[["engine_name", "link", "status", "duration_ms", "title"]]
         print(df.to_markdown(index=False), file=fw)

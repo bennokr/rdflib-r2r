@@ -170,9 +170,9 @@ class R2RStore(Store):
                 if isinstance(dbcol.type, sqltypes.Numeric):
                     if dbcol.type.precision:
                         return sqlfunc.hex(dbcol)
-                return dbcol.cast(sqltypes.String)
+                return dbcol.cast(sqltypes.VARCHAR)
             else:
-                return literal_column(f"{tname}.{col}").cast(sqltypes.String)
+                return literal_column(f"{tname}.{col}").cast(sqltypes.VARCHAR)
 
         parts = [
             x
@@ -227,9 +227,8 @@ class R2RStore(Store):
                     else:
                         # WARNING: Rowid is not supported in all RDBs!
                         # TODO: replace with RDB-specific construct (postgresql?)
-                        yield f"_:{tname}#" + literal_column(f"{tname}.rowid").cast(
-                            sqltypes.String
-                        )
+                        rowid = literal_column(f"{tname}.rowid").cast(sqltypes.VARCHAR)
+                        yield f"_:{tname}#" + rowid
                         continue
 
                     if termtype == rr.IRI:
@@ -313,7 +312,7 @@ class R2RStore(Store):
                 for tm in mg[: RDF.type : rr.TriplesMap]:
 
                     query = self._triplesmap_select(metadata, mg, tm)
-
+                    logging.warn(('query', str(query)))
                     for row in conn.execute(query):
                         fields = {}
                         for k, v in row._mapping.items():

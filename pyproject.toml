@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "rdflib_r2r"
+version = "0.1.0"
+description = "A wrapper for accessing existing relational databases from rdflib using r2rml rdb2rdf mappings."
+authors = ["Benno Kruit <bennokr@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.7.1"
+rdflib = "^5.0.0"
+sqlalchemy = "^1.3.19"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
+pytest-harvest = "^1.10.3"
+pandas = "^1.2.4"
+tabulate = "^0.8.9"
+duckdb-engine = {path = "../duckdb_engine", develop=true}
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
