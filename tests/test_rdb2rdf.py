@@ -8,6 +8,7 @@ import pathlib
 import logging
 from typing import NamedTuple
 import re
+import base64
 
 import pytest
 import rdflib
@@ -65,7 +66,7 @@ def yield_database_testcases(path: pathlib.Path):
             if id:
                 marks = []
                 if not g.value(testspec, rdb2rdftest.hasExpectedOutput).toPython():
-                    marks.append( pytest.mark.xfail )
+                    marks.append(pytest.mark.xfail)
                 yield pytest.param(
                     TestCase(
                         id=str(id),
@@ -74,19 +75,30 @@ def yield_database_testcases(path: pathlib.Path):
                         meta=dict(g[testspec:]),
                     ),
                     id=str(id),
-                    marks=marks
+                    marks=marks,
                 )
 
 
 def setup_engine():
-    return create_engine("sqlite:///:memory:", echo=True, future=True)
+    import sqlite3
+
+    sqlite3.register_adapter(bool, int)
+    sqlite3.register_converter("BOOLEAN", lambda v: bool(int(v)))
+
+    return create_engine(
+        "sqlite:///:memory:",
+        echo=True,
+        future=True,
+        connect_args={"detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES},
+        native_datetime=True,
+    )
 
 
 PATHS = sorted(
     path
     for path in pathlib.Path(__file__).parent.joinpath("rdb2rdf-ts").iterdir()
     if path.name[0] != "."
-)#[:10]
+)
 
 TESTS = [
     testcase
@@ -107,45 +119,55 @@ def test_rdb2rdf(testcase: TestCase):
         # Make direct mapping
         mapping = Mapping.from_db(testcase.db)
 
-    g1 = rdflib.Graph(R2RStore(db=testcase.db, mapping=mapping))
+    g_made = rdflib.Graph(R2RStore(db=testcase.db, mapping=mapping))
 
     outfile = testcase.path.joinpath(testcase.meta[rdb2rdftest.output])
     fmt = rdflib.util.guess_format(str(outfile))
-    if fmt == 'nquads':
-        rx = re.compile(r'([^ ]+) ([^ ]+) (.+?) ?(?: (<[^>]+>))? \.$')
-        g2 = rdflib.ConjunctiveGraph()
+    if fmt == "nquads":
+        rx = re.compile(r"([^ ]+) ([^ ]+) (.+?) ?(?: (<[^>]+>))? \.$")
+        g_goal = rdflib.ConjunctiveGraph()
         for li, l in enumerate(open(outfile).read().splitlines()):
             if l.strip():
                 m = rx.match(l.strip())
                 if m:
-                    g2.add(tuple(from_n3(n) for n in m.groups()))
+                    g_goal.add(tuple(from_n3(n) for n in m.groups()))
                 else:
                     logging.warn(f"bad nquads line {li} in {outfile}: {l}")
-        logging.warn(("g2", type(g2), len(list(g2)), list(g2)))
+        logging.warn(("g_goal", type(g_goal), len(list(g_goal)), list(g_goal)))
     else:
-        g2 = rdflib.Graph().parse(str(outfile), format=fmt)
-        logging.warn(("g2", type(g2), len(list(g2)), g2.serialize(format='turtle')))
+        g_goal = rdflib.Graph().parse(str(outfile), format=fmt)
+        logging.warn(
+            (
+                "g_goal",
+                type(g_goal),
+                len(list(g_goal)),
+                g_goal.serialize(format="turtle"),
+            )
+        )
 
-    # l1 = list(g1)
-    # g1 = rdflib.Graph()
+    # l1 = list(g_made)
+    # g_made = rdflib.Graph()
     # for t in l1:
-    #     g1.add(t)
-    # s1 = g1.serialize(format="turtle")
+    #     g_made.add(t)
+    # s1 = g_made.serialize(format="turtle")
     # for t in l1:
-    #     logging.warn(("g1", t))
-    # logging.warn(("g1", len(l1), s1))
-    # logging.warn(("g2", len(list(g2)), g2.serialize(format="turtle")))
+    #     logging.warn(("g_made", t))
+    # logging.warn(("g_made", len(l1), s1))
+    # logging.warn(("g_goal", len(list(g_goal)), g_goal.serialize(format="turtle")))
 
-    iso1, iso2 = to_isomorphic(g1), to_isomorphic(g2)
-    in_both, in_1, in_2 = graph_diff(iso1, iso2)
+    iso_made, iso_goal = to_isomorphic(g_made), to_isomorphic(g_goal)
+    in_both, in_made, in_goal = graph_diff(iso_made, iso_goal)
 
     def dump_nt_sorted(g):
-        return sorted(g.serialize(format="nt").splitlines())
+        return sorted(g.serialize(format="nt").strip().splitlines())
 
-    logging.warn(("in_both", len(list(in_both)), dump_nt_sorted(in_both)))
-    logging.warn(("in_1", len(list(in_1)), dump_nt_sorted(in_1)))
-    logging.warn(("in_2", len(list(in_2)), dump_nt_sorted(in_2)))
-    assert iso1 == iso2
+    for li, line in enumerate(dump_nt_sorted(in_both)):
+        logging.warn(f"in_both {li}/{len(list(in_both))}: {line}")
+    for li, line in enumerate(dump_nt_sorted(in_made)):
+        logging.warn(f"in_made {li}/{len(list(in_made))}: {line}")
+    for li, line in enumerate(dump_nt_sorted(in_goal)):
+        logging.warn(f"in_goal {li}/{len(list(in_goal))}: {line}")
+    assert iso_made == iso_goal
 
 
 def test_synthesis(module_results_df):
@@ -161,8 +183,8 @@ def test_synthesis(module_results_df):
         "xfailed": "🔆",
         "xpassed": "❗️",
     }
-    logging.warn(('statuses', set(df["status"])))
-    df["status"] = df["status"].apply(lambda s: status_emoji.get(s,'') + " " + s)
+    logging.warn(("statuses", set(df["status"])))
+    df["status"] = df["status"].apply(lambda s: status_emoji.get(s, "") + " " + s)
     with open("test-results.md", "w") as fw:
         print("# Test results\n", file=fw)
         df = df[["link", "status", "duration_ms", "title"]]

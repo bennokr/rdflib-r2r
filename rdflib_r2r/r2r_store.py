@@ -2,11 +2,15 @@
 rdflib_r2r.r2r_store
 =======================
 """
+from os import linesep
 from typing import Iterable
 import logging
 import functools
 import operator
-import itertools
+import base64
+import urllib.parse
+import re
+from string import Formatter
 
 from rdflib import Graph, URIRef, Literal, BNode
 from rdflib.namespace import RDF, XSD, Namespace
@@ -14,13 +18,19 @@ from rdflib.store import Store
 from rdflib.util import from_n3
 
 from sqlalchemy import MetaData, select, text, null, literal_column, union_all
-from sqlalchemy import types as sqltypes, func as sqlfunc
-
-from urllib.parse import quote
+from sqlalchemy import schema as sqlschema, types as sqltypes, func as sqlfunc
 
 from rdflib_r2r.types import Any, Optional, Engine, Triple, NamedTuple
 
 rr = Namespace("http://www.w3.org/ns/r2rml#")
+
+
+def iri_safe(v):
+    return urllib.parse.quote(v, safe="/#;=")
+
+
+def iri_unsafe(v):
+    return urllib.parse.unquote(v)
 
 
 class Mapping(NamedTuple):
@@ -45,8 +55,9 @@ class Mapping(NamedTuple):
         with db.connect() as conn:
             metadata = MetaData(conn)
             metadata.reflect(db)
+            tmaps = {}
             for tablename, table in metadata.tables.items():
-                tm = BNode()
+                tm = tmaps.setdefault(tablename, BNode())
                 mg.add([tm, RDF.type, rr.TriplesMap])
                 logtable = BNode()
                 mg.add([tm, rr.logicalTable, logtable])
@@ -54,23 +65,21 @@ class Mapping(NamedTuple):
 
                 s_map = BNode()
                 mg.add([tm, rr.subjectMap, s_map])
-                mg.add([s_map, rr["class"], base[table.name]])
-                
+                mg.add([s_map, rr["class"], base[iri_safe(table.name)]])
+
                 if table.primary_key:
-                    parts = ['%s={%s}' % (c.name,c.name) for c in table.primary_key]
-                    template = baseuri + table.name + '/' + ';'.join(parts)
+                    parts = ['%s={"%s"}' % (c.name, c.name) for c in table.primary_key]
+                    template = baseuri + table.name + "/" + ";".join(parts)
                     mg.add([s_map, rr.template, Literal(template)])
                 else:
                     mg.add([s_map, rr.termType, rr.BlankNode])
 
-                # if table.foreign_keys:
-
-
                 for column in table.c:
+                    # Add a predicate-object map per column
                     po_map = BNode()
                     mg.add([tm, rr.predicateObjectMap, po_map])
-                    pred = base[f"{table.name}#{column.name}"]
-                    mg.add([po_map, rr.predicate, pred])
+                    pname = f"{table.name}#{column.name}"
+                    mg.add([po_map, rr.predicate, base[iri_safe(pname)]])
 
                     o_map = BNode()
                     mg.add([po_map, rr.objectMap, o_map])
@@ -78,18 +87,27 @@ class Mapping(NamedTuple):
                     if isinstance(column.type, sqltypes.Integer):
                         mg.add([o_map, rr.datatype, XSD.integer])
 
-        logging.warn("direct: %s", mg.serialize(format="turtle"))
-        return cls(mg)
+                    for fk in column.foreign_keys:
+                        # Add another predicate-object map for every foreign key
+                        po_map = BNode()
+                        mg.add([tm, rr.predicateObjectMap, po_map])
+                        pname = f"{table.name}#ref-{column.name}"
+                        mg.add([po_map, rr.predicate, base[iri_safe(pname)]])
 
-    @staticmethod
-    def cols_to_rownode(cols):
-        vals = [
-            x
-            for c in cols
-            for x in [c.name, "=", sqlfunc.cast(c, sqltypes.String), ";"]
-        ]
-        logging.warn(("cols_to_rownode", vals))
-        return functools.reduce(operator.add, vals[:-1])
+                        o_map = BNode()
+                        mg.add([po_map, rr.objectMap, o_map])
+                        ref = fk.column
+                        refmap = tmaps.setdefault(ref.table.name, BNode())
+                        mg.add([o_map, rr.parentTriplesMap, refmap])
+                        join = BNode()
+                        mg.add([o_map, rr.joinCondition, join])
+                        mg.add([join, rr.child, Literal(f'"{column.name}"')])
+                        mg.add([join, rr.parent, Literal(f'"{ref.name}"')])
+
+        logging.warn("direct:")
+        for line in mg.serialize(format="turtle").decode().splitlines():
+            logging.warn(line)
+        return cls(mg)
 
 
 class R2RStore(Store):
@@ -141,48 +159,79 @@ class R2RStore(Store):
         raise NotImplementedError
 
     @staticmethod
-    def _template_to_function(template):
-        prefix, *rest = template.split("{")
-        parts = [prefix] + [
+    def _template_to_function(dbtable, tname, template):
+        # make python format string: escape curly braces by doubling {{ }}
+        template = re.sub("\\\\[{}]", lambda x: x.group(0)[1] * 2, template)
+
+        def get_col(col):
+            if type(dbtable) is sqlschema.Table:
+                dbcol = dbtable.c[col.strip('"')]
+                logging.warn(("dbtable[col]", dbcol))
+                if isinstance(dbcol.type, sqltypes.Numeric):
+                    if dbcol.type.precision:
+                        return sqlfunc.hex(dbcol)
+                return dbcol.cast(sqltypes.String)
+            else:
+                return literal_column(f"{tname}.{col}").cast(sqltypes.String)
+
+        parts = [
             x
-            for part in rest
-            for col, _, suffix in [part.partition("}")]
-            for x in (literal_column(col).cast(sqltypes.String), suffix)
+            for prefix, col, _, _ in Formatter().parse(template)
+            for x in (
+                prefix,
+                get_col(col) if col else "",
+            )
             if x != ""
         ]
         logging.warn(("template_to_function", parts))
         return functools.reduce(operator.add, parts)
 
     @classmethod
-    def _term_map(cls, graph, parent, mapper, shortcut, obj=False):
+    def _term_map(cls, graph, tname, dbtable, parent, mapper, shortcut, obj=False):
         if graph.value(parent, shortcut):
-            for column in graph[parent:shortcut]:
-                yield literal_column("'<%s>'" % column)
+            # constant shortcut properties
+            for const in graph[parent:shortcut]:
+                yield literal_column("'%s'" % iri_unsafe(const.n3()))
         elif graph.value(parent, mapper):
             for tmap in graph[parent:mapper]:
                 if graph.value(tmap, rr.constant):
-                    yield literal_column("'%s'" % graph.value(tmap, rr.constant).n3())
+                    # constant value
+                    for const in graph[tmap : rr.constant]:
+                        yield literal_column("'%s'" % iri_unsafe(const.n3()))
                 else:
                     termtype = graph.value(tmap, rr.termType) or rr.IRI
                     if graph.value(tmap, rr.column):
-                        urifunc = literal_column(graph.value(tmap, rr.column))
+                        col = graph.value(tmap, rr.column)
+                        urifunc = literal_column(f"{tname}.{col}")
                         if obj:
-                            termtype = rr.Literal
+                            # for objects, the default term type is Literal
+                            termtype = graph.value(tmap, rr.termType) or rr.Literal
                     elif graph.value(tmap, rr.template):
                         template = graph.value(tmap, rr.template)
-                        urifunc = cls._template_to_function(template)
+                        urifunc = cls._template_to_function(dbtable, tname, template)
                     elif graph.value(tmap, rr.parentTriplesMap):
+                        # referencing object map
                         ref = graph.value(tmap, rr.parentTriplesMap)
-                        if graph.value(tmap, rr.joinCondition):
-                            continue
-                        else:
-                            rs = cls._term_map(graph, ref, rr.subjectMap, rr.subject)
-                            yield from rs
-                            continue
-                    else:
-                        yield literal_column("'_:'")
+                        ptable, pname = cls._get_table(graph, ref)
+                        wheres = []
+                        for join in graph[tmap : rr.joinCondition]:
+                            ccol = f"{tname}.{graph.value(join, rr.child)}"
+                            pcol = f"{pname}.{graph.value(join, rr.parent)}"
+                            wheres.append(literal_column(ccol) == literal_column(pcol))
+                        rs = cls._term_map(
+                            graph, pname, ptable, ref, rr.subjectMap, rr.subject
+                        )
+                        for func in rs:
+                            yield select(func).select_from(ptable).where(*wheres)
                         continue
-                    
+                    else:
+                        # WARNING: Rowid is not supported in all RDBs!
+                        # TODO: replace with RDB-specific construct (postgresql?)
+                        yield f"_:{tname}#" + literal_column(f"{tname}.rowid").cast(
+                            sqltypes.String
+                        )
+                        continue
+
                     if termtype == rr.IRI:
                         yield "<" + urifunc + ">"
                     elif termtype == rr.BlankNode:
@@ -195,42 +244,53 @@ class R2RStore(Store):
                             dtype = graph.value(tmap, rr.datatype)
                             yield '"' + urifunc + '"^^' + dtype.n3()
                         else:
-                            yield urifunc # keep original datatype
+                            # keep original datatype
+                            yield urifunc
                     else:
                         yield literal_column("'_:'")
-    
+
     @classmethod
-    def _triplesmap_select(cls, mg, tmap):
-        logtable = mg.value(tmap, rr.logicalTable)
-        if mg.value(logtable, rr.tableName):
-            dbtable = text(mg.value(logtable, rr.tableName).toPython())
+    def _get_table(cls, graph, tmap):
+        logtable = graph.value(tmap, rr.logicalTable)
+        if graph.value(logtable, rr.tableName):
+            tname = graph.value(logtable, rr.tableName).toPython()
+            return text(tname), tname
         else:
-            sqlquery = mg.value(logtable, rr.sqlQuery)
-            dbtable = text(f"({sqlquery})")
+            tname = f'"View_{base64.b32encode(str(tmap).encode()).decode()}"'
+            sqlquery = graph.value(logtable, rr.sqlQuery).strip().strip(";")
+            return text(f"({sqlquery}) AS {tname}"), tname
+
+    def _triplesmap_select(self, metadata, graph, tmap):
+        dbtable, tname = self._get_table(graph, tmap)
+        dbtable = metadata.tables.get(tname.strip('"'), dbtable)
 
         terms = {}
-        for s in cls._term_map(mg, tmap, rr.subjectMap, rr.subject):
-            terms['s'] = s
-        s_map = mg.value(tmap, rr.subjectMap)
-        gs = cls._term_map(mg, s_map, rr.graphMap, rr.graph)
+        for s in self._term_map(graph, tname, dbtable, tmap, rr.subjectMap, rr.subject):
+            terms["s"] = s
+        s_map = graph.value(tmap, rr.subjectMap)
+        gs = self._term_map(graph, tname, dbtable, s_map, rr.graphMap, rr.graph)
         for gi, g in enumerate(gs):
-            terms[f'g{gi}'] = g
-        for ci, c in enumerate(mg[s_map : rr["class"]]):
-            terms[f'c{ci}'] = literal_column("'%s'" % c.n3())
+            terms[f"g{gi}"] = g
+        for ci, c in enumerate(graph[s_map : rr["class"]]):
+            terms[f"c{ci}"] = literal_column("'%s'" % c.n3())
 
         # Predicate-Object Maps
-        for po_i, po_map in enumerate(mg[tmap : rr.predicateObjectMap :]):
-            ps = cls._term_map(mg, po_map, rr.predicateMap, rr.predicate)
+        for po_i, po_map in enumerate(graph[tmap : rr.predicateObjectMap :]):
+            ps = self._term_map(
+                graph, tname, dbtable, po_map, rr.predicateMap, rr.predicate
+            )
             for pi, p in enumerate(ps):
-                terms[f'v{po_i}-p{pi}'] = p
-            os = cls._term_map(mg, po_map, rr.objectMap, rr.object, True)
+                terms[f"v{po_i}-p{pi}"] = p
+            os = self._term_map(
+                graph, tname, dbtable, po_map, rr.objectMap, rr.object, True
+            )
             for oi, o in enumerate(os):
-                terms[f'v{po_i}-o{oi}'] = o
-            gs = cls._term_map(mg, po_map, rr.graphMap, rr.graph)
+                terms[f"v{po_i}-o{oi}"] = o
+            gs = self._term_map(graph, tname, dbtable, po_map, rr.graphMap, rr.graph)
             for gi, g in enumerate(gs):
-                terms[f'v{po_i}-g{gi}'] = g
-        
-        return select(*[v.label(k) for k,v in terms.items()]).select_from(dbtable)
+                terms[f"v{po_i}-g{gi}"] = g
+
+        return select(*[v.label(k) for k, v in terms.items()]).select_from(dbtable)
 
     def triples(self, pattern, context) -> Iterable[Triple]:
         """Search for a triple pattern in a DB mapping.
@@ -242,7 +302,6 @@ class R2RStore(Store):
         Returns: An iterator that produces RDF triples matching the input triple pattern.
         """
 
-
         mg = self.mapping.graph
         with self.db.connect() as conn:
             qunion = []
@@ -252,60 +311,78 @@ class R2RStore(Store):
 
                 # Triple Maps
                 for tm in mg[: RDF.type : rr.TriplesMap]:
-                    
-                    query = self._triplesmap_select(mg, tm)
+
+                    query = self._triplesmap_select(metadata, mg, tm)
 
                     for row in conn.execute(query):
                         fields = {}
                         for k, v in row._mapping.items():
-                            a, _, b = k.partition('-')
+                            a, _, b = k.partition("-")
                             if not b:
                                 fields.setdefault(a[0], []).append(v)
                             else:
-                                field = fields.setdefault(a[0], {}) \
-                                    .setdefault(a[1:], {}) \
-                                    .setdefault(b[0], []).append(v)
-                        
-                        for s in fields['s']:
-                            for g in fields.get('g', ['_:']):
+                                (
+                                    fields.setdefault(a[0], {})
+                                    .setdefault(a[1:], {})
+                                    .setdefault(b[0], [])
+                                    .append(v)
+                                )
+
+                        for s in fields["s"]:
+                            for g in fields.get("g", ["_:"]):
                                 gnode = from_n3(g)
-                                if s.startswith("<"):
+                                if s is None:
+                                    continue
+                                elif s.startswith("<"):
                                     snode = URIRef(self._iri_encode(s[1:-1]))
-                                elif s == '_:':
+                                elif s == "_:":
                                     snode = BNode()
                                 else:
                                     snode = BNode(hex(hash(s) ** 2)[2:])
-                                
-                                for c in fields.get('c', []):
+
+                                for c in fields.get("c", []):
                                     cnode = from_n3(c)
                                     yield (snode, RDF.type, cnode), gnode
-                                
-                                for v in fields['v'].values():
-                                    for p in v['p']:
+
+                                for v in fields["v"].values():
+                                    for p in v["p"]:
                                         pnode = URIRef(self._iri_encode(p[1:-1]))
 
-                                        for o in v['o']:
+                                        for o in v["o"]:
                                             o_isstr = isinstance(o, str)
-                                            if (not o_isstr) or (o[0] not in '"<_'):
-                                                onode = Literal(o)
+                                            if o is None:
+                                                continue
+                                            elif (not o_isstr) or (o[0] not in '"<_'):
+                                                if type(o) == bytes:
+                                                    onode = Literal(
+                                                        base64.b16encode(o),
+                                                        datatype=XSD.hexBinary,
+                                                    )
+                                                else:
+                                                    onode = Literal(o)
                                             elif o.startswith("<"):
                                                 o_uri = self._iri_encode(o[1:-1])
                                                 onode = URIRef(o_uri)
+                                            elif o.startswith("_:"):
+                                                onode = BNode(hex(hash(o) ** 2)[2:])
                                             else:
                                                 onode = from_n3(o)
 
-                                            for g2 in v.get('g', ['_:']):
+                                            for g2 in v.get("g", ["_:"]):
                                                 if g2 != g:
                                                     gnode = from_n3(g2)
-                                                
-                                                logging.warn(('spog', s, p, o, g))
+
+                                                logging.warn(("spog", s, p, o, g))
                                                 yield (snode, pnode, onode), gnode
 
     @staticmethod
     def _iri_encode(iri):
-        parts = iri.split("/", 3)
-        parts[-1] = quote(parts[-1], safe="/#;=")
-        return "/".join(parts)
+        if not iri.startswith('data'):
+            parts = iri.split("/", 3)
+            parts[-1] = iri_safe(parts[-1])
+            return "/".join(parts)
+        else:
+            return iri
 
     def create(self, configuration):
         raise TypeError("The DB mapping is read only!")
