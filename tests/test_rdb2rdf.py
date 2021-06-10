@@ -64,7 +64,7 @@ def yield_database_testcases(path: pathlib.Path):
                 )
 
 
-def setup_engine(name):
+def setup_engine(name, echo=False):
     if name == "sqlite":
         import sqlite3
 
@@ -73,7 +73,7 @@ def setup_engine(name):
 
         return create_engine(
             "sqlite:///:memory:",
-            echo=True,
+            echo=echo,
             future=True,
             connect_args={
                 "detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
@@ -82,30 +82,34 @@ def setup_engine(name):
         )
     
     if name == "duckdb":
-        return create_engine("duckdb:///:memory:", connect_args={
+        db = create_engine(
+            "duckdb:///:memory:", 
+            echo=echo,
+            # future=True,
+            connect_args={
             'read_only':False
         })
+        db.dialect.server_version_info = (0,)
+        return db
 
 def create_database(db, path, sql_fname):
     sql_script = path.joinpath(sql_fname).open().read()
-    connection = db.raw_connection()
-    logging.warn(connection.connection)
+    conn = db.raw_connection()
     try:
-        connection.execute(sql_script, (), None)
+        if hasattr(conn.connection, 'c'):
+            cursor = conn.connection.c
+        else:
+            cursor = conn.cursor()
+        cursor.execute(sql_script, (), None)
     except Exception as e:
         logging.warn(e)
         try:
-            cursor = connection.cursor()
-            cursor.execute(sql_script)
+            cursor = conn.cursor()
+            cursor.executescript(sql_script)
         except Exception as e:
-            logging.warn(e)
-            try:
-                cursor = connection.cursor()
-                cursor.executescript(sql_script)
-            except Exception as e:
-                raise Exception(f"Problem with {path}: {e}")
-    finally:
-        connection.close()
+            raise Exception(f"Problem with {path}: {e}")
+    # finally:
+    #     conn.close()
 
 PATHS = sorted(
     path

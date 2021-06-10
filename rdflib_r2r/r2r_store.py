@@ -53,56 +53,72 @@ class Mapping(NamedTuple):
         mg = Graph()
 
         with db.connect() as conn:
-            metadata = MetaData(conn)
-            metadata.reflect(db)
             tmaps = {}
-            for tablename, table in metadata.tables.items():
+            for tablename in db.dialect.get_table_names(conn, schema='main'):
                 tm = tmaps.setdefault(tablename, BNode())
                 mg.add([tm, RDF.type, rr.TriplesMap])
                 logtable = BNode()
                 mg.add([tm, rr.logicalTable, logtable])
-                mg.add([logtable, rr.tableName, Literal(f'"{table.name}"')])
+                mg.add([logtable, rr.tableName, Literal(f'"{tablename}"')])
 
                 s_map = BNode()
                 mg.add([tm, rr.subjectMap, s_map])
-                mg.add([s_map, rr["class"], base[iri_safe(table.name)]])
+                mg.add([s_map, rr["class"], base[iri_safe(tablename)]])
 
-                if table.primary_key:
-                    parts = ['%s={"%s"}' % (c.name, c.name) for c in table.primary_key]
-                    template = baseuri + table.name + "/" + ";".join(parts)
+                # TEMPORARY: duckdb hack
+                pk = db.dialect.get_pk_constraint(conn, tablename, schema='main')
+                if pk and any(pk.values()):
+                    primary_keys = (
+                        pk['constrained_columns'] 
+                        or eval(pk['name'].partition('KEY')[-1])
+                    )
+                    if not (type(primary_keys) in [tuple, list]):
+                        primary_keys = (primary_keys, )
+                else:
+                    primary_keys = []
+
+                if primary_keys:
+                    parts = ['%s={"%s"}' % (c, c) for c in primary_keys]
+                    template = baseuri + tablename + "/" + ";".join(parts)
                     mg.add([s_map, rr.template, Literal(template)])
                 else:
                     mg.add([s_map, rr.termType, rr.BlankNode])
 
-                for column in table.c:
+                for column in db.dialect.get_columns(conn, tablename, schema='main'):
+                    colname = column['name']
+                    coltype = column['type']
                     # Add a predicate-object map per column
                     po_map = BNode()
                     mg.add([tm, rr.predicateObjectMap, po_map])
-                    pname = f"{table.name}#{column.name}"
+                    pname = f"{tablename}#{colname}"
                     mg.add([po_map, rr.predicate, base[iri_safe(pname)]])
 
                     o_map = BNode()
                     mg.add([po_map, rr.objectMap, o_map])
-                    mg.add([o_map, rr.column, Literal(f'"{column.name}"')])
-                    if isinstance(column.type, sqltypes.Integer):
+                    mg.add([o_map, rr.column, Literal(f'"{colname}"')])
+                    if isinstance(coltype, sqltypes.Integer):
                         mg.add([o_map, rr.datatype, XSD.integer])
 
-                    for fk in column.foreign_keys:
+                    foreign_keys = db.dialect.get_foreign_keys(conn, tablename, schema='main')
+
+                    for fk in foreign_keys:
                         # Add another predicate-object map for every foreign key
                         po_map = BNode()
                         mg.add([tm, rr.predicateObjectMap, po_map])
-                        pname = f"{table.name}#ref-{column.name}"
+                        pname = f"{tablename}#ref-{colname}"
                         mg.add([po_map, rr.predicate, base[iri_safe(pname)]])
 
                         o_map = BNode()
                         mg.add([po_map, rr.objectMap, o_map])
-                        ref = fk.column
-                        refmap = tmaps.setdefault(ref.table.name, BNode())
+                        reftable = fk['referred_table']
+                        refmap = tmaps.setdefault(reftable, BNode())
                         mg.add([o_map, rr.parentTriplesMap, refmap])
+                        
                         join = BNode()
                         mg.add([o_map, rr.joinCondition, join])
-                        mg.add([join, rr.child, Literal(f'"{column.name}"')])
-                        mg.add([join, rr.parent, Literal(f'"{ref.name}"')])
+                        mg.add([join, rr.child, Literal(f'"{colname}"')])
+                        for refcol in fk['referred_columns']:
+                            mg.add([join, rr.parent, Literal(f'"{refcol}"')])
 
         logging.warn("direct:")
         for line in mg.serialize(format="turtle").decode().splitlines():
@@ -178,7 +194,7 @@ class R2RStore(Store):
             x
             for prefix, col, _, _ in Formatter().parse(template)
             for x in (
-                prefix,
+                sqlfunc.cast(prefix, sqltypes.VARCHAR),
                 get_col(col) if col else "",
             )
             if x != ""
