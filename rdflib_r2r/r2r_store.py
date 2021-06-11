@@ -50,11 +50,11 @@ class Mapping(NamedTuple):
             Mapping
         """
         base = Namespace(baseuri)
-        mg = Graph()
+        mg = Graph(base=baseuri)
 
         with db.connect() as conn:
             tmaps = {}
-            for tablename in db.dialect.get_table_names(conn, schema='main'):
+            for tablename in db.dialect.get_table_names(conn, schema="main"):
                 tm = tmaps.setdefault(tablename, BNode())
                 mg.add([tm, RDF.type, rr.TriplesMap])
                 logtable = BNode()
@@ -66,27 +66,27 @@ class Mapping(NamedTuple):
                 mg.add([s_map, rr["class"], base[iri_safe(tablename)]])
 
                 # TEMPORARY: duckdb hack
-                pk = db.dialect.get_pk_constraint(conn, tablename, schema='main')
+                pk = db.dialect.get_pk_constraint(conn, tablename, schema="main")
                 if pk and any(pk.values()):
-                    primary_keys = (
-                        pk['constrained_columns'] 
-                        or eval(pk['name'].partition('KEY')[-1])
+                    primary_keys = pk["constrained_columns"] or eval(
+                        pk["name"].partition("KEY")[-1]
                     )
                     if not (type(primary_keys) in [tuple, list]):
-                        primary_keys = (primary_keys, )
+                        primary_keys = (primary_keys,)
                 else:
                     primary_keys = []
 
                 if primary_keys:
-                    parts = ['%s={"%s"}' % (c, c) for c in primary_keys]
-                    template = baseuri + tablename + "/" + ";".join(parts)
+                    parts = ['%s={"%s"}' % (iri_safe(c), c) for c in primary_keys]
+                    template = iri_safe(tablename) + "/" + ";".join(parts)
                     mg.add([s_map, rr.template, Literal(template)])
+                    mg.add([s_map, rr.termType, rr.IRI])
                 else:
                     mg.add([s_map, rr.termType, rr.BlankNode])
 
-                for column in db.dialect.get_columns(conn, tablename, schema='main'):
-                    colname = column['name']
-                    coltype = column['type']
+                for column in db.dialect.get_columns(conn, tablename, schema="main"):
+                    colname = column["name"]
+                    coltype = column["type"]
                     # Add a predicate-object map per column
                     po_map = BNode()
                     mg.add([tm, rr.predicateObjectMap, po_map])
@@ -99,26 +99,29 @@ class Mapping(NamedTuple):
                     if isinstance(coltype, sqltypes.Integer):
                         mg.add([o_map, rr.datatype, XSD.integer])
 
-                    foreign_keys = db.dialect.get_foreign_keys(conn, tablename, schema='main')
+                foreign_keys = db.dialect.get_foreign_keys(
+                    conn, tablename, schema="main"
+                )
+                for fk in foreign_keys:
+                    logging.warn((''))
+                    # Add another predicate-object map for every foreign key
+                    po_map = BNode()
+                    mg.add([tm, rr.predicateObjectMap, po_map])
+                    pname = f"{tablename}#ref-{';'.join(fk['constrained_columns'])}"
+                    mg.add([po_map, rr.predicate, base[iri_safe(pname)]])
 
-                    for fk in foreign_keys:
-                        # Add another predicate-object map for every foreign key
-                        po_map = BNode()
-                        mg.add([tm, rr.predicateObjectMap, po_map])
-                        pname = f"{tablename}#ref-{colname}"
-                        mg.add([po_map, rr.predicate, base[iri_safe(pname)]])
+                    o_map = BNode()
+                    mg.add([po_map, rr.objectMap, o_map])
+                    reftable = fk["referred_table"]
+                    refmap = tmaps.setdefault(reftable, BNode())
+                    mg.add([o_map, rr.parentTriplesMap, refmap])
 
-                        o_map = BNode()
-                        mg.add([po_map, rr.objectMap, o_map])
-                        reftable = fk['referred_table']
-                        refmap = tmaps.setdefault(reftable, BNode())
-                        mg.add([o_map, rr.parentTriplesMap, refmap])
-                        
+                    colpairs = zip(fk['constrained_columns'], fk["referred_columns"])
+                    for colname, refcol in colpairs:
                         join = BNode()
                         mg.add([o_map, rr.joinCondition, join])
                         mg.add([join, rr.child, Literal(f'"{colname}"')])
-                        for refcol in fk['referred_columns']:
-                            mg.add([join, rr.parent, Literal(f'"{refcol}"')])
+                        mg.add([join, rr.parent, Literal(f'"{refcol}"')])
 
         logging.warn("direct:")
         for line in mg.serialize(format="turtle").decode().splitlines():
@@ -139,6 +142,7 @@ class R2RStore(Store):
         self,
         db: Engine,
         mapping: Optional[Mapping] = None,
+        base: str = "http://example.com/base/",
         configuration=None,
         identifier=None,
     ):
@@ -147,6 +151,7 @@ class R2RStore(Store):
         )
         self.db = db
         self.mapping = mapping or Mapping.from_db(db)
+        self.base = base
         assert self.db
         assert self.mapping
 
@@ -175,31 +180,52 @@ class R2RStore(Store):
         raise NotImplementedError
 
     @staticmethod
-    def _template_to_function(dbtable, tname, template):
+    def _get_col(dbtable, tname, col, template=False):
+        if type(dbtable) is sqlschema.Table:
+            dbcol = dbtable.c[col.strip('"')]
+            logging.warn(("dbtable[col]", tname, col, dbcol))
+
+            if isinstance(dbcol.type, sqltypes.Numeric):
+                if dbcol.type.precision:
+                    if template:
+                        return sqlfunc.hex(dbcol)
+                    else:
+                        return literal_column(f"{tname}.{col}")
+
+            if (not template) and isinstance(dbcol.type, sqltypes.CHAR):
+                if dbcol.type.length:
+                    l = dbcol.type.length
+                    return sqlfunc.substr(dbcol + " " * l, 1, l)
+
+            return dbcol
+        else:
+            return literal_column(f"{tname}.{col}")
+
+    @staticmethod
+    def _sql_safe(literal):
+        # Acutally, this is a terrible idea due to the large number of chars.
+        literal = sqlfunc.replace(literal, " ", "%20")
+        literal = sqlfunc.replace(literal, "/", "%2F")
+        literal = sqlfunc.replace(literal, "(", "%28")
+        literal = sqlfunc.replace(literal, ")", "%29")
+        literal = sqlfunc.replace(literal, ",", "%2C")
+        literal = sqlfunc.replace(literal, ":", "%3A")
+        return literal
+
+    @classmethod
+    def _template_to_function(cls, dbtable, tname, template, irisafe=False):
         # make python format string: escape curly braces by doubling {{ }}
         template = re.sub("\\\\[{}]", lambda x: x.group(0)[1] * 2, template)
 
-        def get_col(col):
-            if type(dbtable) is sqlschema.Table:
-                dbcol = dbtable.c[col.strip('"')]
-                logging.warn(("dbtable[col]", dbcol))
-                if isinstance(dbcol.type, sqltypes.Numeric):
-                    if dbcol.type.precision:
-                        return sqlfunc.hex(dbcol)
-                return dbcol.cast(sqltypes.VARCHAR)
-            else:
-                return literal_column(f"{tname}.{col}").cast(sqltypes.VARCHAR)
-
-        parts = [
-            x
-            for prefix, col, _, _ in Formatter().parse(template)
-            for x in (
-                sqlfunc.cast(prefix, sqltypes.VARCHAR),
-                get_col(col) if col else "",
-            )
-            if x != ""
-        ]
-        logging.warn(("template_to_function", parts))
+        parts = []
+        for prefix, col, _, _ in Formatter().parse(template):
+            parts.append(prefix)
+            if col:
+                c = cls._get_col(dbtable, tname, col, template=True)
+                if irisafe:
+                    c = cls._sql_safe(c)
+                parts.append(c)
+        parts = [sqlfunc.cast(x, sqltypes.VARCHAR) for x in parts if x != ""]
         return functools.reduce(operator.add, parts)
 
     @classmethod
@@ -207,24 +233,27 @@ class R2RStore(Store):
         if graph.value(parent, shortcut):
             # constant shortcut properties
             for const in graph[parent:shortcut]:
-                yield literal_column("'%s'" % iri_unsafe(const.n3()))
+                yield literal_column("'%s'" % const.n3())
         elif graph.value(parent, mapper):
             for tmap in graph[parent:mapper]:
                 if graph.value(tmap, rr.constant):
                     # constant value
                     for const in graph[tmap : rr.constant]:
-                        yield literal_column("'%s'" % iri_unsafe(const.n3()))
+                        yield literal_column("'%s'" % const.n3())
                 else:
                     termtype = graph.value(tmap, rr.termType) or rr.IRI
                     if graph.value(tmap, rr.column):
                         col = graph.value(tmap, rr.column)
-                        urifunc = literal_column(f"{tname}.{col}")
+                        urifunc = cls._get_col(dbtable, tname, col)
                         if obj:
                             # for objects, the default term type is Literal
                             termtype = graph.value(tmap, rr.termType) or rr.Literal
                     elif graph.value(tmap, rr.template):
                         template = graph.value(tmap, rr.template)
-                        urifunc = cls._template_to_function(dbtable, tname, template)
+                        urifunc = cls._template_to_function(
+                            dbtable, tname, template,
+                            irisafe = (termtype == rr.IRI)
+                        )
                     elif graph.value(tmap, rr.parentTriplesMap):
                         # referencing object map
                         ref = graph.value(tmap, rr.parentTriplesMap)
@@ -328,7 +357,7 @@ class R2RStore(Store):
                 for tm in mg[: RDF.type : rr.TriplesMap]:
 
                     query = self._triplesmap_select(metadata, mg, tm)
-                    logging.warn(('query', str(query)))
+                    logging.warn(("query", str(query)))
                     for row in conn.execute(query):
                         fields = {}
                         for k, v in row._mapping.items():
@@ -349,7 +378,8 @@ class R2RStore(Store):
                                 if s is None:
                                     continue
                                 elif s.startswith("<"):
-                                    snode = URIRef(self._iri_encode(s[1:-1]))
+                                    suri = self._iri_encode(s[1:-1])
+                                    snode = URIRef(suri, base=self.base)
                                 elif s == "_:":
                                     snode = BNode()
                                 else:
@@ -361,7 +391,8 @@ class R2RStore(Store):
 
                                 for v in fields["v"].values():
                                     for p in v["p"]:
-                                        pnode = URIRef(self._iri_encode(p[1:-1]))
+                                        puri = self._iri_encode(p[1:-1])
+                                        pnode = URIRef(puri, base=self.base)
 
                                         for o in v["o"]:
                                             o_isstr = isinstance(o, str)
@@ -377,7 +408,7 @@ class R2RStore(Store):
                                                     onode = Literal(o)
                                             elif o.startswith("<"):
                                                 o_uri = self._iri_encode(o[1:-1])
-                                                onode = URIRef(o_uri)
+                                                onode = URIRef(o_uri, base=self.base)
                                             elif o.startswith("_:"):
                                                 onode = BNode(hex(hash(o) ** 2)[2:])
                                             else:
@@ -392,12 +423,12 @@ class R2RStore(Store):
 
     @staticmethod
     def _iri_encode(iri):
-        if not iri.startswith('data'):
-            parts = iri.split("/", 3)
-            parts[-1] = iri_safe(parts[-1])
-            return "/".join(parts)
-        else:
-            return iri
+        # if not iri.startswith("data"):
+        #     parts = iri.split("/", 3)
+        #     parts[-1] = iri_safe(parts[-1])
+        #     return "/".join(parts)
+        # else:
+        return iri
 
     def create(self, configuration):
         raise TypeError("The DB mapping is read only!")
