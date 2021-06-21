@@ -6,17 +6,17 @@ Downloaded from [https://dvcs.w3.org/hg/rdb2rdf-tests/raw-file/default/rdb2rdf-t
 
 import pathlib
 import logging
-from typing import NamedTuple
 import re
-import base64
+import pathlib
+from typing import NamedTuple
 
 import pytest
 import rdflib
 from rdflib.namespace import RDF, Namespace
 from rdflib.compare import to_isomorphic, graph_diff
 from rdflib.util import from_n3
-from sqlalchemy import create_engine, text, engine as sqlengine
 
+from util import setup_engine, create_database
 from rdflib_r2r.r2r_store import R2RStore, Mapping
 
 test = Namespace("http://www.w3.org/2006/03/test-description#")
@@ -64,53 +64,6 @@ def yield_database_testcases(path: pathlib.Path):
                 )
 
 
-def setup_engine(name, echo=False):
-    if name == "sqlite":
-        import sqlite3
-
-        sqlite3.register_adapter(bool, int)
-        sqlite3.register_converter("BOOLEAN", lambda v: bool(int(v)))
-
-        return create_engine(
-            "sqlite:///:memory:",
-            echo=echo,
-            future=True,
-            connect_args={
-                "detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
-            },
-            native_datetime=True,
-        )
-    
-    if name == "duckdb":
-        db = create_engine(
-            "duckdb:///:memory:", 
-            echo=echo,
-            # future=True,
-            connect_args={
-            'read_only':False
-        })
-        db.dialect.server_version_info = (0,)
-        return db
-
-def create_database(db, path, sql_fname):
-    sql_script = path.joinpath(sql_fname).open().read()
-    conn = db.raw_connection()
-    try:
-        if hasattr(conn.connection, 'c'):
-            cursor = conn.connection.c
-        else:
-            cursor = conn.cursor()
-        cursor.execute(sql_script, (), None)
-    except Exception as e:
-        logging.warn(e)
-        try:
-            cursor = conn.cursor()
-            cursor.executescript(sql_script)
-        except Exception as e:
-            raise Exception(f"Problem with {path}: {e}")
-    # finally:
-    #     conn.close()
-
 PATHS = sorted(
     path
     for path in pathlib.Path(__file__).parent.joinpath("rdb2rdf-ts").iterdir()
@@ -123,18 +76,21 @@ TESTS = [
     for testcase in sorted(yield_database_testcases(path), key=lambda s: s.id)
 ]
 
+@pytest.fixture()
+def dbecho(pytestconfig):
+    return pytestconfig.getoption("dbecho")
 
 @pytest.mark.parametrize("testcase", TESTS, ids=[t.id for t in TESTS])
 @pytest.mark.parametrize("engine_name", ["sqlite", "duckdb"])
-# @pytest.mark.parametrize("engine_name", ["duckdb"])
-def test_rdb2rdf(testcase: TestCase, engine_name: str):
+def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool):
     # Create database
-    db = setup_engine(engine_name)
+    db = setup_engine(engine_name, echo=dbecho)
     create_database(db, testcase.path, testcase.sql_fname)
 
     # Create mapped R2RStore
     mapping = None
     if rdb2rdftest.mappingDocument in testcase.meta:
+        # Load mapping
         mapfile = testcase.path.joinpath(testcase.meta[rdb2rdftest.mappingDocument])
         fmt = rdflib.util.guess_format(str(mapfile))
         mapping = Mapping(rdflib.Graph().parse(str(mapfile), format=fmt))
@@ -147,6 +103,7 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str):
     outfile = testcase.path.joinpath(testcase.meta[rdb2rdftest.output])
     fmt = rdflib.util.guess_format(str(outfile))
     if fmt == "nquads":
+        # RDFLib nquads parser doesn't work?
         rx = re.compile(r"([^ ]+) ([^ ]+) (.+?) ?(?: (<[^>]+>))? \.$")
         g_goal = rdflib.ConjunctiveGraph()
         for li, l in enumerate(open(outfile).read().splitlines()):
@@ -168,16 +125,6 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str):
             )
         )
 
-    # l1 = list(g_made)
-    # g_made = rdflib.Graph()
-    # for t in l1:
-    #     g_made.add(t)
-    # s1 = g_made.serialize(format="turtle")
-    # for t in l1:
-    #     logging.warn(("g_made", t))
-    # logging.warn(("g_made", len(l1), s1))
-    # logging.warn(("g_goal", len(list(g_goal)), g_goal.serialize(format="turtle")))
-
     iso_made, iso_goal = to_isomorphic(g_made), to_isomorphic(g_goal)
     in_both, in_made, in_goal = graph_diff(iso_made, iso_goal)
 
@@ -191,6 +138,24 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str):
     for li, line in enumerate(dump_nt_sorted(in_goal)):
         logging.warn(f"in_goal {li}/{len(list(in_goal))}: {line}")
     assert iso_made == iso_goal
+
+    if any(g_made):
+        g_ss, g_ps, g_os = zip(*g_made)
+        for s in set(g_ss):
+            s_triples = list(g_made.triples([s, None, None]))
+            assert s_triples
+            for s_, _, _ in s_triples:
+                assert s_ == s
+        for p in set(g_ps):
+            p_triples = list(g_made.triples([None, p, None]))
+            assert p_triples
+            for _, p_, _ in p_triples:
+                assert p_ == p
+        for o in set(g_os):
+            o_triples = list(g_made.triples([None, None, o]))
+            assert o_triples
+            for _, _, o_ in o_triples:
+                assert o_ == o
 
 
 def test_synthesis(module_results_df):
