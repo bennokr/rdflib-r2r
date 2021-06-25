@@ -20,7 +20,8 @@ from rdflib.namespace import RDF, XSD, Namespace
 from rdflib.store import Store
 from rdflib.util import from_n3
 
-from sqlalchemy import MetaData, select, text, null, literal_column
+import sqlalchemy
+from sqlalchemy import MetaData, select, text, null, literal_column, literal
 from sqlalchemy import union_all, or_ as sql_or, and_ as sql_and
 from sqlalchemy import schema as sqlschema, types as sqltypes, func as sqlfunc
 from sqlalchemy.engine import Engine
@@ -55,6 +56,7 @@ class Mapping:
 
     @dataclass(eq=True, order=True, frozen=True)
     class Matcher:
+        tname: str
         const: str = None
         field: str = None
         parser: str = None
@@ -148,7 +150,7 @@ class Mapping:
                         mg.add([join, rr.parent, Literal(f'"{refcol}"')])
 
         logging.warn("direct:")
-        for line in mg.serialize(format="turtle").decode().splitlines():
+        for line in mg.serialize(format="turtle").decode().splitlines(): # warn
             logging.warn(line)
         return cls(mg, baseuri=baseuri)
 
@@ -182,13 +184,13 @@ class Mapping:
         if graph.value(parent, shortcut):
             # constant shortcut properties
             for const in graph[parent:shortcut]:
-                yield cls.Matcher(const=const.toPython())
+                yield cls.Matcher(const=const.toPython(), tname=tname)
         elif graph.value(parent, mapper):
             for tmap in graph[parent:mapper]:
                 if graph.value(tmap, rr.constant):
                     # constant value
                     for const in graph[tmap : rr.constant]:
-                        yield cls.Matcher(const=const.toPython())
+                        yield cls.Matcher(const=const.toPython(), tname=tname)
                 else:
                     # Inverse Expression
                     inverse = None
@@ -200,42 +202,23 @@ class Mapping:
                     if graph.value(tmap, rr.column):
                         col = graph.value(tmap, rr.column)
                         col = re.sub('(^"|"$)', "", col)
-                        yield cls.Matcher(field=col, inverse=inverse)
+                        yield cls.Matcher(field=col, inverse=inverse, tname=tname)
                     elif graph.value(tmap, rr.template):
                         template = graph.value(tmap, rr.template)
                         parser = cls._template_to_parser(
                             template, irisafe=(termtype == rr.IRI)
                         )
-                        yield cls.Matcher(parser=parser, inverse=inverse)
+                        yield cls.Matcher(parser=parser, inverse=inverse, tname=tname)
                     elif graph.value(tmap, rr.parentTriplesMap):
                         # referencing object map
                         ref = graph.value(tmap, rr.parentTriplesMap)
                         _, rt = _get_table(graph, ref)
                         rs = cls._term_pat(graph, rt, ref, rr.subjectMap, rr.subject)
-                        for refpat in rs:
-                            if not refpat.inverse:
-                                for join in graph[tmap : rr.joinCondition]:
-                                    ccol = graph.value(join, rr.child).toPython()
-                                    pcol = graph.value(join, rr.parent).toPython()
-                                    if refpat.parser:
-                                        ccol = cls._template_to_parser("{%s}" % ccol)
-                                        pcol = cls._template_to_parser("{%s}" % pcol)
-                                        parser = refpat.parser.replace(pcol, ccol)
-                                        logging.warn(f"FK: {refpat.parser} -> {parser}")
-                                        refpat = cls.Matcher(
-                                            parser=parser, inverse=refpat.inverse
-                                        )
-                                    elif refpat.field:
-                                        field = ccol
-                                        logging.warn(f"FK: {refpat.field} -> {field}")
-                                        refpat = cls.Matcher(
-                                            field=field, inverse=refpat.inverse
-                                        )
-                            yield refpat
+                        yield from rs
                     else:
                         t = tname.strip('"')
                         parser = cls._template_to_parser(f"{t}#{{rowid}}")
-                        yield cls.Matcher(parser=parser, inverse=inverse)
+                        yield cls.Matcher(parser=parser, inverse=inverse, tname=tname)
 
     def __init__(self, g, baseuri="http://example.com/base/"):
         self.graph = g
@@ -257,7 +240,7 @@ class Mapping:
         logging.warn(("ppat_pomaps", self.ppat_pomaps))
         logging.warn(("opat_pomaps", self.opat_pomaps))
 
-    def inverse_condition(self, tname, inverse_expr, field_values):
+    def inverse_condition(self, inverse_expr, field_values):
         col_replace = {
             col: f'"{col}"'
             for _, col, _, _ in Formatter().parse(inverse_expr)
@@ -267,7 +250,7 @@ class Mapping:
         t = text(inverse_expr.format(**col_replace, **param_replace))
         return t.bindparams(**field_values)
 
-    def get_node_filter(self, node, tname, pat_maps):
+    def get_node_filter(self, node, pat_maps):
         map_conditions = {}
         if node is not None:
             for pat, maps in pat_maps.items():
@@ -284,29 +267,38 @@ class Mapping:
                         val = iri_unsafe(val).replace(self.baseuri, "").strip()
                     elif isinstance(val, datetime.date):
                         val = str(val)
+                    elif isinstance(val, bytes):
+                        # WARNING: this might be a sqlite hack!
+                        val = text(f"x'{base64.b16encode(val).decode()}'")
                     if pat.inverse:
                         fields = {pat.field: val}
-                        where = self.inverse_condition(tname, pat.inverse, fields)
+                        where = self.inverse_condition(pat.inverse, fields)
                         logging.warn(f"where inverse: {where}")
                     else:
-                        where = literal_column(f'{tname}."{pat.field}"') == val
+                        where = literal_column(f'{pat.tname}."{pat.field}"') == val
                     for m in maps:
                         map_conditions.setdefault(m, []).append(where)
                 elif pat.parser:
                     parser = parse.compile(pat.parser)
-                    # not super sure of this:
+                    # WARNING: I'm not super sure of this removing of the baseuri
                     val = str(node.toPython()).replace(self.baseuri, "").strip()
+
                     logging.warn(("parse", str(pat), node.n3(), parser.parse(val)))
                     if parser.parse(val):
                         fields = parser.parse(val).named
                         if pat.inverse:
-                            where = self.inverse_condition(tname, pat.inverse, fields)
+                            where = self.inverse_condition(pat.inverse, fields)
                         else:
-                            where_clauses = [
-                                literal_column(f'{tname}."{k.replace("__", " ")}"')
-                                == iri_unsafe(v)
-                                for k, v in fields.items()
-                            ]
+                            where_clauses = []
+                            for key, val in fields.items():
+                                key = f'{pat.tname}."{key.replace("__", " ")}"'
+                                if pat.parser.startswith('data:'):
+                                    val = text(f"x'{val}'")
+                                else:
+                                    val = iri_unsafe(val)
+                                clause = literal_column(key) == val
+                                where_clauses.append(clause)
+
                             where = sql_and(*where_clauses)
                         for m in maps:
                             map_conditions.setdefault(m, []).append(where)
@@ -460,10 +452,12 @@ class R2RStore(Store):
                     elif obj:
                         if graph.value(tmap, rr.language):
                             lang = graph.value(tmap, rr.language)
-                            yield '"' + func + '"@' + str(lang)
+                            func = sqlfunc.cast(func, sqltypes.VARCHAR)
+                            yield literal('"') + func + '"@' + str(lang)
                         elif graph.value(tmap, rr.datatype):
                             dtype = graph.value(tmap, rr.datatype)
-                            yield '"' + func + '"^^' + dtype.n3()
+                            func = sqlfunc.cast(func, sqltypes.VARCHAR)
+                            yield literal('"') + func + '"^^' + dtype.n3()
                         else:
                             # keep original datatype
                             yield func
@@ -475,9 +469,9 @@ class R2RStore(Store):
         dbtable = metadata.tables.get(tname.strip('"'), dbtable)
 
         qs, qp, qo = pattern
-        sfilt = self.mapping.get_node_filter(qs, tname, self.mapping.spat_tmaps)
-        pfilt = self.mapping.get_node_filter(qp, tname, self.mapping.ppat_pomaps)
-        ofilt = self.mapping.get_node_filter(qo, tname, self.mapping.opat_pomaps)
+        sfilt = self.mapping.get_node_filter(qs, self.mapping.spat_tmaps)
+        pfilt = self.mapping.get_node_filter(qp, self.mapping.ppat_pomaps)
+        ofilt = self.mapping.get_node_filter(qo, self.mapping.opat_pomaps)
 
         for n, q, f in zip("spo", pattern, (sfilt, pfilt, ofilt)):
             showfilt = {
@@ -505,7 +499,7 @@ class R2RStore(Store):
                 p = literal_column("'%s'" % RDF.type.n3()).label("p")
                 o = literal_column("'%s'" % c.n3()).label("o")
                 # no unsafe IRI because it should be defined to be safe
-                cwhere = [(o == qo.n3())] if qo else []
+                cwhere = [(o == qo.n3())] if (qo is not None) else []
                 for g in list(gs) or [null()]:
                     yield (s, p, o, g.label("g")), dbtable, swhere + cwhere
 
@@ -515,12 +509,8 @@ class R2RStore(Store):
             pomaps &= set(pfilt)
         if not (None in ofilt):
             pomaps &= set(ofilt)
-        pomap_conditions = {
-            pomap: (pfilt.get(pomap) or []) + (ofilt.get(pomap) or [])
-            for pomap in pomaps
-        }
 
-        for pomap, powhere in pomap_conditions.items():
+        for pomap in pomaps:
             ps = list(
                 self._term_map(
                     graph, tname, dbtable, pomap, rr.predicateMap, rr.predicate
@@ -535,15 +525,22 @@ class R2RStore(Store):
                 self._term_map(graph, tname, dbtable, pomap, rr.graphMap, rr.graph)
             )
             for p in ps:
+                pwhere = pfilt.get(pomap) or []
                 if (qp is not None) and p.is_literal and str(p)[1:-1] != qp.n3():
                     # Filter out non-identical property patterns
                     logging.warn(f"Skipping property {p} due to pattern {qp.n3()}")
                     continue
                 p = p.label("p")
                 for o in os:
+                    owhere = ofilt.get(pomap) or []
+                    if isinstance(o, sqlalchemy.sql.selectable.Select):
+                        # referencing object map condition
+                        o = o.where(*owhere)
+                        owhere = []
                     o = o.label("o")
                     for g in list(gs) or [null()]:
-                        yield (s, p, o, g.label("g")), dbtable, swhere + powhere
+                        where = swhere + pwhere + owhere
+                        yield (s, p, o, g.label("g")), dbtable, where
 
     def triples(self, pattern, context) -> Iterable[Triple]:
         """Search for a triple pattern in a DB mapping.
@@ -567,10 +564,10 @@ class R2RStore(Store):
 
                     query = select(*spog).select_from(dbtable).where(*where)
 
-                    rows = list(conn.execute(query))
                     qstr = str(query.compile(compile_kwargs={"literal_binds": True}))
-                    for line in qstr.splitlines():
+                    for line in qstr.splitlines(): # warn
                         logging.warn(f"query: {line}")
+                    rows = list(conn.execute(query))
                     logging.warn(f"results: {len(rows)}")
                     for s, p, o, g in rows:
                         logging.warn(("spog", s, p, o, g))
