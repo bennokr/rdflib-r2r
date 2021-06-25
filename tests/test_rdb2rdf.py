@@ -132,30 +132,31 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool):
         return sorted(g.serialize(format="nt").strip().splitlines())
 
     for li, line in enumerate(dump_nt_sorted(in_both)):
-        logging.warn(f"in_both {li}/{len(list(in_both))}: {line}")
+        logging.warn(f"in_both {li+1}/{len(list(in_both))}: {line}")
     for li, line in enumerate(dump_nt_sorted(in_made)):
-        logging.warn(f"in_made {li}/{len(list(in_made))}: {line}")
+        logging.warn(f"in_made {li+1}/{len(list(in_made))}: {line}")
     for li, line in enumerate(dump_nt_sorted(in_goal)):
-        logging.warn(f"in_goal {li}/{len(list(in_goal))}: {line}")
+        logging.warn(f"in_goal {li+1}/{len(list(in_goal))}: {line}")
     assert iso_made == iso_goal
 
-    if any(g_made):
-        g_ss, g_ps, g_os = zip(*g_made)
-        for s in set(g_ss):
-            s_triples = list(g_made.triples([s, None, None]))
+    made_triples = sorted(g_made)
+    if any(made_triples):
+        g_ss, g_ps, g_os = zip(*made_triples)
+        for s in sorted(set(g_ss)):
+            s_triples = sorted(g_made.triples([s, None, None]))
             assert s_triples
             for s_, _, _ in s_triples:
                 assert s_ == s
-        for p in set(g_ps):
-            p_triples = list(g_made.triples([None, p, None]))
+        for p in sorted(set(g_ps)):
+            p_triples = sorted(g_made.triples([None, p, None]))
             assert p_triples
             for _, p_, _ in p_triples:
                 assert p_ == p
-        for o in set(g_os):
-            o_triples = list(g_made.triples([None, None, o]))
+        for o in sorted(set(g_os)):
+            o_triples = sorted(g_made.triples([None, None, o]))
             assert o_triples
             for _, _, o_ in o_triples:
-                assert o_ == o
+                assert o_.toPython() == o.toPython()
 
 
 def test_synthesis(module_results_df):
