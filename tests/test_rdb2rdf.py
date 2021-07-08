@@ -17,7 +17,7 @@ from rdflib.compare import to_isomorphic, graph_diff
 from rdflib.util import from_n3
 
 from util import setup_engine, create_database
-from rdflib_r2r.r2r_store import R2RStore, Mapping
+from rdflib_r2r import R2RStore, R2RMapping
 
 test = Namespace("http://www.w3.org/2006/03/test-description#")
 dcterms = Namespace("http://purl.org/dc/elements/1.1/")
@@ -80,9 +80,13 @@ TESTS = [
 def dbecho(pytestconfig):
     return pytestconfig.getoption("dbecho")
 
+@pytest.fixture()
+def nopattern(pytestconfig):
+    return pytestconfig.getoption("nopattern")
+
 @pytest.mark.parametrize("testcase", TESTS, ids=[t.id for t in TESTS])
 @pytest.mark.parametrize("engine_name", ["sqlite", "duckdb"])
-def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool):
+def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: bool):
     # Create database
     db = setup_engine(engine_name, echo=dbecho)
     create_database(db, testcase.path, testcase.sql_fname)
@@ -93,10 +97,10 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool):
         # Load mapping
         mapfile = testcase.path.joinpath(testcase.meta[rdb2rdftest.mappingDocument])
         fmt = rdflib.util.guess_format(str(mapfile))
-        mapping = Mapping(rdflib.Graph().parse(str(mapfile), format=fmt))
+        mapping = R2RMapping(rdflib.Graph().parse(str(mapfile), format=fmt))
     else:
         # Make direct mapping
-        mapping = Mapping.from_db(db)
+        mapping = R2RMapping.from_db(db)
 
     g_made = rdflib.Graph(R2RStore(db=db, mapping=mapping))
 
@@ -139,24 +143,25 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool):
         logging.warn(f"in_goal {li+1}/{len(list(in_goal))}: {line}")
     assert iso_made == iso_goal
 
-    made_triples = sorted(g_made)
-    if any(made_triples):
-        g_ss, g_ps, g_os = zip(*made_triples)
-        for s in sorted(set(g_ss)):
-            s_triples = sorted(g_made.triples([s, None, None]))
-            assert s_triples
-            for s_, _, _ in s_triples:
-                assert s_ == s
-        for p in sorted(set(g_ps)):
-            p_triples = sorted(g_made.triples([None, p, None]))
-            assert p_triples
-            for _, p_, _ in p_triples:
-                assert p_ == p
-        for o in sorted(set(g_os)):
-            o_triples = sorted(g_made.triples([None, None, o]))
-            assert o_triples
-            for _, _, o_ in o_triples:
-                assert o_.toPython() == o.toPython()
+    if not nopattern:
+        made_triples = sorted(g_made)
+        if any(made_triples):
+            g_ss, g_ps, g_os = zip(*made_triples)
+            for s in sorted(set(g_ss)):
+                s_triples = sorted(g_made.triples([s, None, None]))
+                assert s_triples
+                for s_, _, _ in s_triples:
+                    assert s_ == s
+            for p in sorted(set(g_ps)):
+                p_triples = sorted(g_made.triples([None, p, None]))
+                assert p_triples
+                for _, p_, _ in p_triples:
+                    assert p_ == p
+            for o in sorted(set(g_os)):
+                o_triples = sorted(g_made.triples([None, None, o]))
+                assert o_triples
+                for _, _, o_ in o_triples:
+                    assert o_.toPython() == o.toPython()
 
 
 def test_synthesis(module_results_df):
