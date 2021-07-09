@@ -36,14 +36,13 @@ TestCase.__test__ = False
 
 
 def yield_database_testcases(path: pathlib.Path):
-    logging.warn("Running w3c rdb2rdf test '%s'.", path.name)
     manifest_file = str(path.joinpath("manifest.ttl"))
 
     g = rdflib.Graph()
     g.parse(manifest_file, format="ttl")
     # Get test databases
     for dbspec in g[: RDF.type : rdb2rdftest.DataBase]:
-        logging.warn("Loading DB: '%s'", g.value(dbspec, dcterms.title))
+        logging.warn("Loading w3c rdb2rdf DB %s ('%s')", path.name, g.value(dbspec, dcterms.title))
         sql_fname = g.value(dbspec, rdb2rdftest.sqlScriptFile)
 
         for testspec in g.objects(dbspec, rdb2rdftest.relatedTestCase):

@@ -24,6 +24,7 @@ import sqlalchemy
 from sqlalchemy import MetaData, select, text, null, literal_column, literal
 from sqlalchemy import union_all, or_ as sql_or, and_ as sql_and
 from sqlalchemy import schema as sqlschema, types as sqltypes, func as sqlfunc
+from sqlalchemy.sql.expression import Operators as SQLOperators
 
 from sqlalchemy.engine import Engine
 
@@ -40,6 +41,18 @@ def iri_safe(v):
 def iri_unsafe(v):
     return urllib.parse.unquote(v)
 
+def sql_safe(literal):
+    # return "<ENCODE>" + sqlfunc.cast(literal, sqltypes.VARCHAR) + "</ENCODE>"
+    # This is a terrible idea due to the large number of chars.
+    # ... but the alternative messes up SPARQL query rewriting
+    literal = sqlfunc.replace(literal, " ", "%20")
+    literal = sqlfunc.replace(literal, "/", "%2F")
+    literal = sqlfunc.replace(literal, "(", "%28")
+    literal = sqlfunc.replace(literal, ")", "%29")
+    literal = sqlfunc.replace(literal, ",", "%2C")
+    literal = sqlfunc.replace(literal, ":", "%3A")
+    return literal
+    
 
 def _get_table(graph, tmap):
     logtable = graph.value(tmap, rr.logicalTable)
@@ -367,9 +380,6 @@ class R2RStore(Store):
         else:
             return literal_column(f"{tname}.{col}")
 
-    @staticmethod
-    def _sql_safe(literal):
-        return "<ENCODE>" + sqlfunc.cast(literal, sqltypes.VARCHAR) + "</ENCODE>"
 
     @classmethod
     def _template_to_function(cls, dbtable, tname, template, irisafe=False):
@@ -382,7 +392,7 @@ class R2RStore(Store):
             if col:
                 c = cls._get_col(dbtable, tname, col, template=True)
                 if irisafe:
-                    c = cls._sql_safe(c)
+                    c = sql_safe(c)
                 parts.append(c)
         parts = [sqlfunc.cast(x, sqltypes.VARCHAR) for x in parts if x != ""]
         return functools.reduce(operator.add, parts)
@@ -526,7 +536,7 @@ class R2RStore(Store):
                         where = swhere + pwhere + owhere
                         yield (s, p, o, g.label("g")), dbtable, where
 
-    def _get_query(self, metadata, pattern):
+    def queryPattern(self, metadata, pattern):
         queries = []
         # Triple Maps
         for tmap in self.mapping.graph[: RDF.type : rr.TriplesMap]:
@@ -538,32 +548,110 @@ class R2RStore(Store):
                 
         return union_all(*queries)
 
-    def evalBGP(self, bgp):
+    def queryBGP(self, conn, bgp):
+        metadata = MetaData(conn)
+        if 'duckdb' not in type(self.db.dialect).__module__:
+            metadata.reflect(self.db)
 
-        ns = self.mapping.graph.namespace_manager
-        logging.warn('bgp:\n' + '\n'.join(' '.join(n.n3(ns) for n in t) for t in bgp))
+        var_cols = {}
+        for qs, qp, qo in bgp:
+            nonvar = lambda n: n if not isinstance(n, Variable) else None
+            pattern = nonvar(qs), nonvar(qp), nonvar(qo)
+            subquery = self.queryPattern(metadata, pattern).subquery()
+            for node, col in zip((qs, qp, qo), subquery.c):
+                if isinstance(node, Variable):
+                    var_cols.setdefault(node, []).append(col)
+        sel = [cs[0].label(str(v)) for v, cs in var_cols.items()]
+        where = [
+            (c0 == c)
+            for (c0, *cs) in var_cols.values()
+            for c in cs
+        ]
+        return select(*sel).where(*where)
 
+    def queryFilter(self, conn, part):
+        expr = part.expr
+        part_query = self.queryPart(conn, part.p)
+        if hasattr(expr, 'name') and (expr.name == 'RelationalExpression'):
+            var_col = {Variable(c.key):c for c in part_query.inner_columns}
+            # TODO: eval group expr!
+            a = var_col.get(expr.expr, expr.expr.n3())
+            b = var_col.get(expr.other, expr.other.n3())
+            # Assume one of two expressions is a column!
+            c1, c2 = (a,b) if hasattr(a, 'bool_op') else (b, a)
+            clause = c1.bool_op(expr.op)(c2)
+            return part_query.where(clause)
+
+        raise NotImplementedError
+    
+    def queryJoin(self, conn, part):
+        query1 = self.queryPart(conn, part.p1)
+        query2 = self.queryPart(conn, part.p2)
+        var_cols = {}
+        for c in list(query1.c) + list(query2.c):
+            var_cols.setdefault(c.name, []).append(c)
+        sel = [cs[0].label(str(v)) for v, cs in var_cols.items()]
+        where = [
+            (c0 == c)
+            for (c0, *cs) in var_cols.values()
+            for c in cs
+        ]
+        return select(*sel).where(*where)
+    
+    def queryAggregateJoin(self, conn, agg):
+        funcs = {
+            "Aggregate_Count": sqlfunc.count,
+            "Aggregate_Sample": lambda x:x,
+            "Aggregate_Sum": sqlfunc.sum,
+            "Aggregate_Avg": sqlfunc.avg,
+            "Aggregate_Min": sqlfunc.min,
+            "Aggregate_Max": sqlfunc.max,
+            "Aggregate_GroupConcat": sqlfunc.group_concat,
+        }
+        # Assume agg.p is always a Group
+        group_expr, group_part = agg.p.expr, agg.p.p
+        part_query = self.queryPart(conn, group_part)
+        cols = list(part_query.inner_columns)
+        var_col = {Variable(c.key): c for c in cols}
+        # TODO: eval group expr!
+        cols = [funcs.get(a.name)(var_col[a.vars]).label(str(a.res)) for a in agg.A]
+        groups = [var_col[e] for e in group_expr]
+        return part_query.group_by(*groups).with_only_columns(cols)
+    
+    def queryExtend(self, conn, part):
+        part_query = self.queryPart(conn, part.p)
+        cols = list(part_query.inner_columns)
+        var_col = {Variable(c.key): c for c in cols}
+        cols += [var_col[part.expr].label(str(part.var))]
+        return part_query.with_only_columns(cols)
+
+    def queryProject(self, conn, part):
+        part_query = self.queryPart(conn, part.p)
+        cols = list(part_query.inner_columns)
+        var_col = {Variable(c.key): c for c in cols}
+        cols = [var_col[c] for c in part.PV]
+        return part_query.with_only_columns(cols)
+
+    def queryPart(self, conn, part):
+        if part.name == "BGP":
+            return self.queryBGP(conn, part.triples)
+        if part.name == "Filter":
+            return self.queryFilter(conn, part)
+        if part.name == "Extend":
+            return self.queryExtend(conn, part)
+        if part.name == "Project":
+            return self.queryProject(conn, part)
+        if part.name == "Join":
+            return self.queryJoin(conn, part)
+        if part.name == "AggregateJoin":
+            return self.queryAggregateJoin(conn, part)
+        if part.name == "ToMultiSet":
+            # no idea what this should do
+            return self.queryPart(conn, part.p)
+        raise NotImplementedError
+
+    def exec(self, query):
         with self.db.connect() as conn:
-            metadata = MetaData(conn)
-            if 'duckdb' not in type(self.db.dialect).__module__:
-                metadata.reflect(self.db)
-
-            var_cols = {}
-            for qs, qp, qo in bgp:
-                nonvar = lambda n: n if not isinstance(n, Variable) else None
-                pattern = nonvar(qs), nonvar(qp), nonvar(qo)
-                subquery = self._get_query(metadata, pattern).subquery()
-                for node, col in zip((qs, qp, qo), subquery.c):
-                    if isinstance(node, Variable):
-                        var_cols.setdefault(node, []).append(col)
-            logging.warn(var_cols)
-            sel = [cs[0].label(v) for v, cs in var_cols.items()]
-            where = [
-                (c0 == c)
-                for (c0, *cs) in var_cols.values()
-                for c in cs
-            ]
-            query = select(*sel).where(*where)
             qstr = str(query.compile(compile_kwargs={"literal_binds": True}))
             import sqlparse
             qstr = sqlparse.format(qstr, reindent=True, keyword_case='upper')
@@ -571,10 +659,15 @@ class R2RStore(Store):
 
             results = conn.execute(query)
             rows = list(results)
-            keys = list(results.keys())
+            keys = [Variable(v) for v in results.keys()]
             logging.warn(f"Got {len(rows)} rows of {keys}")
             for vals in rows:
                 yield dict(zip(keys, [self.make_node(v) for v in vals]))
+
+    def evalPart(self, part):
+        with self.db.connect() as conn:
+            query = self.queryPart(conn, part)
+        return self.exec(query)
 
     def make_node(self, val):
         isstr = isinstance(val, str)
@@ -615,8 +708,7 @@ class R2RStore(Store):
             if 'duckdb' not in type(self.db.dialect).__module__:
                 metadata.reflect(self.db)
 
-            query = self._get_query(metadata, pattern)
-            qstr = str(query.compile(compile_kwargs={"literal_binds": True}))
+            query = self.queryPattern(metadata, pattern)
             rows = list(conn.execute(query))
             for s, p, o, g in rows:
                 gnode = from_n3(g)

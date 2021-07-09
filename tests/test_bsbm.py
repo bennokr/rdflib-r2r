@@ -116,10 +116,11 @@ def test_bsbm(testcase: TestCase, dbname: str, path, dbs):
     param_sets = get_param_sets(path, graph)
 
     logging.warn(testcase.querytemplate)
-
+    
     def sample_params(match):
-        p = testcase.params.get(match.group(1))
-        sample = random.choice( list(param_sets.get(p, ['?_'])) ).n3()
+        pname = match.group(1)
+        domain = list(param_sets.get(testcase.params.get(pname), ['?_']))
+        sample = params.setdefault(pname, random.choice( domain ).n3())
         logging.warn(f"{match.group(1)}: {sample}")
         return sample
 
@@ -133,8 +134,9 @@ def test_bsbm(testcase: TestCase, dbname: str, path, dbs):
     tried = 0
     goal = None
     while not goal:
+        params = {}
         query = re.sub('%([^%]+)%', sample_params, testcase.querytemplate)
-        # logging.warn(query)
+        logging.warn(f'params: {params}')
 
         goal = set(graph.query(query))
         logging.warn(f'goal: {len(goal)} triples\n' \
@@ -144,10 +146,10 @@ def test_bsbm(testcase: TestCase, dbname: str, path, dbs):
             logging.warn(f"Tried {tried} options")
             continue
 
-        optimize_sparql() # THIS FUNCTION BREAKS NON-R2R STORES ?!?
+        optimize_sparql()
         made = set(graph_rdb.query(query))
         logging.warn(f'made: {len(made)} triples\n' \
             + '\n'.join(' '.join(n.n3(ns) for n in t) for t in made))
         assert made == goal
-
+        break
     reset_sparql()
