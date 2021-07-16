@@ -15,9 +15,10 @@ def setup_engine(name, echo=False):
             echo=echo,
             future=True,
             connect_args={
-                "detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
+                "detect_types": sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
+                'timeout': 30 * 1000
             },
-            native_datetime=True,
+            native_datetime=True, # ?
         )
 
     if name == "duckdb":
