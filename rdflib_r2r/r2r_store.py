@@ -1,6 +1,14 @@
 """
 rdflib_r2r.r2r_store
 =======================
+
+TODO:
+- make the mold objects nicer & documented
+- make all queryPart functions return SubMold objects
+    - queryFilter: colmold comparison (also decompose constants!) (and NotExists!)
+    - queryAggregate: colmold groups & colmold counts
+- delay the UNION creation longer, so that we can use colmolds to filter them
+
 """
 from os import linesep
 from typing import Iterable, List, Tuple
@@ -179,8 +187,17 @@ class R2RStore(Store):
     def _concat_colmold(strings: List[str], cols: List[ColumnElement]):
         if cols == []:
             return literal_column(''.join(strings))
+        if strings == [None]:
+            return cols[0]
         cols = list(cols)
-        parts = [(literal(s) if s != None else cols.pop(0)) for s in strings]
+        parts = []
+        for s in strings:
+            if s in [True, None, False]:
+                col = sqlfunc.cast(cols.pop(0), sqltypes.VARCHAR)
+                part = sql_safe(col) if s else col
+            else:
+                part = literal(s)
+            parts.append(part)
         return functools.reduce(operator.add, parts)
 
     @classmethod
@@ -194,10 +211,7 @@ class R2RStore(Store):
                 strings.append(prefix)
             if colname:
                 col = cls._get_col(dbtable, colname, template=True)
-                col = sqlfunc.cast(col, sqltypes.VARCHAR)
-                if irisafe:
-                    col = sql_safe(col)
-                strings.append(None)
+                strings.append(irisafe) # sorry not sorry
                 cols.append(col)
 
         return strings, cols
@@ -549,13 +563,11 @@ class R2RStore(Store):
             
             # TODO: node mold stuff here!
             pat_query, submold = self.queryPattern(metadata, pat, restriction)
-            logging.warn(sql_pretty(pat_query))
-            logging.warn(submold)
             if isinstance(pat_query, Select):
                 cols = list(pat_query.inner_columns)
                 qvar_colmold = [
                     (q, (tuple(s), tuple(cols[i] for i in ixs) ) )
-                    for (ixs,s),q in zip(submold, (qs, qp, qo)) 
+                    for q, (ixs, s) in zip((qs, qp, qo), submold)
                     if isinstance(q, Variable)
                 ]
                 if len(pat_query._from_obj) == 1:
@@ -568,7 +580,7 @@ class R2RStore(Store):
                 pat_query = pat_query.with_only_columns(allcols)
                 qvar_submold = zip(qvars, submold)
             else:
-                qvar_submold = [(q,i) for q,i in zip(pat, submold) if q != None]
+                qvar_submold = [(q,i) for q,i in zip((qs, qp, qo), submold) if isinstance(q, Variable)]
             query_varsubmold.append( (pat_query, qvar_submold) )
 
         # Merge simple select statements on same table
@@ -588,7 +600,6 @@ class R2RStore(Store):
                 var_colmolds.setdefault(var, []).append( (mold, cols) )
 
         # Simplify colmold equalities
-        submold, allcols = self._combine_colmolds(*colmolds)
         sel = [self._concat_colmold(*cs[0]).label(str(v)) for v, cs in var_colmolds.items()]
         where = [eq for cs in var_colmolds.values() for eq in self.colmold_equal(*cs)]
         return select(*sel).where(*where)
@@ -602,6 +613,7 @@ class R2RStore(Store):
                     for c0, c in zip(cols_0, cols):
                         yield c0 == c
                 else:
+                    logging.warn(('neq:', mold_0, mold))
                     result = self._concat_colmold(mold, cols)
                     yield result_0 == result
 
@@ -653,7 +665,7 @@ class R2RStore(Store):
             for c in list(query2.inner_columns) + list(part_query.inner_columns):
                 var_cols.setdefault(c.name, []).append(c)
             where = [
-                c0 == c
+                c0 == c # TODO: colmold comparison
                 for (c0, *cs) in var_cols.values() 
                 for c in cs
             ]
