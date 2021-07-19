@@ -12,7 +12,7 @@ import rdflib.plugins.sparql.evaluate as sparql_evaluate
 from rdflib import Variable
 from rdflib.plugins.sparql.sparql import FrozenBindings, QueryContext
 
-from rdflib_r2r.r2r_store import R2RStore
+from rdflib_r2r.r2r_store import R2RStore, SparqlNotImplementedError
 
 # copy the default RDFlib function for evaluating Basic Graph Patterns
 rdflib_evalPart = sparql_evaluate.evalPart
@@ -36,13 +36,12 @@ def optimize_sparql():
 
         logging.warn(("starting", part.name))
         try:
-            
             return freeze_bindings(ctx, ctx.graph.store.evalPart(part))
-        except NotImplementedError:
+        except SparqlNotImplementedError:
             return rdflib_evalPart(ctx, part)
-        except:
-            logging.warn(part)
-            raise
+        # except Exception as e:
+        #     logging.warn(part)
+        #     raise e
             
 
     sparql_evaluate.evalPart = __evalPart__

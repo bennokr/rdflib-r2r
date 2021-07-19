@@ -13,7 +13,7 @@ import random
 
 import pytest
 import rdflib
-from rdflib.namespace import RDF, Namespace
+from rdflib.namespace import RDF, DC, Namespace
 from rdflib.compare import to_isomorphic, graph_diff
 from rdflib.util import from_n3
 
@@ -82,6 +82,7 @@ def get_param_sets(path, graph):
         'ProductFeatureURI': set(graph[ : RDF.type : bsbm.ProductFeature]),
         'ProductURI': set(graph[ : RDF.type : bsbm.Product]),
         'ProductTypeURI': set(graph[ : RDF.type : bsbm.ProductType]),
+        'ProductType': set(graph[ : RDF.type : bsbm.ProductType]),
         'ProductPropertyNumericValue': [rdflib.Literal(d) for d in range(1,500)],
         'OfferURI': set(graph[ : RDF.type : bsbm.ProductType]),
         'CurrentDate': set(d for _, d in graph[ : bsbm.validTo : ]),
@@ -91,6 +92,7 @@ def get_param_sets(path, graph):
             for w in path.joinpath('titlewords.txt').open().read().splitlines()
         ],
         'CountryURI': set(d for _, d in graph[ : bsbm.country : ]),
+        'Date': set(d._value for _, d in graph[ : DC.date : ]),
     }
 
 TESTS = list(yield_testcases(PATH))
@@ -99,6 +101,7 @@ TESTS = list(yield_testcases(PATH))
 def dbecho(pytestconfig):
     return pytestconfig.getoption("dbecho")
 
+@pytest.mark.timeout(60)
 @pytest.mark.parametrize("testcase", TESTS, ids=[t.id for t in TESTS])
 @pytest.mark.parametrize("dbname", ["sqlite", "duckdb"])
 def test_bsbm(testcase: TestCase, dbname: str, path, dbs):
@@ -117,12 +120,28 @@ def test_bsbm(testcase: TestCase, dbname: str, path, dbs):
 
     logging.warn(testcase.querytemplate)
     
-    def sample_params(match):
-        pname = match.group(1)
-        domain = list(param_sets.get(testcase.params.get(pname), ['?_']))
-        sample = params.setdefault(pname, random.choice( domain ).n3())
-        logging.warn(f"{match.group(1)}: {sample}")
-        return sample
+    def get_params(querytemplate):
+        params = {}
+        pnames = set(re.findall('%([^%]+)%', querytemplate))
+        if any(p.startswith('ConsecutiveMonth') for p in pnames):
+            from datetime import timedelta
+            ps = [p for p in pnames if p.startswith('ConsecutiveMonth')]
+            sample = random.choice( list(param_sets['Date']) )
+            month = sample.replace(day=1)
+            for p in sorted(ps, key=lambda x: int(x[-1])):
+                params[p] = month.isoformat()
+                month = (month + timedelta(days=40)).replace(day=1)
+        for pname in pnames:
+            if pname not in params:
+                params[pname] = sample_param(pname)
+        return params
+
+    def sample_param(pname):
+        tname = testcase.params.get(pname)
+        alt = pname.split('_')[0]
+        domain = param_sets.get(tname) or param_sets[alt]
+        sample = random.choice( list(domain) )
+        return sample.n3() if isinstance(sample, rdflib.term.Node) else sample
 
     logging.warn(f"Graph has {len(graph)} triples")
     # gb = rdflib.term.URIRef('http://downlode.org/rdf/iso-3166/countries#GB')
@@ -133,12 +152,17 @@ def test_bsbm(testcase: TestCase, dbname: str, path, dbs):
 
     tried = 0
     goal = None
+    querytemplate = testcase.querytemplate
     while not goal:
-        params = {}
-        query = re.sub('%([^%]+)%', sample_params, testcase.querytemplate)
+        params = get_params(querytemplate)
         logging.warn(f'params: {params}')
+        query = re.sub('%([^%]+)%', lambda m: params[m.group(1)], querytemplate)
 
-        goal = set(graph.query(query))
+        try:
+            goal = set(graph.query(query))
+        except TypeError as e:
+            logging.warn(f'Query failed with TypeError {e}')
+        
         logging.warn(f'goal: {len(goal)} triples\n' \
             + '\n'.join(' '.join(n.n3(ns) for n in t) for t in goal))
         if not goal:
@@ -152,4 +176,4 @@ def test_bsbm(testcase: TestCase, dbname: str, path, dbs):
             + '\n'.join(' '.join(n.n3(ns) for n in t) for t in made))
         assert made == goal
         break
-    reset_sparql()
+    reset_sparql() 
