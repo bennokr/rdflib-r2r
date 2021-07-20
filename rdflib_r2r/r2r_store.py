@@ -3,15 +3,13 @@ rdflib_r2r.r2r_store
 =======================
 
 TODO:
-- make the mold objects nicer & documented
-- make all queryPart functions return SubMold objects
-    - queryFilter: colmold comparison (also decompose constants!) (and NotExists!)
-    - queryAggregate: colmold groups & colmold counts
-- delay the UNION creation longer, so that we can use colmolds to filter them
+- delay the UNION creation longer, so that we can use colforms to filter them
+    - This is SUPER complicated because you'd need to explode the BGPs 
+        because each triple pattern becomes a set of selects, which you'd need to join
 
 """
 from os import linesep
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Tuple, Union, Dict
 import logging
 import functools
 import operator
@@ -32,9 +30,122 @@ from sqlalchemy import schema as sqlschema, types as sqltypes, func as sqlfunc
 import sqlalchemy.sql as sql
 from sqlalchemy.sql.expression import ColumnElement, GenerativeSelect, Select
 
-ColMold = Tuple[List[str], List[ColumnElement]]
-SelectSubMold = Tuple[Select, List[Tuple[Iterable[int], List[str]]] ]
-GenerativeSelectSubMold = Tuple[GenerativeSelect, List[Tuple[Iterable[int], List[str]]] ]
+FormStrings = Tuple[Union[str, bool]]  # booleans indicate SQL escaping of columns
+SubForm = Tuple[Iterable[int], FormStrings]
+SelectSubForm = Tuple[Select, List[SubForm]]
+GenerativeSelectSubForm = Tuple[GenerativeSelect, List[SubForm]]
+
+class ColForm:
+    """A template object for creating SQL expressions that represent RDF nodes.
+
+    Because the columns are separated from the template, this allows for efficient
+    joins, filters, and aggregates.
+
+    The `form` and `cols` list are combined by replacing non-strings in `form` by
+    elements of `cols` sequentially.
+    """
+
+    form: FormStrings
+    cols: Tuple[ColumnElement]
+    
+    def __init__(self, form, cols):
+        self.form, self.cols = tuple(form), tuple(cols)
+
+    def __hash__(self):
+        return hash((self.form, self.cols))
+    
+    def __repr__(self):
+        return f"ColForm({self.form}, {self.cols})"
+
+    def expr(self):
+        if self.cols == ():
+            return literal_column("".join(self.form))
+        if list(self.form) == [None]:
+            return self.cols[0]
+        cols = list(self.cols)
+        parts = []
+        for s in self.form:
+            if s in [True, None, False]:
+                col = sqlfunc.cast(cols.pop(0), sqltypes.VARCHAR)
+                # non-string values indicate whether to escape URI terms
+                part = sql_safe(col) if s else col
+            else:
+                part = literal(s)
+            parts.append(part)
+        return functools.reduce(operator.add, parts)
+
+    @classmethod
+    def from_template(cls, dbtable, template, irisafe=False) -> "ColForm":
+        # make python format string: escape curly braces by doubling {{ }}
+        template = re.sub("\\\\[{}]", lambda x: x.group(0)[1] * 2, template)
+
+        form, cols = [], []
+        for prefix, colname, _, _ in Formatter().parse(template):
+            if prefix != "":
+                form.append(prefix)
+            if colname:
+                col = R2RStore._get_col(dbtable, colname, template=True)
+                form.append(irisafe)  # sorry not sorry
+                cols.append(col)
+
+        return cls(form, cols)
+    
+    @classmethod
+    def from_subform(cls, cols, subform):
+        cols = list(cols)
+        idxs, form = subform
+        return cls(form, [cols[i] for i in idxs])
+    
+    @classmethod
+    def from_expr(cls, expr):
+        return cls([None], [expr])
+    
+    @classmethod
+    def null(cls):
+        return cls.from_expr(null())
+
+    @staticmethod
+    def to_subforms_columns(*colforms) -> Tuple[List[SubForm], List[ColumnElement]]:
+        subforms, allcols = [], []
+        i = 0
+        for cf in colforms:
+            subforms.append((range(i, i + len(cf.cols)), cf.form))
+            i += len(cf.cols)
+            allcols += list(cf.cols)
+        return subforms, allcols
+
+    @staticmethod
+    def equal(*colforms, eq=True):
+        if colforms:
+            cf0, *cfs = colforms
+            expr0 = cf0.expr()
+            for cf in cfs:
+                if tuple(cf0.form) == tuple(cf.form):
+                    for c0, c in zip(cf0.cols, cf.cols):
+                        yield (c0 == c) if eq else (c0 != c)
+                else:
+                    logging.warn(f"Cannot reduce {cf0} and {cf}")
+                    # TODO: fancy prefix checking
+                    yield (expr0 == cf.expr()) if eq else (expr0 != cf.expr())
+    
+    @classmethod
+    def op(cls, opstr, cf1, cf2):
+        if (opstr in ['=', '==']):
+            return cls.from_expr( sql_and(*cls.equal(cf1, cf2)) )
+        elif (opstr in ['!=', '<>']):
+            return cls.from_expr( sql_or(*cls.equal(cf1, cf2, eq=False)) )
+        elif (opstr == '/'):
+            op = sql.operators.custom_op(opstr, is_comparison=True)
+            a, b = cf1.expr(), cf2.expr()
+            r = sqlfunc.cast(op(a,b), sqltypes.FLOAT)
+            return cls.from_expr( r )
+        else:
+            op = sql.operators.custom_op(opstr, is_comparison=True)
+            # TODO: fancy type casting
+            return cls.from_expr(op(cf1.expr(), cf2.expr()))
+
+
+SelectVarSubForm = Tuple[Select, Dict[Variable, SubForm]]
 
 class SparqlNotImplementedError(NotImplementedError):
     pass
@@ -155,7 +266,6 @@ class R2RStore(Store):
         """The number of shared subject-object in the DB mapping."""
         raise NotImplementedError
 
-
     def _iri_encode(self, iri_n3):
         iri = iri_n3[1:-1]
         uri = re.sub("<ENCODE>(.+?)</ENCODE>", lambda x: iri_safe(x.group(1)), iri)
@@ -183,65 +293,45 @@ class R2RStore(Store):
         else:
             return literal_column(f'"{dbtable.name}".{colname}')
 
-    @staticmethod
-    def _concat_colmold(strings: List[str], cols: List[ColumnElement]):
-        if cols == []:
-            return literal_column(''.join(strings))
-        if strings == [None]:
-            return cols[0]
-        cols = list(cols)
-        parts = []
-        for s in strings:
-            if s in [True, None, False]:
-                col = sqlfunc.cast(cols.pop(0), sqltypes.VARCHAR)
-                part = sql_safe(col) if s else col
-            else:
-                part = literal(s)
-            parts.append(part)
-        return functools.reduce(operator.add, parts)
-
     @classmethod
-    def _template_to_colmolds(cls, dbtable, template, irisafe=False) -> ColMold:
-        # make python format string: escape curly braces by doubling {{ }}
-        template = re.sub("\\\\[{}]", lambda x: x.group(0)[1] * 2, template)
-
-        strings, cols = [], []
-        for prefix, colname, _, _ in Formatter().parse(template):
-            if prefix != "":
-                strings.append(prefix)
-            if colname:
-                col = cls._get_col(dbtable, colname, template=True)
-                strings.append(irisafe) # sorry not sorry
-                cols.append(col)
-
-        return strings, cols
-
-    @classmethod
-    def _term_map_colmolds(
+    def _term_map_colforms(
         cls, graph, dbtable, parent, wheres, mapper, shortcut, obj=False
-    ) -> Iterable[ColMold]:
-        # TODO: make this yield (strings, cols) tuples
+    ) -> Iterable[ColForm]:
+        """For each Triples Map, yield a expression template containing table columns.
+
+        Args:
+            graph (Graph): The RDF2RDB mapping graph
+            dbtable (TableClause): The database table for this mapping
+            parent (Identifier): The parent of this mapping
+            wheres (Iterable[BooleanClause]): SQL clauses for restriction
+            mapper (URIRef): Mapping predicate
+            shortcut (URIRef): Mapping shortcut predicate
+            obj (bool): Whether this term is in the object position. Defaults to False.
+
+        Yields:
+            ColForm: Expression Templates
+        """
         if graph.value(parent, shortcut):
             # constant shortcut properties
             for const in graph[parent:shortcut]:
-                yield [f"'{const.n3()}'"], []
+                yield ColForm([f"'{const.n3()}'"], [])
         elif graph.value(parent, mapper):
             for tmap in graph[parent:mapper]:
                 if graph.value(tmap, rr.constant):
                     # constant value
                     for const in graph[tmap : rr.constant]:
-                        yield [f"'{const.n3()}'"], []
+                        yield ColForm([f"'{const.n3()}'"], [])
                 else:
                     termtype = graph.value(tmap, rr.termType) or rr.IRI
                     if graph.value(tmap, rr.column):
                         colname = graph.value(tmap, rr.column)
-                        strings, cols = [None], [cls._get_col(dbtable, colname)]
+                        colform = ColForm.from_expr(cls._get_col(dbtable, colname))
                         if obj:
                             # for objects, the default term type is Literal
                             termtype = graph.value(tmap, rr.termType) or rr.Literal
                     elif graph.value(tmap, rr.template):
                         template = graph.value(tmap, rr.template)
-                        strings, cols = cls._template_to_colmolds(
+                        colform = ColForm.from_template(
                             dbtable, template, irisafe=(termtype == rr.IRI)
                         )
                     elif graph.value(tmap, rr.parentTriplesMap):
@@ -254,57 +344,50 @@ class R2RStore(Store):
                             ccol = f'"{dbtable.name}".{graph.value(join, rr.child)}'
                             pcol = f'"{ptable.name}".{graph.value(join, rr.parent)}'
                             joins.append(literal_column(ccol) == literal_column(pcol))
-                        referenced_colmolds = cls._term_map_colmolds(
+                        referenced_colforms = cls._term_map_colforms(
                             graph, ptable, ref, [], rr.subjectMap, rr.subject
                         )
-                        for strings, cols in referenced_colmolds:
+                        for refcolform in referenced_colforms:
                             # is this the best way..?
                             cols = [
                                 select(c).select_from(ptable).where(*joins).as_scalar()
-                                for c in cols
+                                for c in refcolform.cols
                             ]
-                            yield strings, cols
+                            yield ColForm(refcolform.form, cols)
                         continue
                     else:
                         # TODO: replace with RDB-specific construct (postgresql?)
                         rowid = literal_column(f'"{dbtable.name}".rowid').cast(
                             sqltypes.VARCHAR
                         )
-                        strings = ["_:" + dbtable.name + "#", None]
-                        yield strings, [rowid]
+                        form = ["_:" + dbtable.name + "#", None]
+                        yield ColForm(form, [rowid])
                         continue
 
                     if termtype == rr.IRI:
-                        yield (["<"] + strings + [">"]), cols
+                        form = ["<"] + list(colform.form) + [">"]
+                        yield ColForm(form, colform.cols)
                     elif termtype == rr.BlankNode:
-                        yield (["_:"] + strings), cols
+                        yield ColForm((["_:"] + list(colform.form)), colform.cols)
                     elif obj:
                         if graph.value(tmap, rr.language):
                             lang = graph.value(tmap, rr.language)
-                            cols = [sqlfunc.cast(c, sqltypes.VARCHAR) for c in cols]
-                            yield (['"'] + strings + ['"@' + str(lang)]), cols
+                            cols = [sqlfunc.cast(c, sqltypes.VARCHAR) for c in colform.cols]
+                            form = ['"'] + list(colform.form) + ['"@' + str(lang)]
+                            yield ColForm(form, cols)
                         elif graph.value(tmap, rr.datatype):
                             dtype = graph.value(tmap, rr.datatype)
-                            cols = [sqlfunc.cast(c, sqltypes.VARCHAR) for c in cols]
-                            yield (['"'] + strings + ['"^^' + dtype.n3()]), cols
+                            cols = [sqlfunc.cast(c, sqltypes.VARCHAR) for c in colform.cols]
+                            form = ['"'] + list(colform.form) + ['"^^' + dtype.n3()]
+                            yield ColForm(form, cols)
                         else:
                             # keep original datatype
-                            yield strings, cols
+                            yield colform
                     else:
-                        yield [None], [literal_column("'_:'")]  # not a real literal
+                        # not a real literal
+                        yield ColForm.from_expr(literal_column("'_:'"))
 
-    @staticmethod
-    def _combine_colmolds(*colmolds):
-        allcols = []
-        submold = []
-        i = 0
-        for strings, cols in colmolds:
-            submold.append((range(i, i + len(cols)), strings))
-            i += len(cols)
-            allcols += cols
-        return submold, allcols
-
-    def _triplesmap_select(self, metadata, tmap, pattern) -> Iterable[SelectSubMold]:
+    def _triplesmap_select(self, metadata, tmap, pattern) -> Iterable[SelectSubForm]:
         mg = self.mapping.graph
 
         dbtable = _get_table(mg, tmap)
@@ -323,34 +406,32 @@ class R2RStore(Store):
             else:
                 swhere = sfilt[tmap]
 
-        ss = self._term_map_colmolds(
+        ss = self._term_map_colforms(
             mg, dbtable, tmap, swhere, rr.subjectMap, rr.subject
         )
-        scolmold = next(ss)
+        scolform = next(ss)
         s_map = mg.value(tmap, rr.subjectMap)
 
-        gcolmolds = list(
-            self._term_map_colmolds(
-                mg, dbtable, s_map, [], rr.graphMap, rr.graph
-            )
-        ) or [([None],[null()])]
+        gcolforms = list(
+            self._term_map_colforms(mg, dbtable, s_map, [], rr.graphMap, rr.graph)
+        ) or [ColForm.null()]
 
         # Class Map
         if (not pfilt) or (None in pfilt) or (RDF.type == qp):
             for c in mg[s_map : rr["class"]]:
-                pcolmold = [f"'{RDF.type.n3()}'"], []
-                ocolmold = [f"'{c.n3()}'"], []
+                pcolform = ColForm([f"'{RDF.type.n3()}'"], [])
+                ocolform = ColForm([f"'{c.n3()}'"], [])
                 # no unsafe IRI because it should be defined to be safe
                 if (qo is not None) and (qo != c):
                     continue
-                for gcolmold in gcolmolds:
-                    submold, cols = self._combine_colmolds(
-                        scolmold, pcolmold, ocolmold, gcolmold
+                for gcolform in gcolforms:
+                    subforms, cols = ColForm.to_subforms_columns(
+                        scolform, pcolform, ocolform, gcolform
                     )
                     query = select(*cols).select_from(dbtable)
                     if swhere:
                         query = query.where(*swhere)
-                    yield query, submold
+                    yield query, subforms
 
         # Predicate-Object Maps
         pomaps = set(mg[tmap : rr.predicateObjectMap :])
@@ -361,34 +442,33 @@ class R2RStore(Store):
 
         for pomap in pomaps:
             pwhere = pfilt.get(pomap) or []
-            pcolmolds = self._term_map_colmolds(
+            pcolforms = self._term_map_colforms(
                 mg, dbtable, pomap, pwhere, rr.predicateMap, rr.predicate
             )
             owhere = ofilt.get(pomap) or []
-            ocolmolds = list(
-                self._term_map_colmolds(
+            ocolforms = list(
+                self._term_map_colforms(
                     mg, dbtable, pomap, owhere, rr.objectMap, rr.object, True
                 )
             )
-            gcolmolds = list(
-                self._term_map_colmolds(mg, dbtable, pomap, [], rr.graphMap, rr.graph)
-            ) or [([None],[null()])]
-            for pcolmold in pcolmolds:
-                pstrings, pcols = pcolmold
-                pstr = "".join(filter(bool, pstrings))
+            gcolforms = list(
+                self._term_map_colforms(mg, dbtable, pomap, [], rr.graphMap, rr.graph)
+            ) or [ColForm.null()]
+            for pcolform in pcolforms:
+                pstr = "".join(filter(bool, pcolform.form))
                 if (qp is not None) and pstr[1:-1] != qp.n3():
                     # Filter out non-identical property patterns
                     continue
-                for ocolmold in ocolmolds:
-                    for gcolmold in gcolmolds:
+                for ocolform in ocolforms:
+                    for gcolform in gcolforms:
                         where = swhere + pwhere + owhere
-                        submold, cols = self._combine_colmolds(
-                            scolmold, pcolmold, ocolmold, gcolmold
+                        subforms, cols = ColForm.to_subforms_columns(
+                            scolform, pcolform, ocolform, gcolform
                         )
                         query = select(*cols).select_from(dbtable)
                         if where:
                             query = query.where(*where)
-                        yield query, submold
+                        yield query, subforms
 
     @staticmethod
     def col_n3(dbcol):
@@ -414,38 +494,44 @@ class R2RStore(Store):
             return n3col
         return dbcol
 
-    def queryPattern(self, metadata, pattern, restrict_tmaps=None) -> GenerativeSelectSubMold:
-        query_idxstrs: List[SelectSubMold] = []
+    def union_spog_querysubforms(self, *queryforms) -> GenerativeSelectSubForm:
+        queries = []
+        # Make expressions from ColForms
+        for query, q_subforms in queryforms:
+            cols = list(query.inner_columns)
+            onlycols = []
+            assert len(q_subforms) == 4  # spog
+            for subform, name in zip(q_subforms, "spog"):
+                col = ColForm.from_subform(cols, subform).expr()
+                onlycols.append(col.label(name))
+            queries.append(query.with_only_columns(*onlycols))
+        subforms = [([i], [None]) for i in range(4)]  # spog
+
+        # If the object columns have different datatypes, cast them to n3 strings
+        # WARNING: In most cases, this should be fine but it might mess up!
+        _, _, o_cols, *_ = zip(*[q.inner_columns for q in queries])
+        kwargs = lambda c: tuple((k, v) for k, v in vars(c).items() if k[0] != "_")
+        o_types = set((c.type.__class__, kwargs(c.type)) for c in o_cols)
+        if len(o_types) > 1:
+            for qi, query in enumerate(queries):
+                s, p, o, g = query.inner_columns
+                queries[qi] = query.with_only_columns([s, p, self.col_n3(o), g])
+        return union_all(*queries), subforms
+
+    def queryPattern(
+        self, metadata, pattern, restrict_tmaps=None
+    ) -> GenerativeSelectSubForm:
+        querysubforms: List[SelectSubForm] = []
         # Triple Maps produce select queries
         for tmap in self.mapping.graph[: RDF.type : rr.TriplesMap]:
             if restrict_tmaps and (tmap not in restrict_tmaps):
                 continue
-            query_idxstrs += list(self._triplesmap_select(metadata, tmap, pattern))
+            querysubforms += list(self._triplesmap_select(metadata, tmap, pattern))
 
-        if len(query_idxstrs) > 1:
-            queries = []
-            for query, q_submold in query_idxstrs:
-                cols = list(query.inner_columns)
-                onlycols = []
-                assert len(q_submold) == 4 # spog
-                for (idxs, strings), name in zip(q_submold, "spog"):
-                    col = self._concat_colmold(strings, [cols[i] for i in idxs])
-                    onlycols.append( col.label(name) )
-                queries.append( query.with_only_columns(*onlycols) )
-            submold = [([i], [None]) for i in range(4)] # spog
-
-            # If the object columns have different datatypes, cast them to n3 strings
-            # WARNING: In most cases, this should be fine but it might mess up!
-            _, _, o_cols, *_ = zip(*[q.inner_columns for q in queries])
-            kwargs = lambda c: tuple((k, v) for k, v in vars(c).items() if k[0] != "_")
-            o_types = set((c.type.__class__, kwargs(c.type)) for c in o_cols)
-            if len(o_types) > 1:
-                for qi, query in enumerate(queries):
-                    s, p, o, g = query.inner_columns
-                    queries[qi] = query.with_only_columns([s, p, self.col_n3(o), g])
-            return union_all(*queries), submold
-        elif query_idxstrs:
-            return query_idxstrs[0]
+        if len(querysubforms) > 1:
+            return self.union_spog_querysubforms(*querysubforms)
+        elif querysubforms:
+            return querysubforms[0]
         else:
             logging.warn(f"Didn't get any tmaps for {pattern} from {restrict_tmaps}!")
 
@@ -488,12 +574,12 @@ class R2RStore(Store):
             if "duckdb" not in type(self.db.dialect).__module__:
                 metadata.reflect(self.db)
 
-            query, submold = self.queryPattern(metadata, pattern)
-            cols = getattr(query, 'inner_columns', query.c)
+            query, subforms = self.queryPattern(metadata, pattern)
+            cols = getattr(query, "inner_columns", query.c)
             onlycols = []
-            for (idxs, mold), colname in zip(submold, "spog"):
-                col = self._concat_colmold(mold, [cols[i] for i in idxs])
-                onlycols.append( col.label(colname) )
+            for subform, colname in zip(subforms, "spog"):
+                col = ColForm.from_subform(cols, subform).expr()
+                onlycols.append(col.label(colname))
             if isinstance(query, Select):
                 query = query.with_only_columns(onlycols)
             else:
@@ -517,7 +603,6 @@ class R2RStore(Store):
         ns = self.mapping.graph.namespace_manager
         patstr = " ".join((n.n3(ns) if n else "_") for n in pattern)
         logging.warn(f"pattern: {patstr}, results: {result_count}")
-
 
     ###### SPARQL #######
 
@@ -555,193 +640,238 @@ class R2RStore(Store):
 
         # Collect queries and associated query variables; collect simple table selects
         novar = lambda n: n if not isinstance(n, Variable) else None
-        query_varsubmold = []
-        table_varcolmolds = {}
+        query_varsubforms = []
+        table_varcolforms = {}
         for qs, qp, qo in bgp:
             restriction = restrict_tmaps.get(qs)
             pat = novar(qs), novar(qp), novar(qo)
-            
-            # TODO: node mold stuff here!
-            pat_query, submold = self.queryPattern(metadata, pat, restriction)
+
+            # Keep track of which columns belong to which query variable
+            pat_query, subforms = self.queryPattern(metadata, pat, restriction)
             if isinstance(pat_query, Select):
+                # Restrict selected terms from pattern query to query variables
                 cols = list(pat_query.inner_columns)
-                qvar_colmold = [
-                    (q, (tuple(s), tuple(cols[i] for i in ixs) ) )
-                    for q, (ixs, s) in zip((qs, qp, qo), submold)
+                qvar_colform = [
+                    (q, ColForm.from_subform(cols, subform))
+                    for q, subform in zip((qs, qp, qo), subforms)
                     if isinstance(q, Variable)
                 ]
                 if len(pat_query._from_obj) == 1:
+                    # Single table, so try to merge shared-subject terms
                     table = pat_query._from_obj[0]
-                    table_varcolmolds.setdefault(table, set()).update(qvar_colmold)
+                    table_varcolforms.setdefault(table, set()).update(qvar_colform)
                     continue
-                
-                qvars, colmolds = zip(*qvar_colmold)
-                submold, allcols = self._combine_colmolds(*colmolds)
+
+                qvars, colforms = zip(*qvar_colform)
+                subforms, allcols = ColForm.to_subforms_columns(*colforms)
                 pat_query = pat_query.with_only_columns(allcols)
-                qvar_submold = zip(qvars, submold)
+                qvar_subform = zip(qvars, subforms)
             else:
-                qvar_submold = [(q,i) for q,i in zip((qs, qp, qo), submold) if isinstance(q, Variable)]
-            query_varsubmold.append( (pat_query, qvar_submold) )
+                qvar_subform = [
+                    (q, subform)
+                    for q, subform in zip((qs, qp, qo), subforms)
+                    if isinstance(q, Variable)
+                ]
+            query_varsubforms.append((pat_query, qvar_subform))
 
         # Merge simple select statements on same table
-        for table, var_colmolds in table_varcolmolds.items():
-            qvars, colmolds = zip(*dict(var_colmolds).items())
-            submold, allcols = self._combine_colmolds(*colmolds)
+        for table, var_colforms in table_varcolforms.items():
+            qvars, colforms = zip(*dict(var_colforms).items())
+            subform, allcols = ColForm.to_subforms_columns(*colforms)
             query = select(*[col.label(str(var)) for var, col in zip(qvars, allcols)])
-            query_varsubmold.append( (query, zip(qvars, submold)) )
+            query_varsubforms.append((query, zip(qvars, subform)))
 
-        # Collect colmolds per variable
-        var_colmolds = {}
-        for query, varsubmold in query_varsubmold:
+        # Collect colforms per variable
+        var_colforms = {}
+        for query, var_subform in query_varsubforms:
             subquery = query.subquery()
             incols = list(subquery.c)
-            for var, (idx, mold) in varsubmold:
+            for var, (idx, form) in var_subform:
                 cols = [incols[i] for i in idx]
-                var_colmolds.setdefault(var, []).append( (mold, cols) )
+                var_colforms.setdefault(var, []).append( ColForm(form, cols) )
 
-        # Simplify colmold equalities
-        sel = [self._concat_colmold(*cs[0]).label(str(v)) for v, cs in var_colmolds.items()]
-        where = [eq for cs in var_colmolds.values() for eq in self.colmold_equal(*cs)]
-        return select(*sel).where(*where)
+        # Simplify colform equalities
+        colforms = [cfs[0] for cfs in var_colforms.values()]
+        subforms, allcols = ColForm.to_subforms_columns(*colforms)
+        where = [eq for cs in var_colforms.values() for eq in ColForm.equal(*cs)]
+        return select(*allcols).where(*where), dict(zip(var_colforms, subforms))
 
-    def colmold_equal(self, *colmolds):
-        if colmolds:
-            (mold_0, cols_0), *cs = colmolds
-            result_0 = self._concat_colmold(mold_0, cols_0)
-            for mold, cols in cs:
-                if tuple(mold_0) == tuple(mold):
-                    for c0, c in zip(cols_0, cols):
-                        yield c0 == c
-                else:
-                    logging.warn(('neq:', mold_0, mold))
-                    result = self._concat_colmold(mold, cols)
-                    yield result_0 == result
-
-    def queryExpr(self, conn, expr, var_col) -> ColumnElement:
-        if hasattr(expr, "name") and (expr.name == "RelationalExpression"):
-            a = self.queryExpr(conn, expr.expr, var_col)
-            b = self.queryExpr(conn, expr.other, var_col)
-            op = sql.operators.custom_op(expr.op, is_comparison=True)
-            return op(a, b)
-        if hasattr(expr, "name") and (expr.name == "MultiplicativeExpression"):
-            # TODO: ternary ops?
-            a = self.queryExpr(conn, expr.expr, var_col)
-            for other in expr.other:
-                b = self.queryExpr(conn, other, var_col)
-                op = sql.operators.custom_op(*expr.op, is_comparison=True)
-                return op(a, b)
-        if hasattr(expr, "name") and (expr.name == "ConditionalAndExpression"):
-            exprs = [self.queryExpr(conn, e, var_col) for e in [expr.expr] + expr.other]
-            return sql_and(*exprs)
-        if hasattr(expr, "name") and (expr.name == "ConditionalOrExpression"):
-            exprs = [self.queryExpr(conn, e, var_col) for e in [expr.expr] + expr.other]
-            return sql_or(*exprs)
-        if hasattr(expr, "name") and (expr.name == "Function"):
-            # TODO: it would be super cool to do UDFs here
-            if expr.iri in XSDToSQL:
-                for e in expr.expr:
-                    val = self.queryExpr(conn, e, var_col)
-                    return sqlfunc.cast(val, XSDToSQL[expr.iri])
-
-        if isinstance(expr, str) and (expr in var_col):
-            return var_col[expr]
-        if isinstance(expr, URIRef):
-            return expr.n3()
-        if isinstance(expr, Literal):
-            return expr.toPython()
-        if isinstance(expr, str):
-            return from_n3(expr).toPython()
-
-        # logging.warn(("Expr not implemented:", getattr(expr, "name", None), expr))
-        raise SparqlNotImplementedError
-
-    def queryFilter(self, conn, part) -> GenerativeSelect:
-        part_query = self.queryPart(conn, part.p)
-
-        if getattr(part.expr, "name", None) == "Builtin_NOTEXISTS":
-            # This is weird, but I guess that's how it is
-            query2 = self.queryPart(conn, part.expr.graph)
-            var_cols = {}
-            for c in list(query2.inner_columns) + list(part_query.inner_columns):
-                var_cols.setdefault(c.name, []).append(c)
-            where = [
-                c0 == c # TODO: colmold comparison
-                for (c0, *cs) in var_cols.values() 
-                for c in cs
-            ]
-            return part_query.filter(~query2.where(*where).exists())
-
-        var_col = {Variable(c.key): c for c in part_query.inner_columns}
-        clause = self.queryExpr(conn, part.expr, var_col)
-
-        # Filter should be HAVING for aggregates
-        if part.p.name == "AggregateJoin":
-            return part_query.having(clause)
-        else:
-            return part_query.where(clause)
-
-    def queryJoin(self, conn, part) -> GenerativeSelect:
-        query1 = self.queryPart(conn, part.p1)
-        query2 = self.queryPart(conn, part.p2)
-        if not query1.c:
-            return query2
-        if not query2.c:
-            return query1
-        var_cols = {}
-        for c in list(query1.c) + list(query2.c):
-            var_cols.setdefault(c.name, []).append(c)
-        sel = [cs[0].label(str(v)) for v, cs in var_cols.items()]
-        where = [(c0 == c) for (c0, *cs) in var_cols.values() for c in cs]
-        return select(*sel).where(*where)
-
-    def queryAggregateJoin(self, conn, agg) -> Select:
-        funcs = {
-            "Aggregate_Count": sqlfunc.count,
+    def queryExpr(self, conn, expr, var_cf) -> ColForm:
+        # this all could get really complicated with expression types...
+        agg_funcs = {
             "Aggregate_Sample": lambda x: x,
+            "Aggregate_Count": sqlfunc.count,
             "Aggregate_Sum": sqlfunc.sum,
             "Aggregate_Avg": sqlfunc.avg,
             "Aggregate_Min": sqlfunc.min,
             "Aggregate_Max": sqlfunc.max,
             "Aggregate_GroupConcat": sqlfunc.group_concat_node,
         }
+        if hasattr(expr, "name") and (expr.name in agg_funcs):
+            sub = self.queryExpr(conn, expr.vars, var_cf)
+            if expr.name == "Aggregate_Sample":
+                return sub
+            func = agg_funcs[expr.name]
+            if (len(sub.cols) == 1) and (expr.name == "Aggregate_Count"):
+                # Count queries don't need full node expression
+                return ColForm.from_expr( func(sub.cols[0]) )
+            else:
+                return ColForm.from_expr( func(sub.expr()) )
+        
+        if hasattr(expr, "name") and (expr.name == "RelationalExpression"):
+            a = self.queryExpr(conn, expr.expr, var_cf)
+            b = self.queryExpr(conn, expr.other, var_cf)
+            return ColForm.op(expr.op, a, b)
+        
+        if hasattr(expr, "name") and (expr.name == "MultiplicativeExpression"):
+            # TODO: ternary ops?
+            a = self.queryExpr(conn, expr.expr, var_cf)
+            for other in expr.other:
+                b = self.queryExpr(conn, other, var_cf)
+                return ColForm.op(expr.op[0], a, b)
+        
+        if hasattr(expr, "name") and (expr.name == "ConditionalAndExpression"):
+            exprs = [self.queryExpr(conn, e, var_cf) for e in [expr.expr] + expr.other]
+            return ColForm.from_expr( sql_and(*[e.expr() for e in exprs]) )
+        
+        if hasattr(expr, "name") and (expr.name == "ConditionalOrExpression"):
+            exprs = [self.queryExpr(conn, e, var_cf) for e in [expr.expr] + expr.other]
+            return ColForm.from_expr( sql_or(*[e.expr() for e in exprs]) )
+        
+        if hasattr(expr, "name") and (expr.name == "Function"):
+            # TODO: it would be super cool to do UDFs here
+            if expr.iri in XSDToSQL:
+                for e in expr.expr:
+                    cf = self.queryExpr(conn, e, var_cf)
+                    val = sqlfunc.cast(cf.expr(), XSDToSQL[expr.iri])
+                    return ColForm.from_expr( val )
+
+        if isinstance(expr, str) and (expr in var_cf):
+            return var_cf[expr]
+        if isinstance(expr, URIRef):
+            return ColForm.from_expr( expr.n3() )
+        if isinstance(expr, Literal):
+            return ColForm.from_expr( expr.toPython() )
+        if isinstance(expr, str):
+            return ColForm.from_expr( from_n3(expr).toPython() )
+
+        # logging.warn(("Expr not implemented:", getattr(expr, "name", None), expr))
+        raise SparqlNotImplementedError
+
+    def queryFilter(self, conn, part) -> Select:
+        part_query, var_subform = self.queryPart(conn, part.p)
+
+        if getattr(part.expr, "name", None) == "Builtin_NOTEXISTS":
+            # This is weird, but I guess that's how it is
+            query2, var_subform2 = self.queryPart(conn, part.expr.graph)
+            
+            var_colforms = {}
+            cols1 = list(part_query.inner_columns)
+            for v, sf1 in var_subform.items():
+                var_colforms.setdefault(v, []).append( ColForm.from_subform(cols1, sf1) )
+            cols2 = list(query2.inner_columns)
+            for v, sf2 in var_subform2.items():
+                var_colforms.setdefault(v, []).append( ColForm.from_subform(cols2, sf2) )
+            
+            where = [eq for cs in var_colforms.values() for eq in ColForm.equal(*cs)]
+            return part_query.filter(~query2.where(*where).exists()), var_subform
+
+        cols = list(getattr(part_query, 'inner_columns', part_query.c))
+        var_cf = {v:ColForm.from_subform(cols, sf) for v, sf in var_subform.items()}
+        clause = self.queryExpr(conn, part.expr, var_cf).expr()
+
+        # Filter should be HAVING for aggregates
+        if part.p.name == "AggregateJoin":
+            return part_query.having(clause), var_subform
+        else:
+            return part_query.where(clause), var_subform
+
+    def queryJoin(self, conn, part) -> Select:
+        query1, var_subform1 = self.queryPart(conn, part.p1)
+        query2, var_subform2 = self.queryPart(conn, part.p2)
+        if not query1.c:
+            return query2, var_subform2
+        if not query2.c:
+            return query1, var_subform1
+        
+        var_colforms = {}
+        cols1 = list(query1.c)
+        for v, sf1 in var_subform1.items():
+            var_colforms.setdefault(v, []).append( ColForm.from_subform(cols1, sf1) )
+        cols2 = list(query2.c)
+        for v, sf2 in var_subform2.items():
+            var_colforms.setdefault(v, []).append( ColForm.from_subform(cols2, sf2) )
+
+        colforms = [cfs[0] for cfs in var_colforms.values()]
+        subforms, allcols = ColForm.to_subforms_columns(*colforms)
+        where = [eq for cs in var_colforms.values() for eq in ColForm.equal(*cs)]
+        return select(*allcols).where(*where), dict(zip(var_colforms, subforms))
+
+    def queryAggregateJoin(self, conn, agg) -> SelectVarSubForm:
         # Assume agg.p is always a Group
         group_expr, group_part = agg.p.expr, agg.p.p
-        part_query = self.queryPart(conn, group_part)
-
-        # CompoundSelect objects are different
-        cols = list(getattr(part_query, "inner_columns", part_query.c))
-        var_col = {Variable(c.key): c for c in cols}
+        part_query, var_subform = self.queryPart(conn, group_part)
+        cols = list(getattr(part_query, 'inner_columns', part_query.c))
+        var_cf = {v:ColForm.from_subform(cols, sf) for v, sf in var_subform.items()}
 
         # Get aggregate column expressions
-        cols = []
-        for a in agg.A:
-            func = funcs.get(a.name)
-            expr = self.queryExpr(conn, a.vars, var_col)
-            col = func(expr).label(str(a.res))
-            cols.append(col)
-        groups = [self.queryExpr(conn, e, var_col) for e in group_expr]
+        var_agg = {a.res: self.queryExpr(conn, a, var_cf) for a in agg.A}
+        groups = [
+            c 
+            for e in group_expr
+            for c in self.queryExpr(conn, e, var_cf).cols
+        ]
 
-        # CompoundSelect objects are different
+        subforms, allcols = ColForm.to_subforms_columns(*var_agg.values())
         if isinstance(part_query, Select):
-            return part_query.group_by(*groups).with_only_columns(cols)
+            query = part_query.group_by(*groups).with_only_columns(allcols)
         else:
-            return select(*cols).group_by(*groups)
+            query = select(*allcols).group_by(*groups)
+        return query, dict(zip(var_agg, subforms))
 
-    def queryExtend(self, conn, part) -> Select:
-        part_query = self.queryPart(conn, part.p)
+    def queryExtend(self, conn, part) -> SelectVarSubForm:
+        part_query, var_subform = self.queryPart(conn, part.p)
+        assert isinstance(part_query, Select) # ?
         cols = list(part_query.inner_columns)
-        var_col = {Variable(c.key): c for c in cols}
-        cols += [self.queryExpr(conn, part.expr, var_col).label(str(part.var))]
-        return part_query.with_only_columns(cols)
+        var_cf = {v:ColForm.from_subform(cols, sf) for v, sf in var_subform.items()}
+        
+        cf = self.queryExpr(conn, part.expr, var_cf)
+        idxs = []
+        for c in cf.cols:
+            if c in cols:
+                idxs.append( cols.index(c) )
+            else:
+                idxs.append( len(cols) )
+                cols.append(c)
 
-    def queryProject(self, conn, part) -> Select:
-        part_query = self.queryPart(conn, part.p)
+        var_subform[part.var] = (idxs, cf.form)
+        
+        return part_query.with_only_columns(cols + list(cf.cols)), var_subform
+
+    def queryProject(self, conn, part) -> SelectVarSubForm:
+        part_query, var_subform = self.queryPart(conn, part.p)
+        var_subform = {v:sf for v, sf in var_subform.items() if v in part.PV}
         cols = list(part_query.inner_columns)
-        var_col = {Variable(c.key): c for c in cols}
-        cols = [self.queryExpr(conn, c, var_col) for c in part.PV]
-        return part_query.with_only_columns(cols)
+        colforms = [ColForm.from_subform(cols, sf) for sf in var_subform.values()]
+        subforms, allcols = ColForm.to_subforms_columns(*colforms)
+        part_query = part_query.with_only_columns(allcols)
+        return part_query, dict(zip(var_subform, subforms))
 
-    def queryPart(self, conn, part):
+    def queryOrderBy(self, conn, part):
+        part_query, var_subform = self.queryPart(conn, part.p)
+        cols = list(part_query.inner_columns)
+        var_cf = {v:ColForm.from_subform(cols, sf) for v, sf in var_subform.items()}
+        
+        ordering = []
+        for e in part.expr:
+            for col in self.queryExpr(conn, e.expr, var_cf).cols:
+                if e.order == "DESC":
+                    col = sqlalchemy.desc(col)
+                ordering.append( col )
+        
+        return part_query.order_by(*ordering), var_subform
+
+    def queryPart(self, conn, part) -> SelectVarSubForm:
         if part.name == "BGP":
             return self.queryBGP(conn, part.triples)
         if part.name == "Filter":
@@ -758,11 +888,14 @@ class R2RStore(Store):
             # no idea what this should do
             return self.queryPart(conn, part.p)
         if part.name == "Minus":
-            q1 = self.queryPart(conn, part.p1)
-            q2 = self.queryPart(conn, part.p2)
-            return q1.except_(q2)
+            q1, v1 = self.queryPart(conn, part.p1)
+            q2, _ = self.queryPart(conn, part.p2)
+            return q1.except_(q2), v1
         if part.name == "Distinct":
-            return self.queryPart(conn, part.p).distinct()
+            query, var_subform = self.queryPart(conn, part.p)
+            return query.distinct(), var_subform
+        if part.name == "OrderBy":
+            return self.queryOrderBy(conn, part)
 
         # logging.warn(("Part not implemented:", part))
         raise SparqlNotImplementedError
@@ -771,18 +904,39 @@ class R2RStore(Store):
         with self.db.connect() as conn:
             logging.warn(sql_pretty(query))
 
-            raise Exception
+            # raise Exception
 
             results = conn.execute(query)
             rows = list(results)
             keys = [Variable(v) for v in results.keys()]
             logging.warn(f"Got {len(rows)} rows of {keys}")
+            first = True
             for vals in rows:
+                if first:
+                    logging.warn(f"First row: {vals}")
+                    first = False
                 yield dict(zip(keys, [self.make_node(v) for v in vals]))
-    
+
+    @staticmethod
+    def _apply_subforms(query, var_subform):
+        if isinstance(query, Select):
+            cols = [
+                ColForm.from_subform(query.inner_columns, sf).expr().label(str(var))
+                for var, sf in var_subform.items()
+            ]
+            return query.with_only_columns(cols)
+        else:
+            cols = [
+                ColForm.from_subform(query.c, sf).expr().label(str(var))
+                for var, sf in var_subform.items()
+            ]
+            return select(*cols)
+
+
     def evalPart(self, part):
         with self.db.connect() as conn:
-            query = self.queryPart(conn, part)
+            query, var_subform = self.queryPart(conn, part)
+            query = self._apply_subforms(query, var_subform)
         return self.exec(query)
 
     def create(self, configuration):
