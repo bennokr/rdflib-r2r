@@ -39,9 +39,6 @@ def optimize_sparql():
             return freeze_bindings(ctx, ctx.graph.store.evalPart(part))
         except SparqlNotImplementedError:
             return rdflib_evalPart(ctx, part)
-        # except Exception as e:
-        #     logging.warn(part)
-        #     raise e
             
 
     sparql_evaluate.evalPart = __evalPart__
