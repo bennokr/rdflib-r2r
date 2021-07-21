@@ -246,7 +246,7 @@ def test_synthesis(module_results_df):
         logging.warn(row)
         testcase = row.testcase
         text = status_emoji.get(row.status, "") + " " + row.status
-        return f"[{text}]({row.engine_name}-rdb2rdf/{testcase.id}.md)"
+        return f"[{text}]({row.engine_name}-bsbm/{testcase.id}.md)"
     df["status"] = df.apply(get_status_link, axis=1)
 
     with testdir.joinpath("bsbm.md").open("w") as fw:
