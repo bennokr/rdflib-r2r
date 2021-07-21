@@ -10,6 +10,7 @@ import re
 import pathlib
 from typing import NamedTuple
 import random
+from natsort import natsorted
 
 import pytest
 import rdflib
@@ -59,7 +60,7 @@ def yield_testcases(path: pathlib.Path):
     qpath = path.joinpath("queries")
     for t in ["bi", "explore"]:
         tpath = qpath.joinpath(t)
-        for d in sorted(tpath.glob("query*desc.txt")):
+        for d in natsorted(tpath.glob("query*desc.txt"), key=lambda x: str(x)):
             params = dict(l.split('=') for l in open(d).read().splitlines()[2:])
 
             name, _, _ = d.name.partition("desc")
@@ -88,11 +89,11 @@ def get_param_sets(path, graph):
         'CurrentDate': set(d for _, d in graph[ : bsbm.validTo : ]),
         'ReviewURI': set(graph[ : RDF.type : review.Review]),
         'Dictionary1': [
-            rdflib.Literal(w)
-            for w in path.joinpath('titlewords.txt').open().read().splitlines()
+            w for w in path.joinpath('titlewords.txt').open().read().splitlines()
         ],
         'CountryURI': set(d for _, d in graph[ : bsbm.country : ]),
         'Date': set(d._value for _, d in graph[ : DC.date : ]),
+        'ProducerURI': set(graph[ : RDF.type : bsbm.Producer]),
     }
 
 TESTS = list(yield_testcases(PATH))
@@ -103,10 +104,9 @@ def dbecho(pytestconfig):
 
 @pytest.mark.timeout(60)
 @pytest.mark.parametrize("testcase", TESTS, ids=[t.id for t in TESTS])
-@pytest.mark.parametrize("dbname", ["sqlite", "duckdb"])
-def test_bsbm(testcase: TestCase, dbname: str, path, dbs):
-
-    db = dbs[dbname]
+@pytest.mark.parametrize("engine_name", ["sqlite", "duckdb"])
+def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
+    db = dbs[engine_name]
 
     mapping = R2RMapping(rdflib.Graph().parse('tests/bsbm.ttl', format='ttl'))
     ns = mapping.graph.namespace_manager
@@ -150,11 +150,13 @@ def test_bsbm(testcase: TestCase, dbname: str, path, dbs):
     #     break
     # raise
 
-    tried = 0
     goal = None
     querytemplate = testcase.querytemplate
+    bad_params = set()
     while not goal:
         params = get_params(querytemplate)
+        if str(params) in bad_params:
+            continue
         logging.warn(f'params: {params}')
         query = re.sub('%([^%]+)%', lambda m: params[m.group(1)], querytemplate)
 
@@ -163,17 +165,91 @@ def test_bsbm(testcase: TestCase, dbname: str, path, dbs):
         except TypeError as e:
             logging.warn(f'Query failed with TypeError {e}')
         
-        logging.warn(f'goal: {len(goal)} triples\n' \
-            + '\n'.join(' '.join(n.n3(ns) for n in t) for t in goal))
+        for t in goal:
+            if any(n is None for n in t):
+                logging.warn(f"None in goal result: {t}")
+
+        gtxt = '\n'.join('\t'.join((n.n3(ns) if n else '') for n in t) for t in goal)
+        logging.warn(f'goal: {len(goal)} triples\n' + gtxt)
         if not goal:
-            tried += 1
-            logging.warn(f"Tried {tried} options")
+            bad_params.add( str(params) )
+            logging.warn(f"Tried {len(bad_params)} options")
             continue
 
         optimize_sparql()
+
+
         made = set(graph_rdb.query(query))
-        logging.warn(f'made: {len(made)} triples\n' \
-            + '\n'.join(' '.join(n.n3(ns) for n in t) for t in made))
+        mtxt = '\n'.join('\t'.join((n.n3(ns) if n else '') for n in t) for t in made)
+        logging.warn(f'made: {len(made)} triples\n' + mtxt)
+        
+        sql_query = graph_rdb.store.getSQL(query)
+        test_out = pathlib.Path(f'test-results/{engine_name}-bsbm/')
+        test_out.mkdir(parents=True, exist_ok=True)
+        test_out.joinpath(f"{testcase.id}.md").write_text(f"""
+# {testcase.id}
+
+## Random parameter sample
+```
+{params}
+```
+
+## SPARQL query
+```sparql
+{query}
+```
+
+## Goal results
+```
+{gtxt}
+```
+
+## Created SQL query
+```sql
+{sql_query}
+```
+
+## Created SQL results
+```
+{mtxt}
+```
+""")
+
         assert made == goal
         break
     reset_sparql() 
+
+def test_synthesis(module_results_df):
+    df = module_results_df
+    ids = df.testcase.apply(lambda x: x.id)
+    def get_link(r):
+        _, part, q = r.testcase.id.split('-')
+        pre = 'http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/'
+        parts = {
+            'explore': 'spec/ExploreUseCase/#queryTripleQ',
+            'bi': 'spec/BusinessIntelligenceUseCase/index.html#queryTripleQ'
+        }
+        link = pre + parts.get(part) + q.strip("query")
+        return f"[{r.testcase.id}]({link})"
+    df["link"] = df.apply(get_link, axis=1)
+    
+    status_emoji = {
+        "passed": "✅",
+        "failed": "❌",
+        "xfailed": "🔆",
+        "xpassed": "❗️",
+    }
+    testdir = pathlib.Path('test-results/')
+    testdir.mkdir(parents=True, exist_ok=True)
+
+    def get_status_link(row):
+        logging.warn(row)
+        testcase = row.testcase
+        text = status_emoji.get(row.status, "") + " " + row.status
+        return f"[{text}]({row.engine_name}-rdb2rdf/{testcase.id}.md)"
+    df["status"] = df.apply(get_status_link, axis=1)
+
+    with testdir.joinpath("bsbm.md").open("w") as fw:
+        print("# Test results\n", file=fw)
+        df = df[["engine_name", "link", "status", "duration_ms"]]
+        print(df.to_markdown(index=False), file=fw)

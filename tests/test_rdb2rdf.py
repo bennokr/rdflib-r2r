@@ -134,13 +134,22 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
     def dump_nt_sorted(g):
         return sorted(g.serialize(format="nt").strip().splitlines())
 
-    test_out = pathlib.Path('test-results/rdb2rdf/')
-    testdir = test_out.joinpath(testcase.id)
-    testdir.mkdir(parents=True, exist_ok=True)
-    made_path = testdir.joinpath(f"{outfile.stem}.made.nt")
-    made_path.write_bytes(b'\n'.join(dump_nt_sorted(iso_made)))
-    goal_path = testdir.joinpath(f"{outfile.stem}.goal.nt")
-    goal_path.write_bytes(b'\n'.join(dump_nt_sorted(iso_goal)))
+    diff_lines = []
+    for g,p in zip([in_both, in_made, in_goal], ['','+ ','- ']):
+        for line in dump_nt_sorted(g):
+            diff_lines.append((line.decode(), p))
+    difftxt = '\n'.join(p+line for line, p in sorted(diff_lines))
+
+    test_out = pathlib.Path(f'test-results/{engine_name}-rdb2rdf/')
+    test_out.mkdir(parents=True, exist_ok=True)
+    test_out.joinpath(f"{testcase.id}.md").write_text(f"""
+# {testcase.id}
+{testcase.meta.get(dcterms.title)}
+
+```diff
+{difftxt}
+```
+""")
 
     for li, line in enumerate(dump_nt_sorted(in_both)):
         logging.warn(f"in_both {li+1}/{len(list(in_both))}: {line}")
@@ -186,18 +195,19 @@ def test_synthesis(module_results_df):
     }
     logging.warn(("statuses", set(df["status"])))
 
-    testdir = pathlib.Path('test-results/rdb2rdf/')
+    testdir = pathlib.Path('test-results/')
     testdir.mkdir(parents=True, exist_ok=True)
 
     def get_status_link(row):
-        testcase = row['testcase']
-        text = status_emoji.get(row["status"], "") + " " + row["status"]
-        return f"[{text}]({testdir}/{testcase.id})"
+        logging.warn(row)
+        testcase = row.testcase
+        text = status_emoji.get(row.status, "") + " " + row.status
+        return f"[{text}]({row.engine_name}-rdb2rdf/{testcase.id}.md)"
 
     # df["status"] = df["status"].apply(lambda s: status_emoji.get(s, "") + " " + s)
-    df["status"] = df.apply(get_status_link)
+    df["status"] = df.apply(get_status_link, axis=1)
 
-    with testdir.joinpath("readme.md").open("w") as fw:
+    with testdir.joinpath("rdb2rdf.md").open("w") as fw:
         print("# Test results\n", file=fw)
         df = df[["engine_name", "link", "status", "duration_ms", "title"]]
         print(df.to_markdown(index=False), file=fw)

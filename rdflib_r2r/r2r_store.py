@@ -17,6 +17,7 @@ import base64
 import urllib.parse
 import re
 from string import Formatter
+from collections import Counter
 
 from rdflib import URIRef, Literal, BNode, Variable
 from rdflib.namespace import RDF, XSD, Namespace
@@ -109,14 +110,20 @@ class ColForm:
         subforms, allcols = [], []
         i = 0
         for cf in colforms:
-            subforms.append((range(i, i + len(cf.cols)), cf.form))
-            i += len(cf.cols)
-            allcols += list(cf.cols)
+            cols = [c for c in cf.cols if type(c) != str]
+            if cf.form:
+                subforms.append((range(i, i + len(cols)), cf.form))
+                i += len(cols)
+                allcols += list(cols)
         return subforms, allcols
 
     @staticmethod
     def equal(*colforms, eq=True):
         if colforms:
+            # Sort colforms by descending frequency of form (for efficient equalities)
+            form_count = Counter(cf.form for cf in colforms)
+            colforms = sorted(colforms, key=lambda cf: -form_count[cf.form])
+            
             cf0, *cfs = colforms
             expr0 = cf0.expr()
             for cf in cfs:
@@ -596,8 +603,9 @@ class R2RStore(Store):
                     continue
 
                 result = snode, pnode, onode
+                if any(r is None for r in result):
+                    logging.warn(f"none in result: {result}")
                 result_count += 1
-                # logging.warn(f"result: {result}")
                 yield result, gnode
 
         ns = self.mapping.graph.namespace_manager
@@ -626,8 +634,10 @@ class R2RStore(Store):
                             restriction.add(tmap)
                 # Find triple map restrictions based on predicates
                 for pomap in mg[: rr.predicate : qp]:
+                    # Other triple maps that share this pred-obj map
                     for tmap in mg[: rr.predicateObjectMap : pomap]:
                         restriction.add(tmap)
+                    # Referenced triple maps
                     for omap in mg[pomap : rr.objectMap]:
                         for tmap in mg[omap : rr.parentTriplesMap]:
                             # recursive ??
@@ -723,7 +733,8 @@ class R2RStore(Store):
             b = self.queryExpr(conn, expr.other, var_cf)
             return ColForm.op(expr.op, a, b)
         
-        if hasattr(expr, "name") and (expr.name == "MultiplicativeExpression"):
+        math_expr_names = ["MultiplicativeExpression", "AdditiveExpression"]
+        if hasattr(expr, "name") and (expr.name in math_expr_names):
             # TODO: ternary ops?
             a = self.queryExpr(conn, expr.expr, var_cf)
             for other in expr.other:
@@ -755,7 +766,7 @@ class R2RStore(Store):
         if isinstance(expr, str):
             return ColForm.from_expr( from_n3(expr).toPython() )
 
-        # logging.warn(("Expr not implemented:", getattr(expr, "name", None), expr))
+        logging.warn(("Expr not implemented:", getattr(expr, "name", None), expr))
         raise SparqlNotImplementedError
 
     def queryFilter(self, conn, part) -> Select:
@@ -818,8 +829,9 @@ class R2RStore(Store):
         var_agg = {a.res: self.queryExpr(conn, a, var_cf) for a in agg.A}
         groups = [
             c 
-            for e in group_expr
+            for e in (group_expr or [])
             for c in self.queryExpr(conn, e, var_cf).cols
+            if type(c) != str
         ]
 
         subforms, allcols = ColForm.to_subforms_columns(*var_agg.values())
@@ -857,7 +869,7 @@ class R2RStore(Store):
         part_query = part_query.with_only_columns(allcols)
         return part_query, dict(zip(var_subform, subforms))
 
-    def queryOrderBy(self, conn, part):
+    def queryOrderBy(self, conn, part) -> SelectVarSubForm:
         part_query, var_subform = self.queryPart(conn, part.p)
         cols = list(part_query.inner_columns)
         var_cf = {v:ColForm.from_subform(cols, sf) for v, sf in var_subform.items()}
@@ -870,6 +882,65 @@ class R2RStore(Store):
                 ordering.append( col )
         
         return part_query.order_by(*ordering), var_subform
+
+    def queryUnion(self, conn, part) -> SelectVarSubForm:
+        query1, var_subform1 = self.queryPart(conn, part.p1)
+        query2, var_subform2 = self.queryPart(conn, part.p2)
+
+        all_vars = set(var_subform1) | set(var_subform2)
+
+        cols1, cols2 = list(query1.c), list(query2.c)
+        allcols1, allcols2 = [], []
+        var_sf = {}
+        for i, v in enumerate(all_vars):
+            # TODO: if forms are identical, don't convert to expression
+            var_sf[v] = [i], [None]
+            if v in var_subform1:
+                e1 = ColForm.from_subform(cols1, var_subform1[v]).expr()
+            else:
+                e1 = null()
+            allcols1.append( e1.label(str(v)) )
+            if v in var_subform2:
+                e2 = ColForm.from_subform(cols2, var_subform2[v]).expr()
+            else:
+                e2 = null()
+            allcols2.append( e2.label(str(v)) )
+        query1 = select(*allcols1)
+        query2 = select(*allcols2)
+        return union_all(query1, query2), var_sf
+
+    def querySlice(self, conn, part) -> SelectVarSubForm:
+        query, var_subform = self.queryPart(conn, part.p)
+        if part.start:
+            query = query.offset(part.start)
+        if part.length:
+            query = query.limit(part.length)
+        return query, var_subform
+
+    def queryLeftJoin(self, conn, part) -> SelectVarSubForm:
+        query1, var_subform1 = self.queryPart(conn, part.p1)
+        query2, var_subform2 = self.queryPart(conn, part.p2)
+        if not query1.c:
+            return query2, var_subform2
+        if not query2.c:
+            return query1, var_subform1
+            
+        var_colforms = {}
+        cols1 = list(query1.c)
+        for v, sf1 in var_subform1.items():
+            var_colforms.setdefault(v, []).append( ColForm.from_subform(cols1, sf1) )
+        cols2 = list(query2.c)
+        for v, sf2 in var_subform2.items():
+            var_colforms.setdefault(v, []).append( ColForm.from_subform(cols2, sf2) )
+
+        colforms = [cfs[0] for cfs in var_colforms.values()]
+        subforms, allcols = ColForm.to_subforms_columns(*colforms)
+        where = [eq for cs in var_colforms.values() for eq in ColForm.equal(*cs)]
+        onclause = sql_and(*where)
+        fromquery = query1.join(query2, onclause=onclause, isouter=True)
+        query = select(*allcols).select_from(fromquery)
+        return query, dict(zip(var_colforms, subforms))
+        
 
     def queryPart(self, conn, part) -> SelectVarSubForm:
         if part.name == "BGP":
@@ -896,8 +967,17 @@ class R2RStore(Store):
             return query.distinct(), var_subform
         if part.name == "OrderBy":
             return self.queryOrderBy(conn, part)
+        if part.name == "Union":
+            return self.queryUnion(conn, part)
+        if part.name == "Slice":
+            return self.querySlice(conn, part)
+        if part.name == "LeftJoin":
+            return self.queryLeftJoin(conn, part)
 
-        # logging.warn(("Part not implemented:", part))
+        if part.name == "SelectQuery":
+            return self.queryPart(conn, part.p)
+
+        logging.warn(("Sparql part not implemented:", part))
         raise SparqlNotImplementedError
 
     def exec(self, query):
@@ -938,6 +1018,16 @@ class R2RStore(Store):
             query, var_subform = self.queryPart(conn, part)
             query = self._apply_subforms(query, var_subform)
         return self.exec(query)
+
+    def getSQL(self, sparqlQuery, base=None, initNs={}):
+        from rdflib.plugins.sparql.parser import parseQuery
+        from rdflib.plugins.sparql.algebra import translateQuery
+        parsetree = parseQuery(sparqlQuery)
+        queryobj = translateQuery(parsetree, base, initNs)
+        with self.db.connect() as conn:
+            query, var_subform = self.queryPart(conn, queryobj.algebra)
+            sqlquery = self._apply_subforms(query, var_subform)
+            return sql_pretty(sqlquery)
 
     def create(self, configuration):
         raise TypeError("The DB mapping is read only!")

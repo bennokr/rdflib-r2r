@@ -1,0 +1,13 @@
+
+# DirectGraphTC0013
+Generation of a direct graph from a table with NULL values
+
+```diff
+<http://example.com/base/Person/ID=1> <http://example.com/base/Person#ID> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<http://example.com/base/Person/ID=1> <http://example.com/base/Person#Name> "Alice" .
+<http://example.com/base/Person/ID=1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Person> .
+<http://example.com/base/Person/ID=2> <http://example.com/base/Person#DateOfBirth> "September, 2010" .
+<http://example.com/base/Person/ID=2> <http://example.com/base/Person#ID> "2"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<http://example.com/base/Person/ID=2> <http://example.com/base/Person#Name> "Bob" .
+<http://example.com/base/Person/ID=2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Person> .
+```

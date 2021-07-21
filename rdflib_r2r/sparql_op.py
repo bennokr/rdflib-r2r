@@ -34,11 +34,13 @@ def optimize_sparql():
         if not isinstance(ctx.graph.store, R2RStore):
             return rdflib_evalPart(ctx, part)
 
-        logging.warn(("starting", part.name))
-        try:
-            return freeze_bindings(ctx, ctx.graph.store.evalPart(part))
-        except SparqlNotImplementedError:
+        # logging.warn(("starting", part.name))
+        # try:
+        if part.name == "SelectQuery":
             return rdflib_evalPart(ctx, part)
+        return freeze_bindings(ctx, ctx.graph.store.evalPart(part))
+        # except SparqlNotImplementedError:
+            # return rdflib_evalPart(ctx, part)
             
 
     sparql_evaluate.evalPart = __evalPart__
