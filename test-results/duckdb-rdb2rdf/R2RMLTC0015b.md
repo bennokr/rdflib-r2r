@@ -3,6 +3,7 @@
 Generation of language tags from a table with language information, and a term map with invalid rr:language value
 
 
+
 ```
 Traceback (most recent call last):
   File "/tests/test_rdb2rdf.py", line 114, in test_rdb2rdf

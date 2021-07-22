@@ -3,10 +3,24 @@
 TriplesMap without subjectMap
 
 
+
 ```
 Traceback (most recent call last):
-  File "/tests/test_rdb2rdf.py", line 114, in test_rdb2rdf
-    outfile = testcase.path.joinpath(testcase.meta[rdb2rdftest.output])
-KeyError: rdflib.term.URIRef('http://purl.org/NET/rdb2rdf-test#output')
+  File "/rdflib_r2r/r2r_store.py", line 426, in _triplesmap_select
+    scolform, stable = next(ss)
+StopIteration
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/tests/test_rdb2rdf.py", line 115, in test_rdb2rdf
+    tuple(g_made)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 421, in triples
+    for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
+  File "/rdflib_r2r/r2r_store.py", line 594, in triples
+    query, subforms = self.queryPattern(metadata, pattern)
+  File "/rdflib_r2r/r2r_store.py", line 545, in queryPattern
+    querysubforms += list(self._triplesmap_select(metadata, tmap, pattern))
+RuntimeError: generator raised StopIteration
 
 ```

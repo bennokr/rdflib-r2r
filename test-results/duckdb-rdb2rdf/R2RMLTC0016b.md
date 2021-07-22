@@ -3,6 +3,7 @@
 Table with datatypes: real and float
 
 
+
 ```
 Traceback (most recent call last):
   File "/tests/util.py", line 45, in create_database

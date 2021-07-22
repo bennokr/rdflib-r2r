@@ -3,6 +3,7 @@
 Two column mapping, presence of rr:termType rr:Literal on rr:subjectMap
 
 
+
 ```
 Traceback (most recent call last):
   File "/tests/test_rdb2rdf.py", line 114, in test_rdb2rdf

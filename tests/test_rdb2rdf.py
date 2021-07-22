@@ -111,6 +111,10 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
 
         g_made = rdflib.Graph(R2RStore(db=db, mapping=mapping))
 
+        if not rdb2rdftest.output in testcase.meta:
+            tuple(g_made)
+            return
+
         outfile = testcase.path.joinpath(testcase.meta[rdb2rdftest.output])
         fmt = rdflib.util.guess_format(str(outfile))
         if fmt == "nquads":
@@ -147,7 +151,11 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
             for line in dump_nt_sorted(g):
                 diff_lines.append((line.decode(), p))
         difftxt = '\n'.join(p+line for line, p in sorted(diff_lines))
-        report += "```diff\n" + difftxt + "\n```\n\n"
+        
+        sql_query = g_made.store.getSQL("SELECT * WHERE {?s ?p ?o}")
+        report += f"## Created SQL query\n```sql\n{sql_query}\n```\n\n"
+        
+        report += "## Triple Diff\n```diff\n" + difftxt + "\n```\n\n"
         report += ('SUCCES' if iso_made == iso_goal else 'FAIL')
         test_file.write_text(report)
 
@@ -181,7 +189,7 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
     except Exception as e:
         import traceback, os
         tb = traceback.format_exc().replace(os.getcwd(), '')
-        report += f"\n```\n{tb}\n```"
+        report += f"\n\n```\n{tb}\n```"
         test_file.write_text(report)
         raise e
 

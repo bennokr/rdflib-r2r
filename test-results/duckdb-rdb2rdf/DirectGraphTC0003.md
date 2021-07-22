@@ -2,6 +2,35 @@
 [link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0003)
 Three columns mapping, generation of a BlankNode
 
+## Created SQL query
+```sql
+SELECT anon_1.s AS s,
+       anon_1.p AS p,
+       anon_1.o AS o
+FROM
+  (SELECT CAST('_:Student#' AS VARCHAR) || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
+          '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
+          '<http://example.com/base/Student>' AS o,
+          NULL AS g
+   FROM "Student"
+   UNION ALL SELECT CAST('_:Student#' AS VARCHAR) || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/Student#ID>' AS p,
+                    CAST('"' AS VARCHAR) || CAST(CAST("Student"."ID" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
+                    NULL AS g
+   FROM "Student"
+   UNION ALL SELECT CAST('_:Student#' AS VARCHAR) || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/Student#FirstName>' AS p,
+                    "Student"."FirstName" AS o,
+                    NULL AS g
+   FROM "Student"
+   UNION ALL SELECT CAST('_:Student#' AS VARCHAR) || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/Student#LastName>' AS p,
+                    "Student"."LastName" AS o,
+                    NULL AS g
+   FROM "Student") AS anon_1
+```
+
+## Triple Diff
 ```diff
 _:cb0 <http://example.com/base/Student#FirstName> "Venus" .
 _:cb0 <http://example.com/base/Student#ID> "10"^^<http://www.w3.org/2001/XMLSchema#integer> .
@@ -10,13 +39,14 @@ _:cb0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base
 ```
 
 SUCCES
+
 ```
 Traceback (most recent call last):
-  File "/tests/test_rdb2rdf.py", line 177, in test_rdb2rdf
+  File "/tests/test_rdb2rdf.py", line 185, in test_rdb2rdf
     o_triples = sorted(g_made.triples([None, None, o]))
   File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 421, in triples
     for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
-  File "/rdflib_r2r/r2r_store.py", line 607, in triples
+  File "/rdflib_r2r/r2r_store.py", line 606, in triples
     rows = list(conn.execute(query))
   File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1262, in execute
     return meth(self, multiparams, params, _EMPTY_EXECUTION_OPTS)

@@ -1,10 +1,10 @@
 # bsbm-explore-query7
-[link]([bsbm-explore-query7](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/ExploreUseCase/#queryTripleQ7))
+[bsbm-explore-query7](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/ExploreUseCase/#queryTripleQ7)
 
 ## Random parameter sample
 ```
-currentDate = "2008-07-13"^^<http://www.w3.org/2001/XMLSchema#date>
-ProductXYZ = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product80>
+ProductXYZ = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product49>
+currentDate = "2008-06-11"^^<http://www.w3.org/2001/XMLSchema#date>
 ```
 
 ## SPARQL query
@@ -18,19 +18,19 @@ PREFIX dc: <http://purl.org/dc/elements/1.1/>
 SELECT ?productLabel ?offer ?price ?vendor ?vendorTitle ?review ?revTitle 
        ?reviewer ?revName ?rating1 ?rating2
 WHERE { 
-	<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product80> rdfs:label ?productLabel .
+	<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product49> rdfs:label ?productLabel .
     OPTIONAL {
-        ?offer bsbm:product <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product80> .
+        ?offer bsbm:product <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product49> .
 		?offer bsbm:price ?price .
 		?offer bsbm:vendor ?vendor .
 		?vendor rdfs:label ?vendorTitle .
         ?vendor bsbm:country <http://downlode.org/rdf/iso-3166/countries#DE> .
         ?offer dc:publisher ?vendor . 
         ?offer bsbm:validTo ?date .
-        FILTER (?date > "2008-07-13"^^<http://www.w3.org/2001/XMLSchema#date> )
+        FILTER (?date > "2008-06-11"^^<http://www.w3.org/2001/XMLSchema#date> )
     }
     OPTIONAL {
-	?review bsbm:reviewFor <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product80> .
+	?review bsbm:reviewFor <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product49> .
 	?review rev:reviewer ?reviewer .
 	?reviewer foaf:name ?revName .
 	?review dc:title ?revTitle .
@@ -42,54 +42,173 @@ WHERE {
 
 ## Goal results
 ```
-"tutors animists rocs"					bsbm-inst:Review807	"menstruum rules deeper heifers booed hornswoggled minicomputers cowled vedic rickettsias stilts flounciest"@en	bsbm-inst:Reviewer42	"Kura-Janette"	"10"^^xsd:integer	
-"tutors animists rocs"					bsbm-inst:Review71	"advocacies bludgeons brickiest boneblack uncomfortably analysts wen retranslation mammoths reexhibited kilty"@en	bsbm-inst:Reviewer5	"Przemek-Berte"	"9"^^xsd:integer	"5"^^xsd:integer
-"tutors animists rocs"					bsbm-inst:Review529	"limpidly scarified swiping frisian minutia sportiest narrates infarcts shopbreaker blankets apologizer frizzers revoker"@en	bsbm-inst:Reviewer27	"Constantin-Vasilis"		"9"^^xsd:integer
-"tutors animists rocs"					bsbm-inst:Review677	"balladeer reapply nauseates indurating brail catamite unhats monomaniacs effaced capuchin assertors unsafeties bisecting grudgers"@en	bsbm-inst:Reviewer34	"Iaroia-Shabaan"	"10"^^xsd:integer	
-"tutors animists rocs"					bsbm-inst:Review367	"nestled exposes moltenly ammonite widowered marching softies inertness proconsuls ramps lamenters"@en	bsbm-inst:Reviewer20	"Hostena-Yasmin"		"9"^^xsd:integer
-"tutors animists rocs"					bsbm-inst:Review845	"sociopathy bloats turnings bullweed lengthiness oncological respecters pompons quadruplets limiter"@en	bsbm-inst:Reviewer43	"Edmund-Nabeela"		"8"^^xsd:integer
-"tutors animists rocs"					bsbm-inst:Review920	"elongating retried crosswords sluggishly"@en	bsbm-inst:Reviewer47	"Gebharde-Yumako"		"4"^^xsd:integer
-"tutors animists rocs"					bsbm-inst:Review310	"bioenergetics sties eely atonally racoon"@en	bsbm-inst:Reviewer16	"Viviane-Stephano"	"9"^^xsd:integer	
-"tutors animists rocs"					bsbm-inst:Review308	"incertitude stratigraphy stratums evitable basinets domini counteropening deluded watersheds rattraps bewilderingly panpipes gunships"@en	bsbm-inst:Reviewer16	"Viviane-Stephano"		"5"^^xsd:integer
-"tutors animists rocs"					bsbm-inst:Review583	"ideologic garbanzos bedstands retributory"@en	bsbm-inst:Reviewer30	"Raymon-Lonni"		"3"^^xsd:integer
-"tutors animists rocs"					bsbm-inst:Review983	"bedfellow felled roomed terns timbering flamier monetarily tumps gustiest reblooming tentacular"@en	bsbm-inst:Reviewer49	"Patrice-Aristea"	"7"^^xsd:integer	"4"^^xsd:integer
-"tutors animists rocs"					bsbm-inst:Review336	"wawls computations plangent asthmatic representor leftists conoid zizzling ounces carbineer lips lube hermeneutical"@en	bsbm-inst:Reviewer18	"Emmy"	"5"^^xsd:integer	
+"camporee"					bsbm-inst:Review666	"pennons splayfoot thirstily boilermakers maoism alerts dromedaries forebay gruffly vocoder defensibility misplayed kilters"@en	bsbm-inst:Reviewer34	"Iaroia-Shabaan"	"6"^^xsd:integer	"1"^^xsd:integer
+"camporee"					bsbm-inst:Review629	"peashooter outwit unscrews validatory resown obliquity nodally douching preexaminations"@en	bsbm-inst:Reviewer32	"Anasooya"	"6"^^xsd:integer	"4"^^xsd:integer
+"camporee"					bsbm-inst:Review238	"secretions covalences sintering utterly"@en	bsbm-inst:Reviewer13	"Inka-Shunsho"		"1"^^xsd:integer
+"camporee"					bsbm-inst:Review697	"handsaw demobbing entryways claimable bravure untired pushiness beguiled hemmers rapist blisters heretical"@en	bsbm-inst:Reviewer36	"Tabora-Blanco"		
+"camporee"					bsbm-inst:Review590	"richens alzheimer ambusher restricting bolas conferees contrives invader finer"@en	bsbm-inst:Reviewer30	"Raymon-Lonni"	"2"^^xsd:integer	
+"camporee"					bsbm-inst:Review326	"malignancies generalizable drably foretastes disjuncts destructed percolator para execrates"@en	bsbm-inst:Reviewer17	"Domiziana-Emilee"	"1"^^xsd:integer	"5"^^xsd:integer
+"camporee"					bsbm-inst:Review291	"northers layering spectres aslant playgoer glands whammy matzahs"@en	bsbm-inst:Reviewer16	"Viviane-Stephano"		"4"^^xsd:integer
+"camporee"					bsbm-inst:Review561	"renograms bimesters lowlander amortizes untrimming generator"@en	bsbm-inst:Reviewer28	"Hemanti-Suhaila"	"7"^^xsd:integer	"10"^^xsd:integer
+"camporee"					bsbm-inst:Review553	"resubmission teleported chitin copping taped outdoing tricycles"@en	bsbm-inst:Reviewer28	"Hemanti-Suhaila"	"10"^^xsd:integer	"10"^^xsd:integer
+"camporee"					bsbm-inst:Review143	"groining abuser phonophotography trailing devotedness nepotistical prosperously dobbins geriatrist itchiness"@en	bsbm-inst:Reviewer8	"Linda-Nada"		"9"^^xsd:integer
+"camporee"					bsbm-inst:Review178	"clarifier oxygenation accruable proboscises whops"@en	bsbm-inst:Reviewer9	"Takiji-Yaphet"	"6"^^xsd:integer	"4"^^xsd:integer
+"camporee"					bsbm-inst:Review31	"chanceries scintillated bider ethicalness grindings"@en	bsbm-inst:Reviewer3	"Danijela-Adalbrand"	"10"^^xsd:integer	"4"^^xsd:integer
+"camporee"					bsbm-inst:Review940	"remonstrant gestation usuries frescoists patronal transmigrators validations mosses"@en	bsbm-inst:Reviewer48	"Labeeb-Tonasha"	"7"^^xsd:integer	"7"^^xsd:integer
+"camporee"					bsbm-inst:Review909	"eccentrically neuralgic ergs cleats handler monstrances postmistresses"@en	bsbm-inst:Reviewer46	"Ezgi"	"9"^^xsd:integer	"8"^^xsd:integer
+"camporee"					bsbm-inst:Review606	"prepayment congealment outswims tailoress palinode hobbler limbs wildebeest astoundingly detectives darnel vainness weening"@en	bsbm-inst:Reviewer30	"Raymon-Lonni"		"3"^^xsd:integer
+"camporee"					bsbm-inst:Review938	"digests paraquats purveyors hellenist escarping tentered nondistribution loomed recollection inched ricketier boomkin"@en	bsbm-inst:Reviewer47	"Gebharde-Yumako"	"9"^^xsd:integer	
+"camporee"					bsbm-inst:Review81	"broadaxe tubercled covenanted bashfulness diasporas apaches entireties defended cruncher affixers randomization"@en	bsbm-inst:Reviewer5	"Przemek-Berte"	"4"^^xsd:integer	"8"^^xsd:integer
+"camporee"					bsbm-inst:Review672	"bedquilt booteries deadeye quilters abloom scoopfuls cherubical repast"@en	bsbm-inst:Reviewer34	"Iaroia-Shabaan"		"5"^^xsd:integer
 ```
 
+## Created SQL query
+```sql
+SELECT anon_1."productLabel" AS "productLabel",
+       CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Offer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS offer,
+       CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Vendor' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."""vendor_ref"".nr_1" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS vendor,
+       anon_1.o AS "vendorTitle",
+       anon_1.price AS price,
+       CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_2.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS review,
+       CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Reviewer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_2."""person_ref"".nr_1" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS reviewer,
+       anon_2."revName" AS "revName",
+       CAST('"' AS VARCHAR) || CAST(anon_2."revTitle" AS VARCHAR) || CAST('"@en' AS VARCHAR) AS "revTitle",
+       anon_2.rating1 AS rating1,
+       anon_2.rating2 AS rating2
+FROM
+  (SELECT anon_3."productLabel" AS "productLabel",
+          anon_4.nr AS nr,
+          anon_4."""vendor_ref"".nr_1" AS """vendor_ref"".nr_1",
+          anon_4.o AS o,
+          anon_4.price AS price,
+          anon_4.date AS date
+   FROM
+     (SELECT anon_5."productLabel" AS "productLabel"
+      FROM
+        (SELECT product.label AS "productLabel"
+         FROM product
+         WHERE "product"."nr" = '49') AS anon_5) AS anon_3,
+
+     (SELECT anon_6.nr AS nr,
+             anon_6."""vendor_ref"".nr_1" AS """vendor_ref"".nr_1",
+             anon_7.o AS o,
+             anon_8.price AS price,
+             anon_8.date AS date
+      FROM
+        (SELECT offer.nr AS nr,
+                "vendor_ref".nr AS """vendor_ref"".nr_1"
+         FROM offer,
+              vendor AS vendor_ref
+         WHERE "offer".vendor = "vendor_ref".nr) AS anon_6,
+
+        (SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(producer.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                '<http://www.w3.org/2000/01/rdf-schema#label>' AS p,
+                producer.label AS o,
+                NULL AS g
+         FROM producer
+         UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Vendor' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(vendor.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                          '<http://www.w3.org/2000/01/rdf-schema#label>' AS p,
+                          vendor.label AS o,
+                          NULL AS g
+         FROM vendor) AS anon_7,
+
+        (SELECT offer.nr AS offer,
+                offer.price AS price,
+                offer."validTo" AS date
+         FROM offer) AS anon_8,
+
+        (SELECT offer.nr AS nr,
+                "vendor_ref".nr AS """vendor_ref"".nr_2"
+         FROM offer,
+              vendor AS vendor_ref
+         WHERE "offer".publisher = "vendor_ref".nr) AS anon_9,
+
+        (SELECT offer.nr AS nr
+         FROM offer,
+              product AS product_ref
+         WHERE "product_ref"."nr" = '49'
+           AND "offer".product = "product_ref".nr) AS anon_10,
+
+        (SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(producer.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/country>' AS p,
+                CAST('<' AS VARCHAR) || CAST('http://downlode.org/rdf/iso-3166/countries#' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(producer.country AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+                NULL AS g
+         FROM producer
+         WHERE "producer"."country" = 'DE'
+         UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Vendor' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(vendor.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                          '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/country>' AS p,
+                          CAST('<' AS VARCHAR) || CAST('http://downlode.org/rdf/iso-3166/countries#' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(vendor.country AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+                          NULL AS g
+         FROM vendor
+         WHERE "vendor"."country" = 'DE') AS anon_11
+      WHERE anon_6.nr = anon_9.nr
+        AND anon_6.nr = anon_10.nr
+        AND anon_6.nr = anon_8.offer
+        AND anon_6."""vendor_ref"".nr_1" = anon_9."""vendor_ref"".nr_2"
+        AND CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Vendor' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_6."""vendor_ref"".nr_1" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) = anon_7.s
+        AND CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Vendor' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_6."""vendor_ref"".nr_1" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) = anon_11.s) AS anon_4) AS anon_1,
+
+  (SELECT anon_12.nr AS nr,
+          anon_12."""person_ref"".nr_1" AS """person_ref"".nr_1",
+          anon_12."revName" AS "revName",
+          anon_12."revTitle" AS "revTitle",
+          anon_12.rating1 AS rating1,
+          anon_13.rating2 AS rating2
+   FROM
+     (SELECT anon_14.nr AS nr,
+             anon_14."""person_ref"".nr_1" AS """person_ref"".nr_1",
+             anon_14."revName" AS "revName",
+             anon_14."revTitle" AS "revTitle",
+             anon_15.rating1 AS rating1
+      FROM
+        (SELECT anon_16.nr AS nr,
+                anon_17."""person_ref"".nr_1" AS """person_ref"".nr_1",
+                anon_18."revName" AS "revName",
+                anon_19."revTitle" AS "revTitle"
+         FROM
+           (SELECT review.nr AS nr
+            FROM review,
+                 product AS product_ref
+            WHERE "product_ref"."nr" = '49'
+              AND "review".product = "product_ref".nr) AS anon_16,
+
+           (SELECT review.nr AS nr,
+                   "person_ref".nr AS """person_ref"".nr_1"
+            FROM review,
+                 person AS person_ref
+            WHERE "review".person = "person_ref".nr) AS anon_17,
+
+           (SELECT person.name AS "revName",
+                   person.nr AS reviewer
+            FROM person) AS anon_18,
+
+           (SELECT review.nr AS review,
+                   CAST(review.title AS VARCHAR) AS "revTitle"
+            FROM review) AS anon_19
+         WHERE anon_16.nr = anon_17.nr
+           AND anon_16.nr = anon_19.review
+           AND anon_18.reviewer = anon_17."""person_ref"".nr_1") AS anon_14,
+
+        (SELECT anon_20.review AS review,
+                anon_20.rating1 AS rating1
+         FROM
+           (SELECT review.nr AS review,
+                   review.rating1 AS rating1
+            FROM review) AS anon_20) AS anon_15
+      WHERE anon_14.nr = anon_15.review) AS anon_12,
+
+     (SELECT anon_21.rating2 AS rating2,
+             anon_21.review AS review
+      FROM
+        (SELECT review.rating2 AS rating2,
+                review.nr AS review
+         FROM review) AS anon_21) AS anon_13
+   WHERE anon_12.nr = anon_13.review) AS anon_2
+```
+
+## Created SQL results
+```
 
 ```
-Traceback (most recent call last):
-  File "/tests/test_bsbm.py", line 212, in test_bsbm
-    sql_query = graph_rdb.store.getSQL(query)
-  File "/rdflib_r2r/r2r_store.py", line 1045, in getSQL
-    query, var_subform = self.queryPart(conn, queryobj.algebra)
-  File "/rdflib_r2r/r2r_store.py", line 995, in queryPart
-    return self.queryPart(conn, part.p)
-  File "/rdflib_r2r/r2r_store.py", line 970, in queryPart
-    return self.queryProject(conn, part)
-  File "/rdflib_r2r/r2r_store.py", line 882, in queryProject
-    part_query, var_subform = self.queryPart(conn, part.p)
-  File "/rdflib_r2r/r2r_store.py", line 992, in queryPart
-    return self.queryLeftJoin(conn, part)
-  File "/rdflib_r2r/r2r_store.py", line 939, in queryLeftJoin
-    query1, var_subform1 = self.queryPart(conn, part.p1)
-  File "/rdflib_r2r/r2r_store.py", line 992, in queryPart
-    return self.queryLeftJoin(conn, part)
-  File "/rdflib_r2r/r2r_store.py", line 958, in queryLeftJoin
-    fromquery = query1.join(query2, onclause=onclause, isouter=True)
-  File "<string>", line 2, in join
-  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/sql/base.py", line 104, in _generative
-    x = fn(self, *args, **kw)
-  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/sql/selectable.py", line 5127, in join
-    target = coercions.expect(
-  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/sql/coercions.py", line 211, in expect
-    return impl._implicit_coercions(
-  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/sql/coercions.py", line 915, in _implicit_coercions
-    self._raise_for_expected(original_element, argname, resolved)
-  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/sql/coercions.py", line 282, in _raise_for_expected
-    util.raise_(exc.ArgumentError(msg, code=code), replace_context=err)
-  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/util/compat.py", line 207, in raise_
-    raise exception
-sqlalchemy.exc.ArgumentError: Join target, typically a FROM expression, or ORM relationship attribute expected, got <sqlalchemy.sql.selectable.Select object at 0x7fc88ceb2280>.
 
-```
+FAIL

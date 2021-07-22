@@ -3,26 +3,33 @@
 Two columns mapping, duplicate column name in SELECT
 
 
+
 ```
 Traceback (most recent call last):
-  File "/tests/test_rdb2rdf.py", line 107, in test_rdb2rdf
-    mapping = R2RMapping(rdflib.Graph().parse(str(mapfile), format=fmt))
-  File "/rdflib_r2r/r2r_mapping.py", line 218, in __init__
-    t = _get_table(g, tmap)
-  File "/rdflib_r2r/r2r_mapping.py", line 39, in _get_table
-    view2obj(sqlquery)
-  File "/rdflib_r2r/sql_view.py", line 106, in view2obj
-    logging.warn((str(s), type(s), parse_id(s, from_table) ))
-  File "/rdflib_r2r/sql_view.py", line 83, in parse_id
-    op = next(parse_node(l, from_table) for l in ls[0] if not l.ttype == Punct)
-  File "/rdflib_r2r/sql_view.py", line 83, in <genexpr>
-    op = next(parse_node(l, from_table) for l in ls[0] if not l.ttype == Punct)
-  File "/rdflib_r2r/sql_view.py", line 29, in parse_node
-    a, b = parse_node(ls[0], from_table), parse_node(ls[-1], from_table)
-  File "/rdflib_r2r/sql_view.py", line 59, in parse_node
-    return parse_id(ls, from_table)
-  File "/rdflib_r2r/sql_view.py", line 96, in parse_id
-    raise Exception(f"Problem with SQL Identifier {ls}")
-Exception: Problem with SQL Identifier [<Name 'ID' at 0x7FC89327A940>]
+  File "/tests/test_rdb2rdf.py", line 115, in test_rdb2rdf
+    tuple(g_made)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 421, in triples
+    for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
+  File "/rdflib_r2r/r2r_store.py", line 606, in triples
+    rows = list(conn.execute(query))
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1262, in execute
+    return meth(self, multiparams, params, _EMPTY_EXECUTION_OPTS)
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/sql/elements.py", line 324, in _execute_on_connection
+    return connection._execute_clauseelement(
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1451, in _execute_clauseelement
+    ret = self._execute_context(
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1813, in _execute_context
+    self._handle_dbapi_exception(
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1998, in _handle_dbapi_exception
+    util.raise_(exc_info[1], with_traceback=exc_info[2])
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/util/compat.py", line 207, in raise_
+    raise exception
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1770, in _execute_context
+    self.dialect.do_execute(
+  File "/opt/miniconda3/lib/python3.8/site-packages/duckdb_engine/__init__.py", line 71, in do_execute
+    cursor.execute(statement, parameters, context)
+  File "/opt/miniconda3/lib/python3.8/site-packages/duckdb_engine/__init__.py", line 35, in execute
+    self.c.execute(statement, parameters)
+RuntimeError: Binder Error: table "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR" has duplicate column name "ID"
 
 ```

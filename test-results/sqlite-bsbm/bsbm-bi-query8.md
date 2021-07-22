@@ -1,9 +1,9 @@
 # bsbm-bi-query8
-[link]([bsbm-bi-query8](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/BusinessIntelligenceUseCase/index.html#queryTripleQ8))
+[bsbm-bi-query8](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/BusinessIntelligenceUseCase/index.html#queryTripleQ8)
 
 ## Random parameter sample
 ```
-ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType9>
+ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType21>
 ```
 
 ## SPARQL query
@@ -16,13 +16,13 @@ ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductT
   {
     { Select ?vendor (count(?offer) As ?belowAvg)
       {
-        { ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType9> .
+        { ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType21> .
           ?offer bsbm:product ?product .
           ?offer bsbm:vendor ?vendor .
           ?offer bsbm:price ?price .
           { Select ?product (avg(xsd:float(xsd:string(?price))) As ?avgPrice)
             {
-              ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType9> .
+              ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType21> .
               ?offer bsbm:product ?product .
               ?offer bsbm:vendor ?vendor .
               ?offer bsbm:price ?price .
@@ -36,7 +36,7 @@ ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductT
     }
     { Select ?vendor (count(?offer) As ?offerCount)
       {
-        ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType9> .
+        ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType21> .
         ?offer bsbm:product ?product .
         ?offer bsbm:vendor ?vendor .
       }
@@ -55,118 +55,121 @@ bsbm-inst:Vendor1
 
 ## Created SQL query
 ```sql
-SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Vendor' || replace(replace(replace(replace(replace(replace(CAST(anon_1.vendor AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS vendor,
-       CAST(CAST(anon_1.count_1 AS FLOAT) / anon_2.count_2 AS FLOAT) AS "cheapExpensiveRatio"
+SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Vendor' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."""vendor_ref"".nr_1" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS vendor,
+       CAST(CAST(anon_1.count_1 AS FLOAT) / anon_2.count_2 AS DECIMAL) AS "cheapExpensiveRatio"
 FROM
-  (SELECT anon_3.vendor AS vendor,
-          count(anon_3.offer) AS count_1
+  (SELECT anon_3."""vendor_ref"".nr_1" AS """vendor_ref"".nr_1",
+          count(anon_3.nr) AS count_1
    FROM
-     (SELECT anon_4.product AS product,
-             anon_4.offer AS offer,
-             anon_5.price AS price,
-             anon_6.vendor AS vendor
+     (SELECT anon_4.nr AS nr,
+             anon_4."""vendor_ref"".nr_1" AS """vendor_ref"".nr_1",
+             anon_4.product AS product,
+             anon_4.price AS price,
+             anon_5.avg_1 AS avg_1
       FROM
-        (SELECT
-           (SELECT "product".nr
-            FROM product
-            WHERE "offer".product = "product".nr) AS product,
-                offer.nr AS offer
-         FROM offer) AS anon_4,
+        (SELECT anon_6.nr AS nr,
+                anon_6."""vendor_ref"".nr_1" AS """vendor_ref"".nr_1",
+                anon_7.product AS product,
+                anon_8.price AS price
+         FROM
+           (SELECT offer.nr AS nr,
+                   "vendor_ref".nr AS """vendor_ref"".nr_1"
+            FROM offer,
+                 vendor AS vendor_ref
+            WHERE "offer".vendor = "vendor_ref".nr) AS anon_6,
 
-        (SELECT offer.price AS price,
-                offer.nr AS offer
-         FROM offer) AS anon_5,
+           (SELECT producttypeproduct.product AS product
+            FROM producttypeproduct,
+                 producttype AS producttype_ref
+            WHERE "producttype_ref"."nr" = '21'
+              AND "producttypeproduct".productType = "producttype_ref".nr) AS anon_7,
 
-        (SELECT
-           (SELECT "vendor".nr
-            FROM vendor
-            WHERE "offer".vendor = "vendor".nr) AS vendor,
-                offer.nr AS offer
-         FROM offer) AS anon_6,
+           (SELECT offer.nr AS offer,
+                   offer.price AS price
+            FROM offer) AS anon_8,
 
-        (SELECT producttypeproduct.product AS product,
+           (SELECT offer.nr AS nr,
+                   "product_ref".nr AS """product_ref"".nr_1"
+            FROM offer,
+                 product AS product_ref
+            WHERE "offer".product = "product_ref".nr) AS anon_9
+         WHERE anon_6.nr = anon_9.nr
+           AND anon_6.nr = anon_8.offer
+           AND anon_7.product = anon_9."""product_ref"".nr_1") AS anon_4,
 
-           (SELECT "producttype".nr
-            FROM producttype
-            WHERE "producttype"."nr" = '9'
-              AND "producttypeproduct".productType = "producttype".nr) AS anon_8
-         FROM producttypeproduct) AS anon_7
-      WHERE anon_7.product = anon_4.product
-        AND anon_4.offer = anon_5.offer
-        AND anon_4.offer = anon_6.offer) AS anon_3,
+        (SELECT anon_10.product AS product,
+                avg(CAST(CAST(anon_10.price AS VARCHAR) AS FLOAT)) AS avg_1
+         FROM
+           (SELECT anon_11.nr AS nr,
+                   anon_11."""vendor_ref"".nr_2" AS """vendor_ref"".nr_2",
+                   anon_12.product AS product,
+                   anon_13.price AS price
+            FROM
+              (SELECT offer.nr AS nr,
+                      "vendor_ref".nr AS """vendor_ref"".nr_2"
+               FROM offer,
+                    vendor AS vendor_ref
+               WHERE "offer".vendor = "vendor_ref".nr) AS anon_11,
 
-     (SELECT anon_10.product AS product,
-             avg(CAST(CAST(anon_11.price AS VARCHAR) AS FLOAT)) AS avg_1
-      FROM
-        (SELECT
-           (SELECT "product".nr
-            FROM product
-            WHERE "offer".product = "product".nr) AS product,
-                offer.nr AS offer
-         FROM offer) AS anon_10,
+              (SELECT producttypeproduct.product AS product
+               FROM producttypeproduct,
+                    producttype AS producttype_ref
+               WHERE "producttype_ref"."nr" = '21'
+                 AND "producttypeproduct".productType = "producttype_ref".nr) AS anon_12,
 
-        (SELECT offer.price AS price,
-                offer.nr AS offer
-         FROM offer) AS anon_11,
+              (SELECT offer.price AS price,
+                      offer.nr AS offer
+               FROM offer) AS anon_13,
 
-        (SELECT producttypeproduct.product AS product,
+              (SELECT offer.nr AS nr,
+                      "product_ref".nr AS """product_ref"".nr_2"
+               FROM offer,
+                    product AS product_ref
+               WHERE "offer".product = "product_ref".nr) AS anon_14
+            WHERE anon_11.nr = anon_14.nr
+              AND anon_11.nr = anon_13.offer
+              AND anon_12.product = anon_14."""product_ref"".nr_2") AS anon_10
+         GROUP BY anon_10.product) AS anon_5
+      WHERE anon_4.product = anon_5.product
+        AND (CAST(CAST(anon_4.price AS VARCHAR) AS FLOAT) < anon_5.avg_1)) AS anon_3
+   GROUP BY anon_3."""vendor_ref"".nr_1") AS anon_1,
 
-           (SELECT "producttype".nr
-            FROM producttype
-            WHERE "producttype"."nr" = '9'
-              AND "producttypeproduct".productType = "producttype".nr) AS anon_13
-         FROM producttypeproduct) AS anon_12,
-
-        (SELECT
-           (SELECT "vendor".nr
-            FROM vendor
-            WHERE "offer".vendor = "vendor".nr) AS vendor,
-                offer.nr AS offer
-         FROM offer) AS anon_14
-      WHERE anon_12.product = anon_10.product
-        AND anon_10.offer = anon_11.offer
-        AND anon_10.offer = anon_14.offer
-      GROUP BY anon_10.product) AS anon_9
-   WHERE anon_3.product = anon_9.product
-     AND (CAST(CAST(anon_3.price AS VARCHAR) AS FLOAT) < anon_9.avg_1)
-   GROUP BY anon_3.vendor) AS anon_1,
-
-  (SELECT anon_15.vendor AS vendor,
-          count(anon_16.offer) AS count_2
+  (SELECT anon_15."""vendor_ref"".nr_3" AS """vendor_ref"".nr_3",
+          count(anon_15.nr) AS count_2
    FROM
-     (SELECT
-        (SELECT "vendor".nr
-         FROM vendor
-         WHERE "offer".vendor = "vendor".nr) AS vendor,
-             offer.nr AS offer
-      FROM offer) AS anon_15,
+     (SELECT anon_16.nr AS nr,
+             anon_16."""vendor_ref"".nr_3" AS """vendor_ref"".nr_3",
+             anon_17.product AS product
+      FROM
+        (SELECT offer.nr AS nr,
+                "vendor_ref".nr AS """vendor_ref"".nr_3"
+         FROM offer,
+              vendor AS vendor_ref
+         WHERE "offer".vendor = "vendor_ref".nr) AS anon_16,
 
-     (SELECT
-        (SELECT "product".nr
-         FROM product
-         WHERE "offer".product = "product".nr) AS product,
-             offer.nr AS offer
-      FROM offer) AS anon_16,
+        (SELECT producttypeproduct.product AS product
+         FROM producttypeproduct,
+              producttype AS producttype_ref
+         WHERE "producttype_ref"."nr" = '21'
+           AND "producttypeproduct".productType = "producttype_ref".nr) AS anon_17,
 
-     (SELECT producttypeproduct.product AS product,
-
-        (SELECT "producttype".nr
-         FROM producttype
-         WHERE "producttype"."nr" = '9'
-           AND "producttypeproduct".productType = "producttype".nr) AS anon_18
-      FROM producttypeproduct) AS anon_17
-   WHERE anon_17.product = anon_16.product
-     AND anon_16.offer = anon_15.offer
-   GROUP BY anon_15.vendor) AS anon_2
-WHERE anon_1.vendor = anon_2.vendor
-ORDER BY CAST(CAST(anon_1.count_1 AS FLOAT) / anon_2.count_2 AS FLOAT) DESC, anon_1.vendor
+        (SELECT offer.nr AS nr,
+                "product_ref".nr AS """product_ref"".nr_3"
+         FROM offer,
+              product AS product_ref
+         WHERE "offer".product = "product_ref".nr) AS anon_18
+      WHERE anon_16.nr = anon_18.nr
+        AND anon_17.product = anon_18."""product_ref"".nr_3") AS anon_15
+   GROUP BY anon_15."""vendor_ref"".nr_3") AS anon_2
+WHERE anon_1."""vendor_ref"".nr_1" = anon_2."""vendor_ref"".nr_3"
+ORDER BY CAST(CAST(anon_1.count_1 AS FLOAT) / anon_2.count_2 AS DECIMAL) DESC, anon_1."""vendor_ref"".nr_1"
 LIMIT 10
 OFFSET 0
 ```
 
 ## Created SQL results
 ```
-bsbm-inst:Vendor1	"0.4885"^^xsd:double
+bsbm-inst:Vendor1	"0.5000000000"^^xsd:decimal
 ```
 
 FAIL

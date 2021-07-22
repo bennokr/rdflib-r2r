@@ -3,6 +3,7 @@
 Unnamed column in a logical table
 
 
+
 ```
 Traceback (most recent call last):
   File "/tests/util.py", line 45, in create_database

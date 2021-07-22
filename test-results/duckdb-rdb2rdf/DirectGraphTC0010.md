@@ -2,26 +2,59 @@
 [link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0010)
 Generation of direct graph for table names with spaces
 
+## Created SQL query
+```sql
+SELECT anon_1.s AS s,
+       anon_1.p AS p,
+       anon_1.o AS o
+FROM
+  (SELECT CAST('<' AS VARCHAR) || CAST('Country%20Info/Country%20Code=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country Info"."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+          '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
+          '<http://example.com/base/Country%20Info>' AS o,
+          NULL AS g
+   FROM "Country Info"
+   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Country%20Info/Country%20Code=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country Info"."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                    '<http://example.com/base/Country%20Info#Country%20Code>' AS p,
+                    CAST('"' AS VARCHAR) || CAST(CAST("Country Info"."Country Code" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
+                    NULL AS g
+   FROM "Country Info"
+   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Country%20Info/Country%20Code=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country Info"."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                    '<http://example.com/base/Country%20Info#ISO%203166>' AS p,
+                    "Country Info"."ISO 3166" AS o,
+                    NULL AS g
+   FROM "Country Info"
+   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Country%20Info/Country%20Code=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country Info"."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                    '<http://example.com/base/Country%20Info#Name>' AS p,
+                    "Country Info"."Name" AS o,
+                    NULL AS g
+   FROM "Country Info") AS anon_1
+```
+
+## Triple Diff
+```diff
+<http://example.com/base/Country%20Info/Country%20Code=1> <http://example.com/base/Country%20Info#Country%20Code> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<http://example.com/base/Country%20Info/Country%20Code=1> <http://example.com/base/Country%20Info#ISO%203166> "BO" .
+<http://example.com/base/Country%20Info/Country%20Code=1> <http://example.com/base/Country%20Info#Name> "Bolivia, Plurinational State of" .
+<http://example.com/base/Country%20Info/Country%20Code=1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
+<http://example.com/base/Country%20Info/Country%20Code=2> <http://example.com/base/Country%20Info#Country%20Code> "2"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<http://example.com/base/Country%20Info/Country%20Code=2> <http://example.com/base/Country%20Info#ISO%203166> "IE" .
+<http://example.com/base/Country%20Info/Country%20Code=2> <http://example.com/base/Country%20Info#Name> "Ireland" .
+<http://example.com/base/Country%20Info/Country%20Code=2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
+<http://example.com/base/Country%20Info/Country%20Code=3> <http://example.com/base/Country%20Info#Country%20Code> "3"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<http://example.com/base/Country%20Info/Country%20Code=3> <http://example.com/base/Country%20Info#ISO%203166> "MF" .
+<http://example.com/base/Country%20Info/Country%20Code=3> <http://example.com/base/Country%20Info#Name> "Saint Martin (French part)" .
+<http://example.com/base/Country%20Info/Country%20Code=3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
+```
+
+SUCCES
 
 ```
 Traceback (most recent call last):
-  File "/tests/test_rdb2rdf.py", line 139, in test_rdb2rdf
-    iso_made, iso_goal = to_isomorphic(g_made), to_isomorphic(g_goal)
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/compare.py", line 492, in to_isomorphic
-    result += graph
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 551, in __iadd__
-    self.addN((s, p, o, self) for s, p, o in other)
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 1409, in addN
-    self.store.addN(
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/store.py", line 225, in addN
-    for s, p, o, c in quads:
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 1409, in <genexpr>
-    self.store.addN(
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 551, in <genexpr>
-    self.addN((s, p, o, self) for s, p, o in other)
+  File "/tests/test_rdb2rdf.py", line 185, in test_rdb2rdf
+    o_triples = sorted(g_made.triples([None, None, o]))
   File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 421, in triples
     for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
-  File "/rdflib_r2r/r2r_store.py", line 607, in triples
+  File "/rdflib_r2r/r2r_store.py", line 606, in triples
     rows = list(conn.execute(query))
   File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1262, in execute
     return meth(self, multiparams, params, _EMPTY_EXECUTION_OPTS)
@@ -41,10 +74,6 @@ Traceback (most recent call last):
     cursor.execute(statement, parameters, context)
   File "/opt/miniconda3/lib/python3.8/site-packages/duckdb_engine/__init__.py", line 35, in execute
     self.c.execute(statement, parameters)
-RuntimeError: Binder Error: No function matches the given name and argument types '||(BLOB, VARCHAR)'. You might need to add explicit type casts.
-	Candidate functions:
-	||(VARCHAR, VARCHAR) -> VARCHAR
-	||(BLOB, BLOB) -> BLOB
-
+RuntimeError: Binder Error: Type mismatch for binding parameter with index 33, expected type VARCHAR but got type INTEGER
 
 ```

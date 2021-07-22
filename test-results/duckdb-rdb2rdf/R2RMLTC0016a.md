@@ -3,6 +3,7 @@
 Table with datatypes: string and integer
 
 
+
 ```
 Traceback (most recent call last):
   File "/tests/util.py", line 45, in create_database

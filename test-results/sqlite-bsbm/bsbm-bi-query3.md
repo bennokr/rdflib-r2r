@@ -1,11 +1,11 @@
 # bsbm-bi-query3
-[link]([bsbm-bi-query3](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/BusinessIntelligenceUseCase/index.html#queryTripleQ3))
+[bsbm-bi-query3](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/BusinessIntelligenceUseCase/index.html#queryTripleQ3)
 
 ## Random parameter sample
 ```
-ConsecutiveMonth_0 = 2008-03-01
-ConsecutiveMonth_1 = 2008-04-01
-ConsecutiveMonth_2 = 2008-05-01
+ConsecutiveMonth_0 = 2008-01-01
+ConsecutiveMonth_1 = 2008-02-01
+ConsecutiveMonth_2 = 2008-03-01
 ```
 
 ## SPARQL query
@@ -22,7 +22,7 @@ ConsecutiveMonth_2 = 2008-05-01
       {
         ?review bsbm:reviewFor ?product .
         ?review dc:date ?date .
-        Filter(?date >= "2008-04-01"^^<http://www.w3.org/2001/XMLSchema#date> && ?date < "2008-05-01"^^<http://www.w3.org/2001/XMLSchema#date>) 
+        Filter(?date >= "2008-02-01"^^<http://www.w3.org/2001/XMLSchema#date> && ?date < "2008-03-01"^^<http://www.w3.org/2001/XMLSchema#date>) 
       }
       Group By ?product
     }  {
@@ -30,7 +30,7 @@ ConsecutiveMonth_2 = 2008-05-01
       {
         ?review bsbm:reviewFor ?product .
         ?review dc:date ?date .
-        Filter(?date >= "2008-03-01"^^<http://www.w3.org/2001/XMLSchema#date> && ?date < "2008-04-01"^^<http://www.w3.org/2001/XMLSchema#date>) #
+        Filter(?date >= "2008-01-01"^^<http://www.w3.org/2001/XMLSchema#date> && ?date < "2008-02-01"^^<http://www.w3.org/2001/XMLSchema#date>) #
       }
       Group By ?product
       Having (count(?review)>0)
@@ -43,91 +43,97 @@ ConsecutiveMonth_2 = 2008-05-01
 
 ## Goal results
 ```
-bsbm-inst:Product46	"4"^^xsd:decimal
-bsbm-inst:Product26	"3"^^xsd:decimal
-bsbm-inst:Product42	"3"^^xsd:decimal
-bsbm-inst:Product49	"3"^^xsd:decimal
-bsbm-inst:Product56	"3"^^xsd:decimal
-bsbm-inst:Product59	"3"^^xsd:decimal
-bsbm-inst:Product70	"3"^^xsd:decimal
-bsbm-inst:Product78	"3"^^xsd:decimal
-bsbm-inst:Product69	"2"^^xsd:decimal
-bsbm-inst:Product72	"2"^^xsd:decimal
+bsbm-inst:Product50	"5"^^xsd:decimal
+bsbm-inst:Product48	"4"^^xsd:decimal
+bsbm-inst:Product71	"4"^^xsd:decimal
+bsbm-inst:Product29	"3"^^xsd:decimal
+bsbm-inst:Product47	"3"^^xsd:decimal
+bsbm-inst:Product32	"2"^^xsd:decimal
+bsbm-inst:Product33	"2"^^xsd:decimal
+bsbm-inst:Product41	"2"^^xsd:decimal
+bsbm-inst:Product42	"2"^^xsd:decimal
+bsbm-inst:Product52	"2"^^xsd:decimal
 ```
 
 ## Created SQL query
 ```sql
-SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' || replace(replace(replace(replace(replace(replace(CAST(anon_1.product AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS product,
-       CAST(CAST(anon_1.count_1 AS FLOAT) / anon_2.count_2 AS FLOAT) AS ratio
+SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."""product_ref"".nr_1" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS product,
+       CAST(CAST(anon_1.count_1 AS FLOAT) / anon_2.count_2 AS DECIMAL) AS ratio
 FROM
-  (SELECT anon_3.product AS product,
-          count(anon_4.s) AS count_1
+  (SELECT anon_3."""product_ref"".nr_1" AS """product_ref"".nr_1",
+          count(anon_3.s) AS count_1
    FROM
-     (SELECT review.nr AS review,
+     (SELECT anon_4.s AS s,
+             anon_4.o AS o,
+             anon_5."""product_ref"".nr_1" AS """product_ref"".nr_1"
+      FROM
+        (SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(review.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                '<http://purl.org/dc/elements/1.1/date>' AS p,
+                review."publishDate" AS o,
+                NULL AS g
+         FROM review
+         UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(product.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                          '<http://purl.org/dc/elements/1.1/date>' AS p,
+                          product."publishDate" AS o,
+                          NULL AS g
+         FROM product) AS anon_4,
 
-        (SELECT "product".nr
-         FROM product
-         WHERE "review".product = "product".nr) AS product
-      FROM review) AS anon_3,
+        (SELECT review.nr AS nr,
+                "product_ref".nr AS """product_ref"".nr_1"
+         FROM review,
+              product AS product_ref
+         WHERE "review".product = "product_ref".nr) AS anon_5
+      WHERE anon_4.s = CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_5.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR)
+        AND (anon_4.o >= '2008-02-01')
+        AND (anon_4.o < '2008-03-01')) AS anon_3
+   GROUP BY anon_3."""product_ref"".nr_1") AS anon_1,
 
-     (SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(review.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-             '<http://purl.org/dc/elements/1.1/date>' AS p,
-             review."publishDate" AS o,
-             NULL AS g
-      FROM review
-      UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' || replace(replace(replace(replace(replace(replace(CAST(product.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                       '<http://purl.org/dc/elements/1.1/date>' AS p,
-                       product."publishDate" AS o,
-                       NULL AS g
-      FROM product) AS anon_4
-   WHERE anon_4.s = '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_3.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>'
-     AND (anon_4.o >= '2008-04-01')
-     AND (anon_4.o < '2008-05-01')
-   GROUP BY anon_3.product) AS anon_1,
-
-  (SELECT anon_5.product AS product,
+  (SELECT anon_6."""product_ref"".nr_2" AS """product_ref"".nr_2",
           count(anon_6.s) AS count_2
    FROM
-     (SELECT
-        (SELECT "product".nr
-         FROM product
-         WHERE "review".product = "product".nr) AS product,
-             review.nr AS review
-      FROM review) AS anon_5,
+     (SELECT anon_7.s AS s,
+             anon_7.o AS o,
+             anon_8."""product_ref"".nr_2" AS """product_ref"".nr_2"
+      FROM
+        (SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(review.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                '<http://purl.org/dc/elements/1.1/date>' AS p,
+                review."publishDate" AS o,
+                NULL AS g
+         FROM review
+         UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(product.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                          '<http://purl.org/dc/elements/1.1/date>' AS p,
+                          product."publishDate" AS o,
+                          NULL AS g
+         FROM product) AS anon_7,
 
-     (SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(review.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-             '<http://purl.org/dc/elements/1.1/date>' AS p,
-             review."publishDate" AS o,
-             NULL AS g
-      FROM review
-      UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' || replace(replace(replace(replace(replace(replace(CAST(product.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                       '<http://purl.org/dc/elements/1.1/date>' AS p,
-                       product."publishDate" AS o,
-                       NULL AS g
-      FROM product) AS anon_6
-   WHERE anon_6.s = '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_5.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>'
-     AND (anon_6.o >= '2008-03-01')
-     AND (anon_6.o < '2008-04-01')
-   GROUP BY anon_5.product
+        (SELECT review.nr AS nr,
+                "product_ref".nr AS """product_ref"".nr_2"
+         FROM review,
+              product AS product_ref
+         WHERE "review".product = "product_ref".nr) AS anon_8
+      WHERE anon_7.s = CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_8.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR)
+        AND (anon_7.o >= '2008-01-01')
+        AND (anon_7.o < '2008-02-01')) AS anon_6
+   GROUP BY anon_6."""product_ref"".nr_2"
    HAVING count(anon_6.s) > 0) AS anon_2
-WHERE anon_1.product = anon_2.product
-ORDER BY CAST(CAST(anon_1.count_1 AS FLOAT) / anon_2.count_2 AS FLOAT) DESC, anon_1.product
+WHERE anon_1."""product_ref"".nr_1" = anon_2."""product_ref"".nr_2"
+ORDER BY CAST(CAST(anon_1.count_1 AS FLOAT) / anon_2.count_2 AS DECIMAL) DESC, anon_1."""product_ref"".nr_1"
 LIMIT 10
 OFFSET 0
 ```
 
 ## Created SQL results
 ```
-bsbm-inst:Product46	"4.0"^^xsd:double
-bsbm-inst:Product26	"3.0"^^xsd:double
-bsbm-inst:Product42	"3.0"^^xsd:double
-bsbm-inst:Product49	"3.0"^^xsd:double
-bsbm-inst:Product56	"3.0"^^xsd:double
-bsbm-inst:Product59	"3.0"^^xsd:double
-bsbm-inst:Product70	"3.0"^^xsd:double
-bsbm-inst:Product78	"3.0"^^xsd:double
-bsbm-inst:Product69	"2.0"^^xsd:double
-bsbm-inst:Product72	"2.0"^^xsd:double
+bsbm-inst:Product50	"5.0000000000"^^xsd:decimal
+bsbm-inst:Product48	"4.0000000000"^^xsd:decimal
+bsbm-inst:Product71	"4.0000000000"^^xsd:decimal
+bsbm-inst:Product29	"3.0000000000"^^xsd:decimal
+bsbm-inst:Product47	"3.0000000000"^^xsd:decimal
+bsbm-inst:Product32	"2.0000000000"^^xsd:decimal
+bsbm-inst:Product33	"2.0000000000"^^xsd:decimal
+bsbm-inst:Product41	"2.0000000000"^^xsd:decimal
+bsbm-inst:Product42	"2.0000000000"^^xsd:decimal
+bsbm-inst:Product52	"2.0000000000"^^xsd:decimal
 ```
 
 FAIL

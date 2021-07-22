@@ -201,6 +201,7 @@ class R2RMapping:
                         # referencing object map
                         ref = graph.value(tmap, rr.parentTriplesMap)
                         rt = _get_table(graph, ref)
+                        rt = rt.alias(f"{rt.name}_ref")
                         rs = cls._term_pat(graph, rt, ref, rr.subjectMap, rr.subject)
                         yield from rs
                     else:

@@ -3,6 +3,7 @@
 Generation of triples from three tables, three primary keys, three foreign keys
 
 
+
 ```
 Traceback (most recent call last):
   File "/tests/util.py", line 45, in create_database

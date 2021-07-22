@@ -1,5 +1,5 @@
 # bsbm-bi-query6
-[link]([bsbm-bi-query6](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/BusinessIntelligenceUseCase/index.html#queryTripleQ6))
+[bsbm-bi-query6](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/BusinessIntelligenceUseCase/index.html#queryTripleQ6)
 
 ## Random parameter sample
 ```
@@ -45,197 +45,199 @@ bsbm-inst:Reviewer40	"9.0"^^xsd:double
 
 ## Created SQL query
 ```sql
-SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Reviewer' || replace(replace(replace(replace(replace(replace(CAST(anon_1.reviewer AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS reviewer,
-       avg(CAST(anon_2.score AS FLOAT)) AS "reviewerAvgScore"
+SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Reviewer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."""person_ref"".nr_1" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS reviewer,
+       avg(CAST(anon_1.score AS FLOAT)) AS "reviewerAvgScore"
 FROM
-  (SELECT anon_3.avg_1 AS avg_1,
-          anon_4.s AS s,
-          anon_4.review AS review,
-          anon_4.reviewer AS reviewer
+  (SELECT anon_2.avg_1 AS avg_1,
+          anon_2.s AS s,
+          anon_2.nr AS nr,
+          anon_2."""person_ref"".nr_1" AS """person_ref"".nr_1",
+          anon_3.score AS score
    FROM
-     (SELECT avg(CAST(anon_5.score AS FLOAT)) AS avg_1
+     (SELECT anon_4.avg_1 AS avg_1,
+             anon_5.s AS s,
+             anon_5.nr AS nr,
+             anon_5."""person_ref"".nr_1" AS """person_ref"".nr_1"
       FROM
-        (SELECT anon_6.review AS review,
-                anon_6.score AS score
+        (SELECT avg(CAST(anon_6.score AS FLOAT)) AS avg_1
          FROM
-           (SELECT anon_7.review AS review,
-                   anon_7.score AS score
+           (SELECT anon_7.s AS s,
+                   anon_7.nr AS nr,
+                   anon_8.score AS score
             FROM
-              (SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_8.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
-                      anon_8.score AS score
+              (SELECT anon_9.s AS s,
+                      anon_10.nr AS nr
                FROM
-                 (SELECT anon_9.score AS score,
-                         anon_9.review AS review
-                  FROM
-                    (SELECT review.rating1 AS score,
-                            review.nr AS review
-                     FROM review) AS anon_9) AS anon_8
-               UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_10.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
-                                anon_10.score AS score
+                 (SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Offer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(offer.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                         '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/producer>' AS p,
+                         CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("producer_ref".nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+                         NULL AS g
+                  FROM offer,
+                       producer AS producer_ref
+                  WHERE "producer_ref"."nr" = '3'
+                    AND "offer".producer = "producer_ref".nr
+                  UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(review.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                                   '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/producer>' AS p,
+                                   CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("producer_ref".nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+                                   NULL AS g
+                  FROM review,
+                       producer AS producer_ref
+                  WHERE "producer_ref"."nr" = '3'
+                    AND "review".producer = "producer_ref".nr
+                  UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(product.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                                   '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/producer>' AS p,
+                                   CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("producer_ref".nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+                                   NULL AS g
+                  FROM product,
+                       producer AS producer_ref
+                  WHERE "producer_ref"."nr" = '3'
+                    AND "product".producer = "producer_ref".nr) AS anon_9,
+
+                 (SELECT review.nr AS nr,
+                         "product_ref".nr AS """product_ref"".nr_1"
+                  FROM review,
+                       product AS product_ref
+                  WHERE "review".product = "product_ref".nr) AS anon_10
+               WHERE anon_9.s = CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_10."""product_ref"".nr_1" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR)) AS anon_7,
+
+              (SELECT anon_11.score AS score,
+                      anon_11.review AS review
                FROM
-                 (SELECT anon_11.score AS score,
-                         anon_11.review AS review
+                 (SELECT anon_12.score AS score,
+                         anon_12.review AS review
                   FROM
-                    (SELECT review.rating2 AS score,
-                            review.nr AS review
-                     FROM review) AS anon_11) AS anon_10) AS anon_7
-            UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_12.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
-                             anon_12.score AS score
+                    (SELECT anon_13.score AS score,
+                            CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_13.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS review
+                     FROM
+                       (SELECT anon_14.score AS score,
+                               anon_14.review AS review
+                        FROM
+                          (SELECT review.rating1 AS score,
+                                  review.nr AS review
+                           FROM review) AS anon_14) AS anon_13
+                     UNION ALL SELECT anon_15.score AS score,
+                                      CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_15.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS review
+                     FROM
+                       (SELECT anon_16.score AS score,
+                               anon_16.review AS review
+                        FROM
+                          (SELECT review.rating2 AS score,
+                                  review.nr AS review
+                           FROM review) AS anon_16) AS anon_15) AS anon_12
+                  UNION ALL SELECT anon_17.score AS score,
+                                   CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_17.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS review
+                  FROM
+                    (SELECT anon_18.review AS review,
+                            anon_18.score AS score
+                     FROM
+                       (SELECT review.nr AS review,
+                               review.rating3 AS score
+                        FROM review) AS anon_18) AS anon_17) AS anon_11
+               UNION ALL SELECT anon_19.score AS score,
+                                CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_19.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS review
+               FROM
+                 (SELECT anon_20.review AS review,
+                         anon_20.score AS score
+                  FROM
+                    (SELECT review.nr AS review,
+                            review.rating4 AS score
+                     FROM review) AS anon_20) AS anon_19) AS anon_8
+            WHERE CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_7.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) = anon_8.review) AS anon_6) AS anon_4,
+
+        (SELECT anon_21.s AS s,
+                anon_22.nr AS nr,
+                anon_22."""person_ref"".nr_1" AS """person_ref"".nr_1"
+         FROM
+           (SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Offer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(offer.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                   '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/producer>' AS p,
+                   CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("producer_ref".nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+                   NULL AS g
+            FROM offer,
+                 producer AS producer_ref
+            WHERE "producer_ref"."nr" = '3'
+              AND "offer".producer = "producer_ref".nr
+            UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(review.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                             '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/producer>' AS p,
+                             CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("producer_ref".nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+                             NULL AS g
+            FROM review,
+                 producer AS producer_ref
+            WHERE "producer_ref"."nr" = '3'
+              AND "review".producer = "producer_ref".nr
+            UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(product.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                             '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/producer>' AS p,
+                             CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("producer_ref".nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+                             NULL AS g
+            FROM product,
+                 producer AS producer_ref
+            WHERE "producer_ref"."nr" = '3'
+              AND "product".producer = "producer_ref".nr) AS anon_21,
+
+           (SELECT review.nr AS nr,
+                   "person_ref".nr AS """person_ref"".nr_1"
+            FROM review,
+                 person AS person_ref
+            WHERE "review".person = "person_ref".nr) AS anon_22,
+
+           (SELECT review.nr AS nr,
+                   "product_ref".nr AS """product_ref"".nr_2"
+            FROM review,
+                 product AS product_ref
+            WHERE "review".product = "product_ref".nr) AS anon_23
+         WHERE anon_21.s = CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_23."""product_ref"".nr_2" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR)
+           AND anon_22.nr = anon_23.nr) AS anon_5) AS anon_2,
+
+     (SELECT anon_24.score AS score,
+             anon_24.review AS review
+      FROM
+        (SELECT anon_25.score AS score,
+                anon_25.review AS review
+         FROM
+           (SELECT anon_26.score AS score,
+                   CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_26.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS review
             FROM
-              (SELECT anon_13.review AS review,
-                      anon_13.score AS score
+              (SELECT anon_27.review AS review,
+                      anon_27.score AS score
                FROM
                  (SELECT review.nr AS review,
-                         review.rating3 AS score
-                  FROM review) AS anon_13) AS anon_12) AS anon_6
-         UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_14.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
-                          anon_14.score AS score
+                         review.rating1 AS score
+                  FROM review) AS anon_27) AS anon_26
+            UNION ALL SELECT anon_28.score AS score,
+                             CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_28.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS review
+            FROM
+              (SELECT anon_29.review AS review,
+                      anon_29.score AS score
+               FROM
+                 (SELECT review.nr AS review,
+                         review.rating2 AS score
+                  FROM review) AS anon_29) AS anon_28) AS anon_25
+         UNION ALL SELECT anon_30.score AS score,
+                          CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_30.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS review
          FROM
-           (SELECT anon_15.review AS review,
-                   anon_15.score AS score
+           (SELECT anon_31.review AS review,
+                   anon_31.score AS score
             FROM
               (SELECT review.nr AS review,
-                      review.rating4 AS score
-               FROM review) AS anon_15) AS anon_14) AS anon_5,
-
-        (SELECT anon_17.s AS s,
-                anon_18.review AS review
-         FROM
-           (SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Offer' || replace(replace(replace(replace(replace(replace(CAST(offer.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                   '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/producer>' AS p,
-                   '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' || replace(replace(replace(replace(replace(replace(CAST(
-                                                                                                                                                        (SELECT "producer".nr
-                                                                                                                                                         FROM producer
-                                                                                                                                                         WHERE "producer"."nr" = '3'
-                                                                                                                                                           AND "offer".producer = "producer".nr) AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
-                   NULL AS g
-            FROM offer
-            UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(review.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                             '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/producer>' AS p,
-                             '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' || replace(replace(replace(replace(replace(replace(CAST(
-                                                                                                                                                                  (SELECT "producer".nr
-                                                                                                                                                                   FROM producer
-                                                                                                                                                                   WHERE "producer"."nr" = '3'
-                                                                                                                                                                     AND "review".producer = "producer".nr) AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
-                             NULL AS g
-            FROM review
-            UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' || replace(replace(replace(replace(replace(replace(CAST(product.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                             '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/producer>' AS p,
-                             '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' || replace(replace(replace(replace(replace(replace(CAST(
-                                                                                                                                                                  (SELECT "producer".nr
-                                                                                                                                                                   FROM producer
-                                                                                                                                                                   WHERE "producer"."nr" = '3'
-                                                                                                                                                                     AND "product".producer = "producer".nr) AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
-                             NULL AS g
-            FROM product) AS anon_17,
-
-           (SELECT
-              (SELECT "product".nr
-               FROM product
-               WHERE "review".product = "product".nr) AS product,
-                   review.nr AS review
-            FROM review) AS anon_18
-         WHERE anon_17.s = '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' || replace(replace(replace(replace(replace(replace(CAST(anon_18.product AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>') AS anon_16
-      WHERE '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_16.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' = anon_5.review) AS anon_3,
-
-     (SELECT anon_19.s AS s,
-             anon_20.review AS review,
-             anon_21.reviewer AS reviewer
+                      review.rating3 AS score
+               FROM review) AS anon_31) AS anon_30) AS anon_24
+      UNION ALL SELECT anon_32.score AS score,
+                       CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_32.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS review
       FROM
-        (SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Offer' || replace(replace(replace(replace(replace(replace(CAST(offer.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/producer>' AS p,
-                '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' || replace(replace(replace(replace(replace(replace(CAST(
-                                                                                                                                                     (SELECT "producer".nr
-                                                                                                                                                      FROM producer
-                                                                                                                                                      WHERE "producer"."nr" = '3'
-                                                                                                                                                        AND "offer".producer = "producer".nr) AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
-                NULL AS g
-         FROM offer
-         UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(review.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                          '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/producer>' AS p,
-                          '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' || replace(replace(replace(replace(replace(replace(CAST(
-                                                                                                                                                               (SELECT "producer".nr
-                                                                                                                                                                FROM producer
-                                                                                                                                                                WHERE "producer"."nr" = '3'
-                                                                                                                                                                  AND "review".producer = "producer".nr) AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
-                          NULL AS g
-         FROM review
-         UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' || replace(replace(replace(replace(replace(replace(CAST(product.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                          '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/producer>' AS p,
-                          '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' || replace(replace(replace(replace(replace(replace(CAST(
-                                                                                                                                                               (SELECT "producer".nr
-                                                                                                                                                                FROM producer
-                                                                                                                                                                WHERE "producer"."nr" = '3'
-                                                                                                                                                                  AND "product".producer = "producer".nr) AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
-                          NULL AS g
-         FROM product) AS anon_19,
-
-        (SELECT
-           (SELECT "product".nr
-            FROM product
-            WHERE "review".product = "product".nr) AS product,
-                review.nr AS review
-         FROM review) AS anon_20,
-
-        (SELECT
-           (SELECT "person".nr
-            FROM person
-            WHERE "review".person = "person".nr) AS reviewer,
-                review.nr AS review
-         FROM review) AS anon_21
-      WHERE anon_19.s = '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' || replace(replace(replace(replace(replace(replace(CAST(anon_20.product AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>'
-        AND anon_20.review = anon_21.review) AS anon_4) AS anon_1,
-
-  (SELECT anon_22.review AS review,
-          anon_22.score AS score
-   FROM
-     (SELECT anon_23.review AS review,
-             anon_23.score AS score
-      FROM
-        (SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_24.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
-                anon_24.score AS score
+        (SELECT anon_33.review AS review,
+                anon_33.score AS score
          FROM
-           (SELECT anon_25.review AS review,
-                   anon_25.score AS score
-            FROM
-              (SELECT review.nr AS review,
-                      review.rating1 AS score
-               FROM review) AS anon_25) AS anon_24
-         UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_26.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
-                          anon_26.score AS score
-         FROM
-           (SELECT anon_27.score AS score,
-                   anon_27.review AS review
-            FROM
-              (SELECT review.rating2 AS score,
-                      review.nr AS review
-               FROM review) AS anon_27) AS anon_26) AS anon_23
-      UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_28.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
-                       anon_28.score AS score
-      FROM
-        (SELECT anon_29.score AS score,
-                anon_29.review AS review
-         FROM
-           (SELECT review.rating3 AS score,
-                   review.nr AS review
-            FROM review) AS anon_29) AS anon_28) AS anon_22
-   UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_30.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
-                    anon_30.score AS score
-   FROM
-     (SELECT anon_31.score AS score,
-             anon_31.review AS review
-      FROM
-        (SELECT review.rating4 AS score,
-                review.nr AS review
-         FROM review) AS anon_31) AS anon_30) AS anon_2
-WHERE '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_1.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' = anon_2.review
-GROUP BY anon_1.reviewer
-HAVING avg(CAST(anon_2.score AS FLOAT)) > (min(anon_1.avg_1) * 1.5)
+           (SELECT review.nr AS review,
+                   review.rating4 AS score
+            FROM review) AS anon_33) AS anon_32) AS anon_3
+   WHERE CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_2.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) = anon_3.review) AS anon_1
+GROUP BY anon_1."""person_ref"".nr_1"
+HAVING avg(CAST(anon_1.score AS FLOAT)) > (min(anon_1.avg_1) * 1.5)
 ```
 
 ## Created SQL results
 ```
-
+bsbm-inst:Reviewer17	"8.666666666666666"^^xsd:double
+bsbm-inst:Reviewer40	"9.0"^^xsd:double
 ```
 
 FAIL

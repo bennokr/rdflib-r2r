@@ -58,7 +58,7 @@ class ColForm:
         return hash((self.form, self.cols))
 
     def __repr__(self):
-        return f"ColForm({self.form}, {self.cols})"
+        return f"ColForm(form={self.form}, cols={self.cols})"
 
     def expr(self):
         if self.cols == ():
@@ -69,11 +69,13 @@ class ColForm:
         parts = []
         for s in self.form:
             if s in [True, None, False]:
-                col = sqlfunc.cast(cols.pop(0), sqltypes.VARCHAR)
+                col = cols.pop(0)
+                if col.type != sqltypes.VARCHAR:
+                    col = sqlfunc.cast(col, sqltypes.VARCHAR)
                 # non-string values indicate whether to escape URI terms
                 part = sql_safe(col) if s else col
             else:
-                part = literal(s)
+                part = sqlfunc.cast(literal(s), sqltypes.VARCHAR)
             parts.append(part)
         return functools.reduce(operator.add, parts)
 
@@ -146,7 +148,7 @@ class ColForm:
         elif opstr == "/":
             op = sql.operators.custom_op(opstr, is_comparison=True)
             a, b = cf1.expr(), cf2.expr()
-            r = sqlfunc.cast(op(a, b), sqltypes.FLOAT)
+            r = sqlfunc.cast(op(a, b), sqltypes.DECIMAL)
             return cls.from_expr(r)
         else:
             op = sql.operators.custom_op(opstr, is_comparison=True)
@@ -324,13 +326,13 @@ class R2RStore(Store):
         if graph.value(parent, shortcut):
             # constant shortcut properties
             for const in graph[parent:shortcut]:
-                yield ColForm([f"'{const.n3()}'"], [])
+                yield ColForm([f"'{const.n3()}'"], []), dbtable
         elif graph.value(parent, mapper):
             for tmap in graph[parent:mapper]:
                 if graph.value(tmap, rr.constant):
                     # constant value
                     for const in graph[tmap : rr.constant]:
-                        yield ColForm([f"'{const.n3()}'"], [])
+                        yield ColForm([f"'{const.n3()}'"], []), dbtable
                 else:
                     termtype = graph.value(tmap, rr.termType) or rr.IRI
                     if graph.value(tmap, rr.column):
@@ -348,8 +350,9 @@ class R2RStore(Store):
                         # referencing object map
                         ref = graph.value(tmap, rr.parentTriplesMap)
                         ptable = _get_table(graph, ref)
+                        ptable = ptable.alias(f"{ptable.name}_ref")
                         # push the where clauses into the subquery
-                        joins, wheres[:] = wheres[:], []
+                        joins = wheres
                         for join in graph[tmap : rr.joinCondition]:
                             ccol = f'"{dbtable.name}".{graph.value(join, rr.child)}'
                             pcol = f'"{ptable.name}".{graph.value(join, rr.parent)}'
@@ -357,16 +360,10 @@ class R2RStore(Store):
                         referenced_colforms = cls._term_map_colforms(
                             graph, ptable, ref, [], rr.subjectMap, rr.subject
                         )
-                        for refcolform in referenced_colforms:
-                            # is this the best way..?
-                            cols = [
-                                select(c)
-                                .select_from(ptable)
-                                .where(*joins)
-                                .as_scalar()
-                                for c in refcolform.cols
-                            ]
-                            yield ColForm(refcolform.form, cols)
+                        for colform, table in referenced_colforms:
+                            cols = [c.label(None) for c in colform.cols]
+                            colform = ColForm(colform.form, cols)
+                            yield colform, table
                         continue
                     else:
                         # TODO: replace with RDB-specific construct (postgresql?)
@@ -374,14 +371,14 @@ class R2RStore(Store):
                             sqltypes.VARCHAR
                         )
                         form = ["_:" + dbtable.name + "#", None]
-                        yield ColForm(form, [rowid])
+                        yield ColForm(form, [rowid]), dbtable
                         continue
 
                     if termtype == rr.IRI:
                         form = ["<"] + list(colform.form) + [">"]
-                        yield ColForm(form, colform.cols)
+                        yield ColForm(form, colform.cols), dbtable
                     elif termtype == rr.BlankNode:
-                        yield ColForm((["_:"] + list(colform.form)), colform.cols)
+                        yield ColForm((["_:"] + list(colform.form)), colform.cols), dbtable
                     elif obj:
                         if graph.value(tmap, rr.language):
                             lang = graph.value(tmap, rr.language)
@@ -389,20 +386,20 @@ class R2RStore(Store):
                                 sqlfunc.cast(c, sqltypes.VARCHAR) for c in colform.cols
                             ]
                             form = ['"'] + list(colform.form) + ['"@' + str(lang)]
-                            yield ColForm(form, cols)
+                            yield ColForm(form, cols), dbtable
                         elif graph.value(tmap, rr.datatype):
                             dtype = graph.value(tmap, rr.datatype)
                             cols = [
                                 sqlfunc.cast(c, sqltypes.VARCHAR) for c in colform.cols
                             ]
                             form = ['"'] + list(colform.form) + ['"^^' + dtype.n3()]
-                            yield ColForm(form, cols)
+                            yield ColForm(form, cols), dbtable
                         else:
                             # keep original datatype
-                            yield colform
+                            yield colform, dbtable
                     else:
                         # not a real literal
-                        yield ColForm.from_expr(literal_column("'_:'"))
+                        yield ColForm.from_expr(literal_column("'_:'")), dbtable
 
     def _triplesmap_select(self, metadata, tmap, pattern) -> Iterable[SelectSubForm]:
         mg = self.mapping.graph
@@ -426,12 +423,12 @@ class R2RStore(Store):
         ss = self._term_map_colforms(
             mg, dbtable, tmap, swhere, rr.subjectMap, rr.subject
         )
-        scolform = next(ss)
+        scolform, stable = next(ss)
         s_map = mg.value(tmap, rr.subjectMap)
 
         gcolforms = list(
             self._term_map_colforms(mg, dbtable, s_map, [], rr.graphMap, rr.graph)
-        ) or [ColForm.null()]
+        ) or [(ColForm.null(), dbtable)]
 
         # Class Map
         if (not pfilt) or (None in pfilt) or (RDF.type == qp):
@@ -441,11 +438,12 @@ class R2RStore(Store):
                 # no unsafe IRI because it should be defined to be safe
                 if (qo is not None) and (qo != c):
                     continue
-                for gcolform in gcolforms:
+                for gcolform, gtable in gcolforms:
                     subforms, cols = ColForm.to_subforms_columns(
                         scolform, pcolform, ocolform, gcolform
                     )
-                    query = select(*cols).select_from(dbtable)
+                    tables = set([stable, gtable])
+                    query = select(*cols).select_from(*tables)
                     if swhere:
                         query = query.where(*swhere)
                     yield query, subforms
@@ -470,19 +468,20 @@ class R2RStore(Store):
             )
             gcolforms = list(
                 self._term_map_colforms(mg, dbtable, pomap, [], rr.graphMap, rr.graph)
-            ) or [ColForm.null()]
-            for pcolform in pcolforms:
+            ) or [(ColForm.null(), dbtable)]
+            for pcolform, ptable in pcolforms:
                 pstr = "".join(filter(bool, pcolform.form))
                 if (qp is not None) and pstr[1:-1] != qp.n3():
                     # Filter out non-identical property patterns
                     continue
-                for ocolform in ocolforms:
-                    for gcolform in gcolforms:
+                for ocolform, otable in ocolforms:
+                    for gcolform, gtable in gcolforms:
                         where = swhere + pwhere + owhere
                         subforms, cols = ColForm.to_subforms_columns(
                             scolform, pcolform, ocolform, gcolform
                         )
-                        query = select(*cols).select_from(dbtable)
+                        tables = set([stable, ptable, otable, gtable])
+                        query = select(*cols).select_from(*tables)
                         if where:
                             query = query.where(*where)
                         yield query, subforms
@@ -679,9 +678,7 @@ class R2RStore(Store):
                 ]
                 if len(pat_query._from_obj) == 1:
                     # Single table, so try to merge shared-subject terms
-                    # Though keep the referenced triple maps around because they filter
-                    refs = tuple(c for c in cols if isinstance(c, ScalarSelect))
-                    table = pat_query._from_obj[0], refs, pat_query.whereclause
+                    table = pat_query._from_obj[0], pat_query.whereclause
                     table_varcolforms.setdefault(table, set()).update(qvar_colform)
                     continue
 
@@ -698,11 +695,10 @@ class R2RStore(Store):
             query_varsubforms.append((pat_query, qvar_subform))
 
         # Merge simple select statements on same table
-        for (table, refs, where), var_colforms in table_varcolforms.items():
+        for (table, where), var_colforms in table_varcolforms.items():
             qvars, colforms = zip(*dict(var_colforms).items())
             subform, allcols = ColForm.to_subforms_columns(*colforms)
             cols = [col.label(str(var)) for var, col in zip(qvars, allcols)]
-            cols += [r for r in refs if r not in allcols]
             query = select(*cols).select_from(table)
             if where is not None:
                 query = query.where(where)
@@ -840,7 +836,7 @@ class R2RStore(Store):
         # Assume agg.p is always a Group
         group_expr, group_part = agg.p.expr, agg.p.p
         part_query, var_subform = self.queryPart(conn, group_part)
-        cols = list(getattr(part_query, "inner_columns", part_query.c))
+        cols = part_query.c
         var_cf = {v: ColForm.from_subform(cols, sf) for v, sf in var_subform.items()}
 
         # Get aggregate column expressions
@@ -853,10 +849,7 @@ class R2RStore(Store):
         ]
 
         subforms, allcols = ColForm.to_subforms_columns(*var_agg.values())
-        if isinstance(part_query, Select):
-            query = part_query.group_by(*groups).with_only_columns(allcols)
-        else:
-            query = select(*allcols).group_by(*groups)
+        query = select(*allcols).group_by(*groups)
         return query, dict(zip(var_agg, subforms))
 
     def queryExtend(self, conn, part) -> SelectVarSubForm:
@@ -954,9 +947,9 @@ class R2RStore(Store):
         colforms = [cfs[0] for cfs in var_colforms.values()]
         subforms, allcols = ColForm.to_subforms_columns(*colforms)
         where = [eq for cs in var_colforms.values() for eq in ColForm.equal(*cs)]
-        onclause = sql_and(*where)
-        fromquery = query1.join(query2, onclause=onclause, isouter=True)
-        query = select(*allcols).select_from(fromquery)
+        # onclause = sql_and(*where)
+        # fromquery = query1.outerjoin(query2.subquery(), onclause=onclause)
+        query = select(*allcols).where(*where)
         return query, dict(zip(var_colforms, subforms))
 
     def queryPart(self, conn, part) -> SelectVarSubForm:
@@ -999,7 +992,7 @@ class R2RStore(Store):
 
     def exec(self, query):
         with self.db.connect() as conn:
-            logging.warn(sql_pretty(query))
+            logging.warn("Executing:\n" + sql_pretty(query))
 
             # raise Exception
 
