@@ -2,13 +2,38 @@
 [link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016e)
 Table with datatypes, binary column
 
-```diff
-<http://example.com/Patient10> <http://example.com/photo> <data:image/png;hex,89504E470D0A1A0A0000000D49484452000000050000000508060000008D6F26E50000001C4944415408D763F9FFFEBFC37F062005C3201284D031F18258CD04000EF535CBD18E0E1F0000000049454E44AE426082> .
-<http://example.com/Patient10> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
-<http://example.com/Patient11> <http://example.com/photo> <data:image/png;hex,89504E470D0A1A0A0000000D49484452000000050000000508060000008D6F26E50000001C4944415408D763F9FFFF3FC37F062005C3201284D031F18258CD04000EF535CBD18E0E1F0000000049454E44AE426082> .
-<http://example.com/Patient11> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
-<http://example.com/Patient12> <http://example.com/photo> <data:image/png;hex,89504E470D0A1A0A0000000D49484452000000050000000508060000008D6F26E50000001C4944415408D763F9FFFEBFC37F062005C3201284D031F18258CD04000EF535CBD18E0E1F0000000049454E44AE426082> .
-<http://example.com/Patient12> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
-```
 
-SUCCES
+
+```
+Traceback (most recent call last):
+  File "/tests/test_rdb2rdf.py", line 139, in test_rdb2rdf
+    iso_made, iso_goal = to_isomorphic(g_made), to_isomorphic(g_goal)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/compare.py", line 492, in to_isomorphic
+    result += graph
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 551, in __iadd__
+    self.addN((s, p, o, self) for s, p, o in other)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 1409, in addN
+    self.store.addN(
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/store.py", line 225, in addN
+    for s, p, o, c in quads:
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 1409, in <genexpr>
+    self.store.addN(
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 551, in <genexpr>
+    self.addN((s, p, o, self) for s, p, o in other)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 421, in triples
+    for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
+  File "/rdflib_r2r/r2r_store.py", line 566, in triples
+    query, subforms = self.queryPattern(metadata, pattern)
+  File "/rdflib_r2r/r2r_store.py", line 517, in queryPattern
+    querysubforms += list(self._triplesmap_select(metadata, tmap, pattern))
+  File "/rdflib_r2r/r2r_store.py", line 436, in _triplesmap_select
+    ocolforms = list(
+  File "/rdflib_r2r/r2r_store.py", line 323, in _term_map_colforms
+    colform = ColForm.from_template(
+  File "/rdflib_r2r/r2r_store.py", line 91, in from_template
+    col = _get_col(dbtable, colname, template=True)
+  File "/rdflib_r2r/r2r_mapping.py", line 60, in _get_col
+    return sqlfunc.hex(dbcol)
+NameError: name 'sqlfunc' is not defined
+
+```

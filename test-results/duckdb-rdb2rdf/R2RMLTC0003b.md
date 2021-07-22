@@ -3,6 +3,7 @@
 Three columns mapping, concatenation of columns, by using a rr:sqlQuery to produce literal
 
 
+
 ```
 Traceback (most recent call last):
   File "/tests/test_rdb2rdf.py", line 139, in test_rdb2rdf
@@ -21,7 +22,7 @@ Traceback (most recent call last):
     self.addN((s, p, o, self) for s, p, o in other)
   File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 421, in triples
     for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
-  File "/rdflib_r2r/r2r_store.py", line 607, in triples
+  File "/rdflib_r2r/r2r_store.py", line 578, in triples
     rows = list(conn.execute(query))
   File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1262, in execute
     return meth(self, multiparams, params, _EMPTY_EXECUTION_OPTS)

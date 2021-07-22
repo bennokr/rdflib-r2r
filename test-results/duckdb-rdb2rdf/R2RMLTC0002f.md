@@ -3,6 +3,7 @@
 Two columns mapping, delimited identifiers referenced as regular identifiers
 
 
+
 ```
 Traceback (most recent call last):
   File "/tests/test_rdb2rdf.py", line 114, in test_rdb2rdf

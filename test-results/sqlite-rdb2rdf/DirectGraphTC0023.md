@@ -2,18 +2,36 @@
 [link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0023)
 Generation of triples for two tables, two primary keys, two foreign keys, references to a key other than primary key
 
-```diff
-<http://example.com/base/Source/ID=1100> <http://example.com/base/Source#ID> "1100"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<http://example.com/base/Source/ID=1100> <http://example.com/base/Source#attrA> "K2A2" .
-<http://example.com/base/Source/ID=1100> <http://example.com/base/Source#attrB> "K2A1" .
-<http://example.com/base/Source/ID=1100> <http://example.com/base/Source#ref-attrA;attrB> <http://example.com/base/Target/PK=1010> .
-<http://example.com/base/Source/ID=1100> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Source> .
-<http://example.com/base/Target/PK=1010> <http://example.com/base/Target#PK> "1010"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<http://example.com/base/Target/PK=1010> <http://example.com/base/Target#key1attr1> "K1A1" .
-<http://example.com/base/Target/PK=1010> <http://example.com/base/Target#key1attr2> "K1A2" .
-<http://example.com/base/Target/PK=1010> <http://example.com/base/Target#key2attr1> "K2A1" .
-<http://example.com/base/Target/PK=1010> <http://example.com/base/Target#key2attr2> "K2A2" .
-<http://example.com/base/Target/PK=1010> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Target> .
-```
 
-SUCCES
+
+```
+Traceback (most recent call last):
+  File "/tests/test_rdb2rdf.py", line 139, in test_rdb2rdf
+    iso_made, iso_goal = to_isomorphic(g_made), to_isomorphic(g_goal)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/compare.py", line 492, in to_isomorphic
+    result += graph
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 551, in __iadd__
+    self.addN((s, p, o, self) for s, p, o in other)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 1409, in addN
+    self.store.addN(
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/store.py", line 225, in addN
+    for s, p, o, c in quads:
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 1409, in <genexpr>
+    self.store.addN(
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 551, in <genexpr>
+    self.addN((s, p, o, self) for s, p, o in other)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 421, in triples
+    for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
+  File "/rdflib_r2r/r2r_store.py", line 566, in triples
+    query, subforms = self.queryPattern(metadata, pattern)
+  File "/rdflib_r2r/r2r_store.py", line 517, in queryPattern
+    querysubforms += list(self._triplesmap_select(metadata, tmap, pattern))
+  File "/rdflib_r2r/r2r_store.py", line 436, in _triplesmap_select
+    ocolforms = list(
+  File "/rdflib_r2r/r2r_store.py", line 317, in _term_map_colforms
+    colform = ColForm.from_expr(_get_col(dbtable, colname))
+  File "/rdflib_r2r/r2r_mapping.py", line 67, in _get_col
+    return sqlfunc.substr(dbcol + " " * l, 1, l)
+NameError: name 'sqlfunc' is not defined
+
+```

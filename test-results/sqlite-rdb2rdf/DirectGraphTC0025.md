@@ -2,50 +2,36 @@
 [link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0025)
 Generation of triples from three tables, three primary keys, three foreign keys
 
-```diff
-<http://example.com/base/Addresses/ID=18> <http://example.com/base/Addresses#ID> "18"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<http://example.com/base/Addresses/ID=18> <http://example.com/base/Addresses#city> "Cambridge" .
-<http://example.com/base/Addresses/ID=18> <http://example.com/base/Addresses#state> "MA" .
-<http://example.com/base/Addresses/ID=18> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Addresses> .
-<http://example.com/base/Department/ID=23> <http://example.com/base/Department#ID> "23"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<http://example.com/base/Department/ID=23> <http://example.com/base/Department#city> "Cambridge" .
-<http://example.com/base/Department/ID=23> <http://example.com/base/Department#manager> "8"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<http://example.com/base/Department/ID=23> <http://example.com/base/Department#name> "accounting" .
-<http://example.com/base/Department/ID=23> <http://example.com/base/Department#ref-manager> <http://example.com/base/People/ID=8> .
-<http://example.com/base/Department/ID=23> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Department> .
-<http://example.com/base/People/ID=7> <http://example.com/base/People#ID> "7"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<http://example.com/base/People/ID=7> <http://example.com/base/People#addr> "18"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<http://example.com/base/People/ID=7> <http://example.com/base/People#deptCity> "Cambridge" .
-<http://example.com/base/People/ID=7> <http://example.com/base/People#deptName> "accounting" .
-<http://example.com/base/People/ID=7> <http://example.com/base/People#fname> "Bob" .
-<http://example.com/base/People/ID=7> <http://example.com/base/People#ref-addr> <http://example.com/base/Addresses/ID=18> .
-<http://example.com/base/People/ID=7> <http://example.com/base/People#ref-deptName;deptCity> <http://example.com/base/Department/ID=23> .
-<http://example.com/base/People/ID=7> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/People> .
-<http://example.com/base/People/ID=8> <http://example.com/base/People#ID> "8"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<http://example.com/base/People/ID=8> <http://example.com/base/People#fname> "Sue" .
-<http://example.com/base/People/ID=8> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/People> .
-<http://example.com/base/TaskAssignments/worker=7;project=pencil%20survey> <http://example.com/base/TaskAssignments#deptCity> "Cambridge" .
-<http://example.com/base/TaskAssignments/worker=7;project=pencil%20survey> <http://example.com/base/TaskAssignments#deptName> "accounting" .
-<http://example.com/base/TaskAssignments/worker=7;project=pencil%20survey> <http://example.com/base/TaskAssignments#project> "pencil survey" .
-<http://example.com/base/TaskAssignments/worker=7;project=pencil%20survey> <http://example.com/base/TaskAssignments#ref-deptName;deptCity> <http://example.com/base/Department/ID=23> .
-<http://example.com/base/TaskAssignments/worker=7;project=pencil%20survey> <http://example.com/base/TaskAssignments#ref-project;deptName;deptCity> _:cb117880a2c3bf9b9abfe5341ae500b5922ce0e7da9402b0cb1b68fcab7243ae9cd .
-<http://example.com/base/TaskAssignments/worker=7;project=pencil%20survey> <http://example.com/base/TaskAssignments#ref-worker> <http://example.com/base/People/ID=7> .
-<http://example.com/base/TaskAssignments/worker=7;project=pencil%20survey> <http://example.com/base/TaskAssignments#worker> "7"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<http://example.com/base/TaskAssignments/worker=7;project=pencil%20survey> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/TaskAssignments> .
-_:cb117880a2c3bf9b9abfe5341ae500b5922ce0e7da9402b0cb1b68fcab7243ae9cd <http://example.com/base/Projects#deptCity> "Cambridge" .
-_:cb117880a2c3bf9b9abfe5341ae500b5922ce0e7da9402b0cb1b68fcab7243ae9cd <http://example.com/base/Projects#deptName> "accounting" .
-_:cb117880a2c3bf9b9abfe5341ae500b5922ce0e7da9402b0cb1b68fcab7243ae9cd <http://example.com/base/Projects#lead> "8"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:cb117880a2c3bf9b9abfe5341ae500b5922ce0e7da9402b0cb1b68fcab7243ae9cd <http://example.com/base/Projects#name> "pencil survey" .
-_:cb117880a2c3bf9b9abfe5341ae500b5922ce0e7da9402b0cb1b68fcab7243ae9cd <http://example.com/base/Projects#ref-deptName;deptCity> <http://example.com/base/Department/ID=23> .
-_:cb117880a2c3bf9b9abfe5341ae500b5922ce0e7da9402b0cb1b68fcab7243ae9cd <http://example.com/base/Projects#ref-lead> <http://example.com/base/People/ID=8> .
-_:cb117880a2c3bf9b9abfe5341ae500b5922ce0e7da9402b0cb1b68fcab7243ae9cd <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Projects> .
-_:cb12eb4fe3bd5291acd055109f01bd0be164e00796027f06baf87339b68b3e7b20a <http://example.com/base/Projects#deptCity> "Cambridge" .
-_:cb12eb4fe3bd5291acd055109f01bd0be164e00796027f06baf87339b68b3e7b20a <http://example.com/base/Projects#deptName> "accounting" .
-_:cb12eb4fe3bd5291acd055109f01bd0be164e00796027f06baf87339b68b3e7b20a <http://example.com/base/Projects#lead> "8"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:cb12eb4fe3bd5291acd055109f01bd0be164e00796027f06baf87339b68b3e7b20a <http://example.com/base/Projects#name> "eraser survey" .
-_:cb12eb4fe3bd5291acd055109f01bd0be164e00796027f06baf87339b68b3e7b20a <http://example.com/base/Projects#ref-deptName;deptCity> <http://example.com/base/Department/ID=23> .
-_:cb12eb4fe3bd5291acd055109f01bd0be164e00796027f06baf87339b68b3e7b20a <http://example.com/base/Projects#ref-lead> <http://example.com/base/People/ID=8> .
-_:cb12eb4fe3bd5291acd055109f01bd0be164e00796027f06baf87339b68b3e7b20a <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Projects> .
-```
 
-SUCCES
+
+```
+Traceback (most recent call last):
+  File "/tests/test_rdb2rdf.py", line 139, in test_rdb2rdf
+    iso_made, iso_goal = to_isomorphic(g_made), to_isomorphic(g_goal)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/compare.py", line 492, in to_isomorphic
+    result += graph
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 551, in __iadd__
+    self.addN((s, p, o, self) for s, p, o in other)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 1409, in addN
+    self.store.addN(
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/store.py", line 225, in addN
+    for s, p, o, c in quads:
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 1409, in <genexpr>
+    self.store.addN(
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 551, in <genexpr>
+    self.addN((s, p, o, self) for s, p, o in other)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 421, in triples
+    for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
+  File "/rdflib_r2r/r2r_store.py", line 566, in triples
+    query, subforms = self.queryPattern(metadata, pattern)
+  File "/rdflib_r2r/r2r_store.py", line 517, in queryPattern
+    querysubforms += list(self._triplesmap_select(metadata, tmap, pattern))
+  File "/rdflib_r2r/r2r_store.py", line 436, in _triplesmap_select
+    ocolforms = list(
+  File "/rdflib_r2r/r2r_store.py", line 317, in _term_map_colforms
+    colform = ColForm.from_expr(_get_col(dbtable, colname))
+  File "/rdflib_r2r/r2r_mapping.py", line 67, in _get_col
+    return sqlfunc.substr(dbcol + " " * l, 1, l)
+NameError: name 'sqlfunc' is not defined
+
+```

@@ -1,5 +1,5 @@
 # bsbm-explore-query9
-[link]([bsbm-explore-query9](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/ExploreUseCase/#queryTripleQ9))
+[bsbm-explore-query9](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/ExploreUseCase/#queryTripleQ9)
 
 
 ```

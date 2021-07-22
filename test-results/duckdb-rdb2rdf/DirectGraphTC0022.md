@@ -3,6 +3,7 @@
 Generation of triples from two tables, a primary key, a foreign key, references no primary keys
 
 
+
 ```
 Traceback (most recent call last):
   File "/tests/util.py", line 45, in create_database

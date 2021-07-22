@@ -126,7 +126,7 @@ def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
     test_out = pathlib.Path(f"test-results/{engine_name}-bsbm/")
     test_out.mkdir(parents=True, exist_ok=True)
     test_file = test_out.joinpath(f"{testcase.id}.md")
-    report = f"# {testcase.id}\n[link]({get_test_hyperlink(testcase.id)})\n\n"
+    report = f"# {testcase.id}\n{get_test_hyperlink(testcase.id)}\n\n"
 
     try:
         db = dbs[engine_name]

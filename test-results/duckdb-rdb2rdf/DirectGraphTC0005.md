@@ -2,39 +2,46 @@
 [link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0005)
 Generation of BlankNodes from duplicate tuples
 
-```diff
-- _:cb21650a665ae41f6fa71adf668f84a44c399c8239fc0d008f357bb7a98e81dd0ec <http://example.com/base/IOUs#amount> "30.0"^^<http://www.w3.org/2001/XMLSchema#double> .
-- _:cb21650a665ae41f6fa71adf668f84a44c399c8239fc0d008f357bb7a98e81dd0ec <http://example.com/base/IOUs#fname> "Bob" .
-- _:cb21650a665ae41f6fa71adf668f84a44c399c8239fc0d008f357bb7a98e81dd0ec <http://example.com/base/IOUs#lname> "Smith" .
-- _:cb21650a665ae41f6fa71adf668f84a44c399c8239fc0d008f357bb7a98e81dd0ec <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
-+ _:cb2352e468f365818450dfb28ce4f6067332479ee184c82a1f84c1dd8203b93c7bf <http://example.com/base/IOUs#amount> "20.0" .
-+ _:cb2352e468f365818450dfb28ce4f6067332479ee184c82a1f84c1dd8203b93c7bf <http://example.com/base/IOUs#fname> "Sue" .
-+ _:cb2352e468f365818450dfb28ce4f6067332479ee184c82a1f84c1dd8203b93c7bf <http://example.com/base/IOUs#lname> "Jones" .
-+ _:cb2352e468f365818450dfb28ce4f6067332479ee184c82a1f84c1dd8203b93c7bf <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
-+ _:cb263251d239558de66032b72bd0676bfde4587f36266780e74bf76f340384dad7d <http://example.com/base/IOUs#amount> "30.0" .
-+ _:cb263251d239558de66032b72bd0676bfde4587f36266780e74bf76f340384dad7d <http://example.com/base/IOUs#fname> "Bob" .
-+ _:cb263251d239558de66032b72bd0676bfde4587f36266780e74bf76f340384dad7d <http://example.com/base/IOUs#lname> "Smith" .
-+ _:cb263251d239558de66032b72bd0676bfde4587f36266780e74bf76f340384dad7d <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
-- _:cb2b3842541ae926e256b3ee60a3e094429888a49654426cea42741869d5f1ad26b <http://example.com/base/IOUs#amount> "20.0"^^<http://www.w3.org/2001/XMLSchema#double> .
-- _:cb2b3842541ae926e256b3ee60a3e094429888a49654426cea42741869d5f1ad26b <http://example.com/base/IOUs#fname> "Sue" .
-- _:cb2b3842541ae926e256b3ee60a3e094429888a49654426cea42741869d5f1ad26b <http://example.com/base/IOUs#lname> "Jones" .
-- _:cb2b3842541ae926e256b3ee60a3e094429888a49654426cea42741869d5f1ad26b <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
-- _:cb2eac4049fd4a00de951ed4fda83e5a1c69b642b787795288431f5e107d4317c21 <http://example.com/base/IOUs#amount> "30.0"^^<http://www.w3.org/2001/XMLSchema#double> .
-- _:cb2eac4049fd4a00de951ed4fda83e5a1c69b642b787795288431f5e107d4317c21 <http://example.com/base/IOUs#fname> "Bob" .
-- _:cb2eac4049fd4a00de951ed4fda83e5a1c69b642b787795288431f5e107d4317c21 <http://example.com/base/IOUs#lname> "Smith" .
-- _:cb2eac4049fd4a00de951ed4fda83e5a1c69b642b787795288431f5e107d4317c21 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
-+ _:cb337987b5dbbb6f554e36acc2e92121ce14723fb3b1d3d2e0599b159af246158b2 <http://example.com/base/IOUs#amount> "30.0" .
-+ _:cb337987b5dbbb6f554e36acc2e92121ce14723fb3b1d3d2e0599b159af246158b2 <http://example.com/base/IOUs#fname> "Bob" .
-+ _:cb337987b5dbbb6f554e36acc2e92121ce14723fb3b1d3d2e0599b159af246158b2 <http://example.com/base/IOUs#lname> "Smith" .
-+ _:cb337987b5dbbb6f554e36acc2e92121ce14723fb3b1d3d2e0599b159af246158b2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
-```
 
-FAIL
+
 ```
 Traceback (most recent call last):
-  File "/tests/test_rdb2rdf.py", line 160, in test_rdb2rdf
-    assert iso_made == iso_goal
-AssertionError: assert <Graph identi...rphicGraph'>)> == <Graph identi...rphicGraph'>)>
-  Use -v to get the full diff
+  File "/tests/test_rdb2rdf.py", line 139, in test_rdb2rdf
+    iso_made, iso_goal = to_isomorphic(g_made), to_isomorphic(g_goal)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/compare.py", line 492, in to_isomorphic
+    result += graph
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 551, in __iadd__
+    self.addN((s, p, o, self) for s, p, o in other)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 1409, in addN
+    self.store.addN(
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/store.py", line 225, in addN
+    for s, p, o, c in quads:
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 1409, in <genexpr>
+    self.store.addN(
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 551, in <genexpr>
+    self.addN((s, p, o, self) for s, p, o in other)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 421, in triples
+    for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
+  File "/rdflib_r2r/r2r_store.py", line 578, in triples
+    rows = list(conn.execute(query))
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1262, in execute
+    return meth(self, multiparams, params, _EMPTY_EXECUTION_OPTS)
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/sql/elements.py", line 324, in _execute_on_connection
+    return connection._execute_clauseelement(
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1451, in _execute_clauseelement
+    ret = self._execute_context(
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1813, in _execute_context
+    self._handle_dbapi_exception(
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1998, in _handle_dbapi_exception
+    util.raise_(exc_info[1], with_traceback=exc_info[2])
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/util/compat.py", line 207, in raise_
+    raise exception
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1770, in _execute_context
+    self.dialect.do_execute(
+  File "/opt/miniconda3/lib/python3.8/site-packages/duckdb_engine/__init__.py", line 71, in do_execute
+    cursor.execute(statement, parameters, context)
+  File "/opt/miniconda3/lib/python3.8/site-packages/duckdb_engine/__init__.py", line 35, in execute
+    self.c.execute(statement, parameters)
+RuntimeError: Binder Error: Referenced table "IOUs" not found!
 
 ```

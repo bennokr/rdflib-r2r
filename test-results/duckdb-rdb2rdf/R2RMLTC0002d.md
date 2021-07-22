@@ -2,18 +2,27 @@
 [link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002d)
 Two columns mapping, generation of a BlankNode subject by using a SQL Query that concatenates two columns
 
-```diff
-_:cb0 <http://xmlns.com/foaf/0.1/name> "Venus" .
-```
 
-SUCCES
+
 ```
 Traceback (most recent call last):
-  File "/tests/test_rdb2rdf.py", line 167, in test_rdb2rdf
-    s_triples = sorted(g_made.triples([s, None, None]))
+  File "/tests/test_rdb2rdf.py", line 139, in test_rdb2rdf
+    iso_made, iso_goal = to_isomorphic(g_made), to_isomorphic(g_goal)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/compare.py", line 492, in to_isomorphic
+    result += graph
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 551, in __iadd__
+    self.addN((s, p, o, self) for s, p, o in other)
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 1409, in addN
+    self.store.addN(
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/store.py", line 225, in addN
+    for s, p, o, c in quads:
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 1409, in <genexpr>
+    self.store.addN(
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 551, in <genexpr>
+    self.addN((s, p, o, self) for s, p, o in other)
   File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 421, in triples
     for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
-  File "/rdflib_r2r/r2r_store.py", line 607, in triples
+  File "/rdflib_r2r/r2r_store.py", line 578, in triples
     rows = list(conn.execute(query))
   File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1262, in execute
     return meth(self, multiparams, params, _EMPTY_EXECUTION_OPTS)
@@ -34,7 +43,7 @@ Traceback (most recent call last):
   File "/opt/miniconda3/lib/python3.8/site-packages/duckdb_engine/__init__.py", line 35, in execute
     self.c.execute(statement, parameters)
 RuntimeError: Binder Error: Values list "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR" does not have a column named "StudentId"
-LINE 9: WHERE "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."StudentId" = ?...
-              ^
+LINE 1: SELECT ? || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CM...
+                         ^
 
 ```

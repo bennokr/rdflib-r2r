@@ -181,7 +181,7 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
     except Exception as e:
         import traceback, os
         tb = traceback.format_exc().replace(os.getcwd(), '')
-        report += f"\n```\n{tb}\n```"
+        report += f"\n\n```\n{tb}\n```"
         test_file.write_text(report)
         raise e
 

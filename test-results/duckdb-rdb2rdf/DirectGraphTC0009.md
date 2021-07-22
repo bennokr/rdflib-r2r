@@ -3,6 +3,7 @@
 Two tables 1 primary key 1 foreign key
 
 
+
 ```
 Traceback (most recent call last):
   File "/tests/util.py", line 45, in create_database

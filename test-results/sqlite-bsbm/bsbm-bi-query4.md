@@ -1,9 +1,9 @@
 # bsbm-bi-query4
-[link]([bsbm-bi-query4](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/BusinessIntelligenceUseCase/index.html#queryTripleQ4))
+[bsbm-bi-query4](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/BusinessIntelligenceUseCase/index.html#queryTripleQ4)
 
 ## Random parameter sample
 ```
-ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType15>
+ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType12>
 ```
 
 ## SPARQL query
@@ -16,7 +16,7 @@ ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductT
   {
     { Select ?feature (avg(xsd:float(xsd:string(?price))) As ?withFeaturePrice)
       {
-        ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType15> ;
+        ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType12> ;
                  bsbm:productFeature ?feature .
         ?offer bsbm:product ?product ;
                bsbm:price ?price .
@@ -26,10 +26,10 @@ ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductT
     { Select ?feature (avg(xsd:float(xsd:string(?price))) As ?withoutFeaturePrice)
       {
         { Select distinct ?feature { 
-          ?p a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType15> ;
+          ?p a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType12> ;
              bsbm:productFeature ?feature .
         } }
-        ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType15> .
+        ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType12> .
         ?offer bsbm:product ?product ;
                bsbm:price ?price .
         FILTER NOT EXISTS { ?product bsbm:productFeature ?feature }
@@ -44,132 +44,121 @@ ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductT
 
 ## Goal results
 ```
-bsbm-inst:ProductFeature653	"2.3414939544364013"^^xsd:double
-bsbm-inst:ProductFeature137	"1.8935085688431526"^^xsd:double
-bsbm-inst:ProductFeature134	"1.320744567610804"^^xsd:double
-bsbm-inst:ProductFeature627	"1.320744567610804"^^xsd:double
-bsbm-inst:ProductFeature99	"1.320744567610804"^^xsd:double
-bsbm-inst:ProductFeature641	"1.2405515472854671"^^xsd:double
-bsbm-inst:ProductFeature100	"1.2122419531648487"^^xsd:double
-bsbm-inst:ProductFeature112	"1.2122419531648487"^^xsd:double
-bsbm-inst:ProductFeature115	"1.2122419531648487"^^xsd:double
-bsbm-inst:ProductFeature117	"1.2122419531648487"^^xsd:double
+bsbm-inst:ProductFeature41	"1.0956197170460957"^^xsd:double
+bsbm-inst:ProductFeature453	"1.0956197170460957"^^xsd:double
+bsbm-inst:ProductFeature48	"1.0956197170460957"^^xsd:double
+bsbm-inst:ProductFeature487	"1.0956197170460957"^^xsd:double
+bsbm-inst:ProductFeature53	"1.0956197170460957"^^xsd:double
+bsbm-inst:ProductFeature56	"1.0956197170460957"^^xsd:double
+bsbm-inst:ProductFeature66	"1.0956197170460957"^^xsd:double
+bsbm-inst:ProductFeature67	"1.0956197170460957"^^xsd:double
+bsbm-inst:ProductFeature62	"1.0916082101177007"^^xsd:double
+bsbm-inst:ProductFeature466	"1.0887155863497342"^^xsd:double
 ```
 
 ## Created SQL query
 ```sql
-SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature' || replace(replace(replace(replace(replace(replace(CAST(anon_1.feature AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS feature,
+SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature' || replace(replace(replace(replace(replace(replace(CAST(anon_1.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS feature,
        CAST(anon_1.avg_1 / anon_2.avg_2 AS FLOAT) AS "priceRatio"
 FROM
-  (SELECT anon_3.feature AS feature,
+  (SELECT anon_3.nr AS nr,
           avg(CAST(CAST(anon_4.price AS VARCHAR) AS FLOAT)) AS avg_1
    FROM
      (SELECT productfeatureproduct.product AS product,
+             productfeature.nr AS nr
+      FROM productfeatureproduct,
+           productfeature
+      WHERE "productfeatureproduct".productFeature = "productfeature".nr) AS anon_3,
 
-        (SELECT "productfeature".nr
-         FROM productfeature
-         WHERE "productfeatureproduct".productFeature = "productfeature".nr) AS feature
-      FROM productfeatureproduct) AS anon_3,
-
-     (SELECT offer.price AS price,
-             offer.nr AS offer
+     (SELECT offer.nr AS nr,
+             offer.price AS price
       FROM offer) AS anon_4,
 
-     (SELECT producttypeproduct.product AS product,
+     (SELECT producttypeproduct.product AS product
+      FROM producttypeproduct,
+           producttype
+      WHERE "nr" = '12'
+        AND "producttypeproduct".productType = "producttype".nr) AS anon_5,
 
-        (SELECT "producttype".nr
-         FROM producttype
-         WHERE "producttype"."nr" = '15'
-           AND "producttypeproduct".productType = "producttype".nr) AS anon_6
-      FROM producttypeproduct) AS anon_5,
+     (SELECT offer.nr AS nr,
+             product.nr AS nr_1
+      FROM offer,
+           product
+      WHERE "offer".product = "product".nr) AS anon_6
+   WHERE anon_5.product = anon_3.product
+     AND anon_5.product = anon_6.nr_1
+     AND anon_6.nr = anon_4.nr
+   GROUP BY anon_3.nr) AS anon_1,
 
-     (SELECT
-        (SELECT "product".nr
-         FROM product
-         WHERE "offer".product = "product".nr) AS product,
-             offer.nr AS offer
-      FROM offer) AS anon_7
-   WHERE anon_5.product = anon_7.product
-     AND anon_3.product = anon_7.product
-     AND anon_7.offer = anon_4.offer
-   GROUP BY anon_3.feature) AS anon_1,
-
-  (SELECT anon_8.feature AS feature,
-          avg(CAST(CAST(anon_9.price AS VARCHAR) AS FLOAT)) AS avg_2
+  (SELECT anon_7.nr AS nr,
+          avg(CAST(CAST(anon_8.price AS VARCHAR) AS FLOAT)) AS avg_2
    FROM
-     (SELECT DISTINCT anon_10.feature AS feature
+     (SELECT DISTINCT anon_9.nr AS nr
       FROM
-        (SELECT productfeatureproduct.product AS p,
+        (SELECT productfeatureproduct.product AS product,
+                productfeature.nr AS nr
+         FROM productfeatureproduct,
+              productfeature
+         WHERE "productfeatureproduct".productFeature = "productfeature".nr) AS anon_9,
 
-           (SELECT "productfeature".nr
-            FROM productfeature
-            WHERE "productfeatureproduct".productFeature = "productfeature".nr) AS feature
-         FROM productfeatureproduct) AS anon_10,
+        (SELECT producttypeproduct.product AS product
+         FROM producttypeproduct,
+              producttype
+         WHERE "nr" = '12'
+           AND "producttypeproduct".productType = "producttype".nr) AS anon_10
+      WHERE anon_10.product = anon_9.product) AS anon_7,
 
-        (SELECT producttypeproduct.product AS p,
-
-           (SELECT "producttype".nr
-            FROM producttype
-            WHERE "producttype"."nr" = '15'
-              AND "producttypeproduct".productType = "producttype".nr) AS anon_12
-         FROM producttypeproduct) AS anon_11
-      WHERE anon_11.p = anon_10.p) AS anon_8,
-
-     (SELECT anon_13.offer AS offer,
-             anon_13.product AS product,
-             anon_14.price AS price
+     (SELECT anon_11.product AS product,
+             anon_12.nr AS nr,
+             anon_13.price AS price
       FROM
-        (SELECT offer.nr AS offer,
+        (SELECT producttypeproduct.product AS product
+         FROM producttypeproduct,
+              producttype
+         WHERE "nr" = '12'
+           AND "producttypeproduct".productType = "producttype".nr) AS anon_11,
 
-           (SELECT "product".nr
-            FROM product
-            WHERE "offer".product = "product".nr) AS product
-         FROM offer) AS anon_13,
+        (SELECT offer.nr AS nr,
+                product.nr AS nr_2
+         FROM offer,
+              product
+         WHERE "offer".product = "product".nr) AS anon_12,
 
-        (SELECT offer.price AS price,
-                offer.nr AS offer
-         FROM offer) AS anon_14,
-
-        (SELECT producttypeproduct.product AS product,
-
-           (SELECT "producttype".nr
-            FROM producttype
-            WHERE "producttype"."nr" = '15'
-              AND "producttypeproduct".productType = "producttype".nr) AS anon_16
-         FROM producttypeproduct) AS anon_15
-      WHERE anon_13.offer = anon_14.offer
-        AND anon_15.product = anon_13.product) AS anon_9
+        (SELECT offer.nr AS nr,
+                offer.price AS price
+         FROM offer) AS anon_13
+      WHERE anon_11.product = anon_12.nr_2
+        AND anon_12.nr = anon_13.nr) AS anon_8
    WHERE NOT (EXISTS
-                (SELECT anon_17.product,
-                        anon_17.feature
+                (SELECT anon_14.product,
+                        anon_14.nr
                  FROM
                    (SELECT productfeatureproduct.product AS product,
-
-                      (SELECT "productfeature".nr
-                       FROM productfeature
-                       WHERE "productfeatureproduct".productFeature = "productfeature".nr) AS feature
-                    FROM productfeatureproduct) AS anon_17
-                 WHERE anon_8.feature = anon_17.feature
-                   AND anon_17.product = anon_9.product))
-   GROUP BY anon_8.feature) AS anon_2
-WHERE anon_1.feature = anon_2.feature
-ORDER BY CAST(anon_1.avg_1 / anon_2.avg_2 AS FLOAT) DESC, anon_1.feature
+                           productfeature.nr AS nr
+                    FROM productfeatureproduct,
+                         productfeature
+                    WHERE "productfeatureproduct".productFeature = "productfeature".nr) AS anon_14
+                 WHERE anon_7.nr = anon_14.nr
+                   AND anon_8.product = anon_14.product))
+   GROUP BY anon_7.nr) AS anon_2
+WHERE anon_1.nr = anon_2.nr
+ORDER BY CAST(anon_1.avg_1 / anon_2.avg_2 AS FLOAT) DESC, anon_1.nr
 LIMIT 10
 OFFSET 0
 ```
 
 ## Created SQL results
 ```
-bsbm-inst:ProductFeature419	"1.2812520583731255"^^xsd:double
-bsbm-inst:ProductFeature417	"1.2532995987875322"^^xsd:double
-bsbm-inst:ProductFeature410	"1.2520972939260449"^^xsd:double
-bsbm-inst:ProductFeature765	"1.2435943359688573"^^xsd:double
-bsbm-inst:ProductFeature812	"1.2435943359688573"^^xsd:double
-bsbm-inst:ProductFeature249	"1.232136071397448"^^xsd:double
-bsbm-inst:ProductFeature269	"1.232136071397448"^^xsd:double
-bsbm-inst:ProductFeature288	"1.2302046910251092"^^xsd:double
-bsbm-inst:ProductFeature284	"1.2202122424187025"^^xsd:double
-bsbm-inst:ProductFeature251	"1.216800142145025"^^xsd:double
+bsbm-inst:ProductFeature41	"1.0956197170460955"^^xsd:double
+bsbm-inst:ProductFeature48	"1.0956197170460955"^^xsd:double
+bsbm-inst:ProductFeature53	"1.0956197170460955"^^xsd:double
+bsbm-inst:ProductFeature56	"1.0956197170460955"^^xsd:double
+bsbm-inst:ProductFeature66	"1.0956197170460955"^^xsd:double
+bsbm-inst:ProductFeature67	"1.0956197170460955"^^xsd:double
+bsbm-inst:ProductFeature453	"1.0956197170460955"^^xsd:double
+bsbm-inst:ProductFeature487	"1.0956197170460955"^^xsd:double
+bsbm-inst:ProductFeature62	"1.0916082101177005"^^xsd:double
+bsbm-inst:ProductFeature466	"1.0887155863497342"^^xsd:double
 ```
 
 FAIL

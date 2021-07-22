@@ -10,8 +10,10 @@ from string import Formatter
 from rdflib import Graph, URIRef, Literal, BNode
 from rdflib.namespace import RDF, XSD, Namespace
 
-from sqlalchemy import text, table, literal_column, types as sqltypes
+from sqlalchemy import text, table, literal_column
+from sqlalchemy import types as sqltypes, func as sqlfunc
 from sqlalchemy import or_ as sql_or, and_ as sql_and
+from sqlalchemy.sql.schema import Column, Table
 
 from rdflib_r2r.sql_view import view2obj
 
@@ -26,20 +28,50 @@ def iri_unsafe(v):
     return urllib.parse.unquote(v)
 
 
-def _get_table(graph, tmap):
+def _get_table(graph, tmap, meta=None):
     logtable = graph.value(tmap, rr.logicalTable)
     if graph.value(logtable, rr.tableName):
         tname = graph.value(logtable, rr.tableName).toPython()
-        return table(tname.strip('"'))
+        dbtable = table(tname.strip('"'))
+        if meta is not None:
+            dbtable = meta.tables.get(dbtable.name, dbtable)
+            if isinstance(dbtable, Table):
+                dbtable.append_column(Column("rowid", sqltypes.Integer))
+            dbtable = dbtable.alias()
+        return dbtable
     else:
         tname = f'"View_{base64.b32encode(str(tmap).encode()).decode()}"'
         sqlquery = graph.value(logtable, rr.sqlQuery).strip().strip(";")
 
-        # TODO: parse views to SQLAlchemy objects to get column types
-        view2obj(sqlquery)
+        # parse views to SQLAlchemy objects to get column types
+        cols = view2obj(sqlquery)
 
-        return text(sqlquery).columns().subquery(tname.strip('"'))
+        return text(sqlquery).columns(*cols).subquery(tname.strip('"'))
 
+def _get_col(dbtable, colname, template=False):
+    colname = colname.strip('"')
+
+    if hasattr(dbtable, 'c') and dbtable.c and (colname in dbtable.c):
+        dbcol = dbtable.c[colname]
+
+        if isinstance(dbcol.type, sqltypes.Numeric):
+            if dbcol.type.precision:
+                if template:
+                    # Binary data
+                    return sqlfunc.hex(dbcol)
+                else:
+                    return dbcol
+
+        if (not template) and isinstance(dbcol.type, sqltypes.CHAR):
+            if dbcol.type.length:
+                l = dbcol.type.length
+                return sqlfunc.substr(dbcol + " " * l, 1, l)
+
+        return dbcol
+    else:
+        tname = getattr(dbtable, 'original', dbtable).name
+        logging.warn(f"Getting column {colname} of {dbtable.__repr__()}")
+        return literal_column(f'"{tname}"."{colname}"')
 
 class R2RMapping:
     graph = None
@@ -47,7 +79,7 @@ class R2RMapping:
 
     @dataclass(eq=True, order=True, frozen=True)
     class Matcher:
-        tname: str
+        t: str
         const: str = None
         field: str = None
         parser: str = None
@@ -173,13 +205,13 @@ class R2RMapping:
         if graph.value(parent, shortcut):
             # constant shortcut properties
             for const in graph[parent:shortcut]:
-                yield cls.Matcher(const=const.toPython(), tname=dbtable.name)
+                yield cls.Matcher(const=const.toPython(), t=dbtable)
         elif graph.value(parent, mapper):
             for tmap in graph[parent:mapper]:
                 if graph.value(tmap, rr.constant):
                     # constant value
                     for const in graph[tmap : rr.constant]:
-                        yield cls.Matcher(const=const.toPython(), tname=dbtable.name)
+                        yield cls.Matcher(const=const.toPython(), t=dbtable)
                 else:
                     # Inverse Expression
                     inverse = None
@@ -190,13 +222,13 @@ class R2RMapping:
                     if graph.value(tmap, rr.column):
                         col = graph.value(tmap, rr.column)
                         col = re.sub('(^"|"$)', "", col)
-                        yield cls.Matcher(field=col, inverse=inverse, tname=dbtable.name)
+                        yield cls.Matcher(field=col, inverse=inverse, t=dbtable)
                     elif graph.value(tmap, rr.template):
                         template = graph.value(tmap, rr.template)
                         parser = cls._template_to_parser(
                             template, irisafe=(termtype == rr.IRI)
                         )
-                        yield cls.Matcher(parser=parser, inverse=inverse, tname=dbtable.name)
+                        yield cls.Matcher(parser=parser, inverse=inverse, t=dbtable)
                     elif graph.value(tmap, rr.parentTriplesMap):
                         # referencing object map
                         ref = graph.value(tmap, rr.parentTriplesMap)
@@ -204,9 +236,9 @@ class R2RMapping:
                         rs = cls._term_pat(graph, rt, ref, rr.subjectMap, rr.subject)
                         yield from rs
                     else:
-                        t = dbtable.name
+                        t = getattr(dbtable, "original", dbtable).name
                         parser = cls._template_to_parser(f"{t}#{{rowid}}")
-                        yield cls.Matcher(parser=parser, inverse=inverse, tname=t)
+                        yield cls.Matcher(parser=parser, inverse=inverse, t=dbtable)
 
     def __init__(self, g, baseuri="http://example.com/base/"):
         self.graph = g
@@ -234,8 +266,8 @@ class R2RMapping:
         t = text(inverse_expr.format(**col_replace, **param_replace))
         return t.bindparams(**field_values)
 
-    def get_node_filter(self, node, pat_maps):
-        
+    def get_filters(self, node, dbtable, pat_maps):
+
         # A pattern may be used in multiple places, so use sql_or
         # (but what happens if the table name is out of scope ...? )
         map_conditions = {}
@@ -255,12 +287,13 @@ class R2RMapping:
                         val = str(val)
                     elif isinstance(val, bytes):
                         val = text(f"x'{base64.b16encode(val).decode()}'")
-                    
+
                     if pat.inverse:
                         fields = {pat.field: val}
                         where = self.inverse_condition(pat.inverse, fields)
                     else:
-                        where = literal_column(f'"{pat.tname}"."{pat.field}"') == val
+                        key = dbtable.c[pat.field]
+                        where = key == val
                     for m in maps:
                         if not (where is True):
                             map_conditions.setdefault(m, []).append(where)
@@ -273,16 +306,16 @@ class R2RMapping:
                         if pat.inverse:
                             where = self.inverse_condition(pat.inverse, fields)
                         else:
-                            # A template pattern may have multiple fields; 
+                            # A template pattern may have multiple fields;
                             #   all must match, so use sql_and
                             where_clauses = []
                             for key, val in fields.items():
-                                key = f'"{pat.tname}"."{key.replace("__", " ")}"'
+                                key = dbtable.c[key.replace("__", " ")]
                                 if pat.parser.startswith("data:"):
                                     val = text(f"x'{val}'")
                                 else:
                                     val = iri_unsafe(val)
-                                clause = literal_column(key) == val
+                                clause = key == val
                                 where_clauses.append(clause)
                             where = sql_and(*where_clauses) if where_clauses else True
                         for m in maps:

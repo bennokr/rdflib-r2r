@@ -27,9 +27,10 @@ from rdflib.util import from_n3
 import sqlalchemy
 from sqlalchemy import MetaData, select, text, null, literal_column, literal
 from sqlalchemy import union_all, or_ as sql_or, and_ as sql_and
-from sqlalchemy import schema as sqlschema, types as sqltypes, func as sqlfunc
+from sqlalchemy import types as sqltypes, func as sqlfunc
 import sqlalchemy.sql as sql
-from sqlalchemy.sql.expression import ColumnElement, GenerativeSelect, Select
+from sqlalchemy.sql.expression import ColumnElement, GenerativeSelect, Select, TableClause
+from sqlalchemy.sql.schema import Column, Table
 from sqlalchemy.sql.selectable import ScalarSelect
 
 FormStrings = Tuple[Union[str, bool]]  # booleans indicate SQL escaping of columns
@@ -87,7 +88,7 @@ class ColForm:
             if prefix != "":
                 form.append(prefix)
             if colname:
-                col = R2RStore._get_col(dbtable, colname, template=True)
+                col = _get_col(dbtable, colname, template=True)
                 form.append(irisafe)  # sorry not sorry
                 cols.append(col)
 
@@ -164,7 +165,7 @@ class SparqlNotImplementedError(NotImplementedError):
 from sqlalchemy.engine import Engine
 
 from rdflib_r2r.types import Any, Optional, Triple
-from rdflib_r2r.r2r_mapping import R2RMapping, _get_table, iri_safe, iri_unsafe
+from rdflib_r2r.r2r_mapping import R2RMapping, _get_table, iri_safe, _get_col
 
 rr = Namespace("http://www.w3.org/ns/r2rml#")
 
@@ -281,31 +282,9 @@ class R2RStore(Store):
         uri = re.sub("<ENCODE>(.+?)</ENCODE>", lambda x: iri_safe(x.group(1)), iri)
         return URIRef(uri, base=self.base)
 
-    @staticmethod
-    def _get_col(dbtable, colname, template=False):
-        if type(dbtable) is sqlschema.Table:
-            dbcol = dbtable.c[colname.strip('"')]
-
-            if isinstance(dbcol.type, sqltypes.Numeric):
-                if dbcol.type.precision:
-                    if template:
-                        # Binary data
-                        return sqlfunc.hex(dbcol)
-                    else:
-                        return literal_column(f'"{dbtable.name}".{colname}')
-
-            if (not template) and isinstance(dbcol.type, sqltypes.CHAR):
-                if dbcol.type.length:
-                    l = dbcol.type.length
-                    return sqlfunc.substr(dbcol + " " * l, 1, l)
-
-            return dbcol
-        else:
-            return literal_column(f'"{dbtable.name}".{colname}')
-
     @classmethod
     def _term_map_colforms(
-        cls, graph, dbtable, parent, wheres, mapper, shortcut, obj=False
+        cls, graph, meta, dbtable, parent, wheres, mapper, shortcut, obj=False
     ) -> Iterable[ColForm]:
         """For each Triples Map, yield a expression template containing table columns.
 
@@ -335,7 +314,7 @@ class R2RStore(Store):
                     termtype = graph.value(tmap, rr.termType) or rr.IRI
                     if graph.value(tmap, rr.column):
                         colname = graph.value(tmap, rr.column)
-                        colform = ColForm.from_expr(cls._get_col(dbtable, colname))
+                        colform = ColForm.from_expr(_get_col(dbtable, colname))
                         if obj:
                             # for objects, the default term type is Literal
                             termtype = graph.value(tmap, rr.termType) or rr.Literal
@@ -347,33 +326,25 @@ class R2RStore(Store):
                     elif graph.value(tmap, rr.parentTriplesMap):
                         # referencing object map
                         ref = graph.value(tmap, rr.parentTriplesMap)
-                        ptable = _get_table(graph, ref)
+                        ptable = _get_table(graph, ref, meta=meta)
                         # push the where clauses into the subquery
-                        joins, wheres[:] = wheres[:], []
+                        #joins, wheres[:] = wheres[:], []
+                        joins = wheres
                         for join in graph[tmap : rr.joinCondition]:
-                            ccol = f'"{dbtable.name}".{graph.value(join, rr.child)}'
-                            pcol = f'"{ptable.name}".{graph.value(join, rr.parent)}'
+                            ccol = _get_col(dbtable, graph.value(join, rr.child))
+                            pcol = _get_col(ptable, graph.value(join, rr.parent))
                             joins.append(literal_column(ccol) == literal_column(pcol))
-                        referenced_colforms = cls._term_map_colforms(
-                            graph, ptable, ref, [], rr.subjectMap, rr.subject
+                        yield from cls._term_map_colforms(
+                            graph, meta, ptable, ref, [], rr.subjectMap, rr.subject
                         )
-                        for refcolform in referenced_colforms:
-                            # is this the best way..?
-                            cols = [
-                                select(c)
-                                .select_from(ptable)
-                                .where(*joins)
-                                .as_scalar()
-                                for c in refcolform.cols
-                            ]
-                            yield ColForm(refcolform.form, cols)
                         continue
                     else:
                         # TODO: replace with RDB-specific construct (postgresql?)
-                        rowid = literal_column(f'"{dbtable.name}".rowid').cast(
+                        rowid = _get_col(dbtable, 'rowid').cast(
                             sqltypes.VARCHAR
                         )
-                        form = ["_:" + dbtable.name + "#", None]
+                        t = getattr(dbtable, 'original', dbtable)
+                        form = ["_:" + t.name + "#", None]
                         yield ColForm(form, [rowid])
                         continue
 
@@ -407,34 +378,32 @@ class R2RStore(Store):
     def _triplesmap_select(self, metadata, tmap, pattern) -> Iterable[SelectSubForm]:
         mg = self.mapping.graph
 
-        dbtable = _get_table(mg, tmap)
-        if metadata:
-            dbtable = metadata.tables.get(dbtable.name, dbtable)
+        dbtable = _get_table(mg, tmap, meta=metadata)
 
         qs, qp, qo = pattern
-        sfilt = self.mapping.get_node_filter(qs, self.mapping.spat_tmaps)
-        pfilt = self.mapping.get_node_filter(qp, self.mapping.ppat_pomaps)
-        ofilt = self.mapping.get_node_filter(qo, self.mapping.opat_pomaps)
+        s_tm_filter = self.mapping.get_filters(qs, dbtable, self.mapping.spat_tmaps)
+        p_tm_filter = self.mapping.get_filters(qp, dbtable, self.mapping.ppat_pomaps)
+        o_tm_filter = self.mapping.get_filters(qo, dbtable, self.mapping.opat_pomaps)
 
         swhere = []
-        if not (None in sfilt):
-            if not (tmap in sfilt):
+        if not (None in s_tm_filter):
+            if not (tmap in s_tm_filter):
                 return
             else:
-                swhere = sfilt[tmap]
+                swhere = s_tm_filter[tmap]
 
         ss = self._term_map_colforms(
-            mg, dbtable, tmap, swhere, rr.subjectMap, rr.subject
+            mg, metadata, dbtable, tmap, swhere, rr.subjectMap, rr.subject
         )
         scolform = next(ss)
         s_map = mg.value(tmap, rr.subjectMap)
 
         gcolforms = list(
-            self._term_map_colforms(mg, dbtable, s_map, [], rr.graphMap, rr.graph)
+            self._term_map_colforms(mg, metadata, dbtable, s_map, [], rr.graphMap, rr.graph)
         ) or [ColForm.null()]
 
         # Class Map
-        if (not pfilt) or (None in pfilt) or (RDF.type == qp):
+        if (not p_tm_filter) or (None in p_tm_filter) or (RDF.type == qp):
             for c in mg[s_map : rr["class"]]:
                 pcolform = ColForm([f"'{RDF.type.n3()}'"], [])
                 ocolform = ColForm([f"'{c.n3()}'"], [])
@@ -445,31 +414,32 @@ class R2RStore(Store):
                     subforms, cols = ColForm.to_subforms_columns(
                         scolform, pcolform, ocolform, gcolform
                     )
-                    query = select(*cols).select_from(dbtable)
+                    tables = [c.table for c in cols if isinstance(c, Column)]
+                    query = select(*cols).select_from(*tables)
                     if swhere:
                         query = query.where(*swhere)
                     yield query, subforms
 
         # Predicate-Object Maps
         pomaps = set(mg[tmap : rr.predicateObjectMap :])
-        if not (None in pfilt):
-            pomaps &= set(pfilt)
-        if not (None in ofilt):
-            pomaps &= set(ofilt)
+        if not (None in p_tm_filter):
+            pomaps &= set(p_tm_filter)
+        if not (None in o_tm_filter):
+            pomaps &= set(o_tm_filter)
 
         for pomap in pomaps:
-            pwhere = pfilt.get(pomap) or []
+            pwhere = p_tm_filter.get(pomap) or []
             pcolforms = self._term_map_colforms(
-                mg, dbtable, pomap, pwhere, rr.predicateMap, rr.predicate
+                mg, metadata, dbtable, pomap, pwhere, rr.predicateMap, rr.predicate
             )
-            owhere = ofilt.get(pomap) or []
+            owhere = o_tm_filter.get(pomap) or []
             ocolforms = list(
                 self._term_map_colforms(
-                    mg, dbtable, pomap, owhere, rr.objectMap, rr.object, True
+                    mg, metadata, dbtable, pomap, owhere, rr.objectMap, rr.object, True
                 )
             )
             gcolforms = list(
-                self._term_map_colforms(mg, dbtable, pomap, [], rr.graphMap, rr.graph)
+                self._term_map_colforms(mg, metadata, dbtable, pomap, [], rr.graphMap, rr.graph)
             ) or [ColForm.null()]
             for pcolform in pcolforms:
                 pstr = "".join(filter(bool, pcolform.form))
@@ -482,7 +452,8 @@ class R2RStore(Store):
                         subforms, cols = ColForm.to_subforms_columns(
                             scolform, pcolform, ocolform, gcolform
                         )
-                        query = select(*cols).select_from(dbtable)
+                        tables = [c.table for c in cols if isinstance(c, Column)]
+                        query = select(*cols).select_from(*tables)
                         if where:
                             query = query.where(*where)
                         yield query, subforms
@@ -631,6 +602,8 @@ class R2RStore(Store):
         metadata = MetaData(conn)
         if "duckdb" not in type(self.db.dialect).__module__:
             metadata.reflect(self.db)
+        if not metadata:
+            logging.warn(f"Could not get metadata for {self.db}")
 
         # Optimize DB table restrictions in queries
         mg = self.mapping.graph
@@ -806,7 +779,6 @@ class R2RStore(Store):
 
         cols = list(getattr(part_query, "inner_columns", part_query.c))
         var_cf = {v: ColForm.from_subform(cols, sf) for v, sf in var_subform.items()}
-        logging.warn(('Building filter clause from', part.expr, var_cf))
         clause = self.queryExpr(conn, part.expr, var_cf).expr()
 
         # Filter should be HAVING for aggregates

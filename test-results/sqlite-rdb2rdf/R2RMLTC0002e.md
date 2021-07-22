@@ -3,6 +3,7 @@
 Two columns mapping, an undefined rr:tableName
 
 
+
 ```
 Traceback (most recent call last):
   File "/tests/test_rdb2rdf.py", line 114, in test_rdb2rdf
