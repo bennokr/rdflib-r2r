@@ -1,5 +1,5 @@
 
-# R2RMLTC0016c
+# [R2RMLTC0016c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016c)
 Table with datatypes: date and timestamp
 
 ```diff
@@ -13,3 +13,7 @@ Table with datatypes: date and timestamp
 <http://example.com/Patient12> <http://example.com/entrancedate> "2007-03-12T02:13:14"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
 <http://example.com/Patient12> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

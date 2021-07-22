@@ -1,5 +1,5 @@
 
-# R2RMLTC0007d
+# [R2RMLTC0007d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007d)
 One column mapping, specifying an rr:predicateObjectMap with rdf:type
 
 ```diff
@@ -8,3 +8,7 @@ One column mapping, specifying an rr:predicateObjectMap with rdf:type
 <http://example.com/Student/10/Venus> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
 <http://example.com/Student/10/Venus> <http://xmlns.com/foaf/0.1/name> "Venus" .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

@@ -1,5 +1,5 @@
 
-# R2RMLTC0014b
+# [R2RMLTC0014b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0014b)
 Triplesmaps with rr:inverseExpression and rr:joinCondition
 
 ```diff
@@ -18,3 +18,7 @@ _:cb0 <http://example.com/dept#deptno> "10"^^<http://www.w3.org/2001/XMLSchema#i
 _:cb0 <http://example.com/dept#location> "NEW YORK" .
 _:cb0 <http://example.com/dept#name> "APPSERVER" .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

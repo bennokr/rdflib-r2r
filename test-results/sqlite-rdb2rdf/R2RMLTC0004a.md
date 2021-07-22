@@ -1,5 +1,5 @@
 
-# R2RMLTC0004a
+# [R2RMLTC0004a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0004a)
 Two column mapping, from one row table to two different triples
 
 ```diff
@@ -8,3 +8,7 @@ Two column mapping, from one row table to two different triples
 <http://example.com/Venus> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/Student> .
 <http://example.com/Venus> <http://xmlns.com/foaf/0.1/name> "Venus" .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

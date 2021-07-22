@@ -1,9 +1,9 @@
 
-# bsbm-bi-query2
+# [bsbm-bi-query2]([bsbm-bi-query2](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/BusinessIntelligenceUseCase/index.html#queryTripleQ2))
 
 ## Random parameter sample
 ```
-{'Product': '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product95>'}
+Product = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product94>
 ```
 
 ## SPARQL query
@@ -13,11 +13,11 @@
   SELECT ?otherProduct ?sameFeatures
   {
     ?otherProduct a bsbm:Product .
-    FILTER(?otherProduct != <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product95>)
+    FILTER(?otherProduct != <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product94>)
     {
       SELECT ?otherProduct (count(?otherFeature) As ?sameFeatures)
       {
-        <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product95> bsbm:productFeature ?feature .
+        <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product94> bsbm:productFeature ?feature .
         ?otherProduct bsbm:productFeature ?otherFeature .
         FILTER(?feature=?otherFeature)
       }
@@ -31,16 +31,16 @@
 
 ## Goal results
 ```
-bsbm-inst:Product11	"6"^^xsd:integer
-bsbm-inst:Product19	"6"^^xsd:integer
-bsbm-inst:Product100	"5"^^xsd:integer
-bsbm-inst:Product29	"5"^^xsd:integer
-bsbm-inst:Product55	"6"^^xsd:integer
-bsbm-inst:Product26	"4"^^xsd:integer
-bsbm-inst:Product18	"5"^^xsd:integer
-bsbm-inst:Product61	"5"^^xsd:integer
-bsbm-inst:Product84	"5"^^xsd:integer
-bsbm-inst:Product20	"5"^^xsd:integer
+bsbm-inst:Product6	"11"^^xsd:integer
+bsbm-inst:Product77	"11"^^xsd:integer
+bsbm-inst:Product35	"10"^^xsd:integer
+bsbm-inst:Product32	"9"^^xsd:integer
+bsbm-inst:Product43	"9"^^xsd:integer
+bsbm-inst:Product44	"8"^^xsd:integer
+bsbm-inst:Product33	"7"^^xsd:integer
+bsbm-inst:Product4	"6"^^xsd:integer
+bsbm-inst:Product2	"5"^^xsd:integer
+bsbm-inst:Product22	"5"^^xsd:integer
 ```
 
 ## Created SQL query
@@ -60,16 +60,19 @@ FROM
 
         (SELECT "productfeature".nr
          FROM productfeature
-         WHERE "productfeatureproduct".productFeature = "productfeature".nr) AS feature,
+         WHERE "productfeatureproduct".productFeature = "productfeature".nr) AS "otherFeature"
+      FROM productfeatureproduct) AS anon_4,
 
+     (SELECT
         (SELECT "productfeature".nr
          FROM productfeature
-         WHERE "productfeatureproduct".productFeature = "productfeature".nr) AS "otherFeature"
-      FROM productfeatureproduct) AS anon_4
-   WHERE anon_4.feature = anon_4."otherFeature"
+         WHERE "productfeatureproduct".productFeature = "productfeature".nr) AS feature
+      FROM productfeatureproduct
+      WHERE "productfeatureproduct"."product" = '94') AS anon_5
+   WHERE anon_5.feature = anon_4."otherFeature"
    GROUP BY anon_4."otherProduct") AS anon_2
 WHERE anon_1."otherProduct" = anon_2."otherProduct"
-  AND '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' || replace(replace(replace(replace(replace(replace(CAST(anon_1."otherProduct" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' != '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product95>'
+  AND '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' || replace(replace(replace(replace(replace(replace(CAST(anon_1."otherProduct" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' != '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product94>'
 ORDER BY anon_2.count_1 DESC,
          anon_1."otherProduct"
 LIMIT 10
@@ -78,14 +81,16 @@ OFFSET 0
 
 ## Created SQL results
 ```
-bsbm-inst:Product25	"34"^^xsd:integer
-bsbm-inst:Product27	"34"^^xsd:integer
-bsbm-inst:Product4	"33"^^xsd:integer
-bsbm-inst:Product66	"33"^^xsd:integer
-bsbm-inst:Product2	"34"^^xsd:integer
-bsbm-inst:Product6	"38"^^xsd:integer
-bsbm-inst:Product35	"38"^^xsd:integer
-bsbm-inst:Product7	"32"^^xsd:integer
-bsbm-inst:Product77	"41"^^xsd:integer
-bsbm-inst:Product70	"38"^^xsd:integer
+bsbm-inst:Product6	"11"^^xsd:integer
+bsbm-inst:Product77	"11"^^xsd:integer
+bsbm-inst:Product35	"10"^^xsd:integer
+bsbm-inst:Product32	"9"^^xsd:integer
+bsbm-inst:Product43	"9"^^xsd:integer
+bsbm-inst:Product44	"8"^^xsd:integer
+bsbm-inst:Product33	"7"^^xsd:integer
+bsbm-inst:Product4	"6"^^xsd:integer
+bsbm-inst:Product2	"5"^^xsd:integer
+bsbm-inst:Product22	"5"^^xsd:integer
 ```
+
+SUCCES

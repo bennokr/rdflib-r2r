@@ -1,5 +1,5 @@
 
-# DirectGraphTC0005
+# [DirectGraphTC0005](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0005)
 Generation of BlankNodes from duplicate tuples
 
 ```diff
@@ -16,3 +16,7 @@ _:cb2eac4049fd4a00de951ed4fda83e5a1c69b642b787795288431f5e107d4317c21 <http://ex
 _:cb2eac4049fd4a00de951ed4fda83e5a1c69b642b787795288431f5e107d4317c21 <http://example.com/base/IOUs#lname> "Smith" .
 _:cb2eac4049fd4a00de951ed4fda83e5a1c69b642b787795288431f5e107d4317c21 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

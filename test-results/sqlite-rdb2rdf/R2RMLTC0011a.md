@@ -1,5 +1,5 @@
 
-# R2RMLTC0011a
+# [R2RMLTC0011a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0011a)
 M to M relation, by using a SQL query
 
 ```diff
@@ -23,3 +23,7 @@ M to M relation, by using a SQL query
 <http://example.com/12/David;Villa> <http://example.com/lastName> "Villa" .
 <http://example.com/12/David;Villa> <http://example.com/plays> <http://example.com/111/Football> .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

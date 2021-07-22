@@ -86,99 +86,111 @@ def nopattern(pytestconfig):
 @pytest.mark.parametrize("testcase", TESTS, ids=[t.id for t in TESTS])
 @pytest.mark.parametrize("engine_name", ["sqlite", "duckdb"])
 def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: bool):
-    # Create database
-    db = setup_engine(engine_name, echo=dbecho)
-    create_database(db, testcase.path, testcase.sql_fname)
-
-    # Create mapped R2RStore
-    mapping = None
-    if rdb2rdftest.mappingDocument in testcase.meta:
-        # Load mapping
-        mapfile = testcase.path.joinpath(testcase.meta[rdb2rdftest.mappingDocument])
-        fmt = rdflib.util.guess_format(str(mapfile))
-        mapping = R2RMapping(rdflib.Graph().parse(str(mapfile), format=fmt))
-    else:
-        # Make direct mapping
-        mapping = R2RMapping.from_db(db)
-
-    g_made = rdflib.Graph(R2RStore(db=db, mapping=mapping))
-
-    outfile = testcase.path.joinpath(testcase.meta[rdb2rdftest.output])
-    fmt = rdflib.util.guess_format(str(outfile))
-    if fmt == "nquads":
-        # RDFLib nquads parser doesn't work?
-        rx = re.compile(r"([^ ]+) ([^ ]+) (.+?) ?(?: (<[^>]+>))? \.$")
-        g_goal = rdflib.ConjunctiveGraph()
-        for li, l in enumerate(open(outfile).read().splitlines()):
-            if l.strip():
-                m = rx.match(l.strip())
-                if m:
-                    g_goal.add(tuple(from_n3(n) for n in m.groups()))
-                else:
-                    logging.warn(f"bad nquads line {li} in {outfile}: {l}")
-        logging.warn(("g_goal", type(g_goal), len(list(g_goal)), list(g_goal)))
-    else:
-        g_goal = rdflib.Graph().parse(str(outfile), format=fmt)
-        logging.warn(
-            (
-                "g_goal",
-                type(g_goal),
-                len(list(g_goal)),
-                g_goal.serialize(format="turtle"),
-            )
-        )
-
-    iso_made, iso_goal = to_isomorphic(g_made), to_isomorphic(g_goal)
-    in_both, in_made, in_goal = graph_diff(iso_made, iso_goal)
-    
-    def dump_nt_sorted(g):
-        return sorted(g.serialize(format="nt").strip().splitlines())
-
-    diff_lines = []
-    for g,p in zip([in_both, in_made, in_goal], ['','+ ','- ']):
-        for line in dump_nt_sorted(g):
-            diff_lines.append((line.decode(), p))
-    difftxt = '\n'.join(p+line for line, p in sorted(diff_lines))
-
     test_out = pathlib.Path(f'test-results/{engine_name}-rdb2rdf/')
     test_out.mkdir(parents=True, exist_ok=True)
-    test_out.joinpath(f"{testcase.id}.md").write_text(f"""
-# {testcase.id}
+    test_file = test_out.joinpath(f"{testcase.id}.md")
+
+    try:
+        # Create database
+        db = setup_engine(engine_name, echo=dbecho)
+        create_database(db, testcase.path, testcase.sql_fname)
+
+        # Create mapped R2RStore
+        mapping = None
+        if rdb2rdftest.mappingDocument in testcase.meta:
+            # Load mapping
+            mapfile = testcase.path.joinpath(testcase.meta[rdb2rdftest.mappingDocument])
+            fmt = rdflib.util.guess_format(str(mapfile))
+            mapping = R2RMapping(rdflib.Graph().parse(str(mapfile), format=fmt))
+        else:
+            # Make direct mapping
+            mapping = R2RMapping.from_db(db)
+
+        g_made = rdflib.Graph(R2RStore(db=db, mapping=mapping))
+
+        outfile = testcase.path.joinpath(testcase.meta[rdb2rdftest.output])
+        fmt = rdflib.util.guess_format(str(outfile))
+        if fmt == "nquads":
+            # RDFLib nquads parser doesn't work?
+            rx = re.compile(r"([^ ]+) ([^ ]+) (.+?) ?(?: (<[^>]+>))? \.$")
+            g_goal = rdflib.ConjunctiveGraph()
+            for li, l in enumerate(open(outfile).read().splitlines()):
+                if l.strip():
+                    m = rx.match(l.strip())
+                    if m:
+                        g_goal.add(tuple(from_n3(n) for n in m.groups()))
+                    else:
+                        logging.warn(f"bad nquads line {li} in {outfile}: {l}")
+            logging.warn(("g_goal", type(g_goal), len(list(g_goal)), list(g_goal)))
+        else:
+            g_goal = rdflib.Graph().parse(str(outfile), format=fmt)
+            logging.warn(
+                (
+                    "g_goal",
+                    type(g_goal),
+                    len(list(g_goal)),
+                    g_goal.serialize(format="turtle"),
+                )
+            )
+
+        iso_made, iso_goal = to_isomorphic(g_made), to_isomorphic(g_goal)
+        in_both, in_made, in_goal = graph_diff(iso_made, iso_goal)
+        
+        def dump_nt_sorted(g):
+            return sorted(g.serialize(format="nt").strip().splitlines())
+
+        diff_lines = []
+        for g,p in zip([in_both, in_made, in_goal], ['','+ ','- ']):
+            for line in dump_nt_sorted(g):
+                diff_lines.append((line.decode(), p))
+        difftxt = '\n'.join(p+line for line, p in sorted(diff_lines))
+
+        test_file.write_text(f"""
+# [{testcase.id}](https://www.w3.org/TR/rdb2rdf-test-cases/#{testcase.id})
 {testcase.meta.get(dcterms.title)}
 
 ```diff
 {difftxt}
 ```
+
+{'SUCCES' if iso_made == iso_goal else 'FAIL'}
+
+(also checking pattern queries afterwards: {not nopattern})
 """)
 
-    for li, line in enumerate(dump_nt_sorted(in_both)):
-        logging.warn(f"in_both {li+1}/{len(list(in_both))}: {line}")
-    for li, line in enumerate(dump_nt_sorted(in_made)):
-        logging.warn(f"in_made {li+1}/{len(list(in_made))}: {line}")
-    for li, line in enumerate(dump_nt_sorted(in_goal)):
-        logging.warn(f"in_goal {li+1}/{len(list(in_goal))}: {line}")
-    assert iso_made == iso_goal
+        for li, line in enumerate(dump_nt_sorted(in_both)):
+            logging.warn(f"in_both {li+1}/{len(list(in_both))}: {line}")
+        for li, line in enumerate(dump_nt_sorted(in_made)):
+            logging.warn(f"in_made {li+1}/{len(list(in_made))}: {line}")
+        for li, line in enumerate(dump_nt_sorted(in_goal)):
+            logging.warn(f"in_goal {li+1}/{len(list(in_goal))}: {line}")
+        assert iso_made == iso_goal
 
-    if not nopattern:
-        made_triples = sorted(g_made)
-        if any(made_triples):
-            g_ss, g_ps, g_os = zip(*made_triples)
-            for s in sorted(set(g_ss)):
-                s_triples = sorted(g_made.triples([s, None, None]))
-                assert s_triples
-                for s_, _, _ in s_triples:
-                    assert s_ == s
-            for p in sorted(set(g_ps)):
-                p_triples = sorted(g_made.triples([None, p, None]))
-                assert p_triples
-                for _, p_, _ in p_triples:
-                    assert p_ == p
-            for o in sorted(set(g_os)):
-                o_triples = sorted(g_made.triples([None, None, o]))
-                assert o_triples
-                for _, _, o_ in o_triples:
-                    assert o_.toPython() == o.toPython()
-
+        if not nopattern:
+            made_triples = sorted(g_made)
+            if any(made_triples):
+                g_ss, g_ps, g_os = zip(*made_triples)
+                for s in sorted(set(g_ss)):
+                    s_triples = sorted(g_made.triples([s, None, None]))
+                    assert s_triples
+                    for s_, _, _ in s_triples:
+                        assert s_ == s
+                for p in sorted(set(g_ps)):
+                    p_triples = sorted(g_made.triples([None, p, None]))
+                    assert p_triples
+                    for _, p_, _ in p_triples:
+                        assert p_ == p
+                for o in sorted(set(g_os)):
+                    o_triples = sorted(g_made.triples([None, None, o]))
+                    assert o_triples
+                    for _, _, o_ in o_triples:
+                        assert o_.toPython() == o.toPython()
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc().replace(os.getcwd(), '')
+        txt = f"# {testcase.id} \n```\n{tb}\n```"
+        test_file.write_text(txt)
+        raise e
 
 def test_synthesis(module_results_df):
     df = module_results_df
@@ -204,7 +216,6 @@ def test_synthesis(module_results_df):
         text = status_emoji.get(row.status, "") + " " + row.status
         return f"[{text}]({row.engine_name}-rdb2rdf/{testcase.id}.md)"
 
-    # df["status"] = df["status"].apply(lambda s: status_emoji.get(s, "") + " " + s)
     df["status"] = df.apply(get_status_link, axis=1)
 
     with testdir.joinpath("rdb2rdf.md").open("w") as fw:

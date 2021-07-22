@@ -1,5 +1,5 @@
 
-# DirectGraphTC0010
+# [DirectGraphTC0010](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0010)
 Generation of direct graph for table names with spaces
 
 ```diff
@@ -16,3 +16,7 @@ Generation of direct graph for table names with spaces
 <http://example.com/base/Country%20Info/Country%20Code=3> <http://example.com/base/Country%20Info#Name> "Saint Martin (French part)" .
 <http://example.com/base/Country%20Info/Country%20Code=3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

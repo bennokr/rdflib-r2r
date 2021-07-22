@@ -1,5 +1,5 @@
 
-# R2RMLTC0008b
+# [R2RMLTC0008b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0008b)
 Generation of triples referencing object map
 
 ```diff
@@ -9,3 +9,7 @@ Generation of triples referencing object map
 <http://example.com/Student/10/Venus%20Williams> <http://xmlns.com/foaf/0.1/name> "Venus Williams" .
 <http://example.com/Tennis> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/activity/Sport> .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

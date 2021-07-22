@@ -1,5 +1,5 @@
 
-# R2RMLTC0016d
+# [R2RMLTC0016d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016d)
 Table with datatypes, boolean conversions
 
 ```diff
@@ -10,3 +10,7 @@ Table with datatypes, boolean conversions
 <http://example.com/Patient12> <http://example.com/paid> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
 <http://example.com/Patient12> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

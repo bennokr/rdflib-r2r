@@ -1,5 +1,5 @@
 
-# R2RMLTC0010b
+# [R2RMLTC0010b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0010b)
 Template with table columns with special chars
 
 ```diff
@@ -7,3 +7,7 @@ Template with table columns with special chars
 <http://example.com/2/Ireland> <http://example.com/name> "Ireland" .
 <http://example.com/3/Saint%20Martin%20%28French%20part%29> <http://example.com/name> "Saint Martin (French part)" .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

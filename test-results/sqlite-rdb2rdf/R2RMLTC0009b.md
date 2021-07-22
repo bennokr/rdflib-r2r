@@ -1,5 +1,5 @@
 
-# R2RMLTC0009b
+# [R2RMLTC0009b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009b)
 Generation of triples to multiple graphs
 
 ```diff
@@ -11,3 +11,7 @@ Generation of triples to multiple graphs
 <http://example.com/resource/student_20> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/ontology/Student> .
 <http://example.com/resource/student_20> <http://xmlns.com/foaf/0.1/name> "Demi Moore" .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

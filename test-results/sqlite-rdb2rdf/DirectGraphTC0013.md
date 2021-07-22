@@ -1,5 +1,5 @@
 
-# DirectGraphTC0013
+# [DirectGraphTC0013](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0013)
 Generation of a direct graph from a table with NULL values
 
 ```diff
@@ -11,3 +11,7 @@ Generation of a direct graph from a table with NULL values
 <http://example.com/base/Person/ID=2> <http://example.com/base/Person#Name> "Bob" .
 <http://example.com/base/Person/ID=2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Person> .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

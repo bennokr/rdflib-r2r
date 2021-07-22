@@ -1,5 +1,5 @@
 
-# R2RMLTC0016a
+# [R2RMLTC0016a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016a)
 Table with datatypes: string and integer
 
 ```diff
@@ -19,3 +19,7 @@ Table with datatypes: string and integer
 <http://example.com/Patient/12> <http://example.com/lastName> "Bing" .
 <http://example.com/Patient/12> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

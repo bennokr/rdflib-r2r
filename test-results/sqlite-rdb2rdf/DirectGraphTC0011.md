@@ -1,5 +1,5 @@
 
-# DirectGraphTC0011
+# [DirectGraphTC0011](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0011)
 Many to Many relations
 
 ```diff
@@ -45,3 +45,7 @@ Many to Many relations
 <http://example.com/base/Student_Sport/ID_Student=12;ID_Sport=111> <http://example.com/base/Student_Sport#ref-ID_Student> <http://example.com/base/Student/ID=12> .
 <http://example.com/base/Student_Sport/ID_Student=12;ID_Sport=111> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Student_Sport> .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

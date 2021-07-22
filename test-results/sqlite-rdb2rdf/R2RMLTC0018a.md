@@ -1,5 +1,5 @@
 
-# R2RMLTC0018a
+# [R2RMLTC0018a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0018a)
 Generation of triples by using CHAR datatype column
 
 ```diff
@@ -13,3 +13,7 @@ Generation of triples by using CHAR datatype column
 <http://example.com/30> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
 <http://example.com/30> <http://xmlns.com/foaf/0.1/name> "David          " .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

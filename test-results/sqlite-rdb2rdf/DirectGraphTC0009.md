@@ -1,5 +1,5 @@
 
-# DirectGraphTC0009
+# [DirectGraphTC0009](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0009)
 Two tables 1 primary key 1 foreign key
 
 ```diff
@@ -15,3 +15,7 @@ Two tables 1 primary key 1 foreign key
 <http://example.com/base/Student/ID=20> <http://example.com/base/Student#Name> "Demi Moore" .
 <http://example.com/base/Student/ID=20> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Student> .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

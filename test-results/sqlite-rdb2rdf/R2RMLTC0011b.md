@@ -1,5 +1,5 @@
 
-# R2RMLTC0011b
+# [R2RMLTC0011b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0011b)
 M to M relation, by using an additional Triples Map
 
 ```diff
@@ -20,3 +20,7 @@ M to M relation, by using an additional Triples Map
 <http://example.com/student/12> <http://example.com/lastName> "Villa" .
 <http://example.com/student/12> <http://example.com/plays> <http://example.com/sport/111> .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

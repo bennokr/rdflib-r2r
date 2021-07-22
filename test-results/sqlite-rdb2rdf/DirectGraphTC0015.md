@@ -1,5 +1,5 @@
 
-# DirectGraphTC0015
+# [DirectGraphTC0015](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0015)
 Generation of direct graph from multi-column primary keys
 
 ```diff
@@ -20,3 +20,7 @@ Generation of direct graph from multi-column primary keys
 <http://example.com/base/Country/Code=IE;Lan=ES> <http://example.com/base/Country#Name> "Irlanda" .
 <http://example.com/base/Country/Code=IE;Lan=ES> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country> .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

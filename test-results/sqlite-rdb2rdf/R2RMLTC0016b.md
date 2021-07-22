@@ -1,5 +1,5 @@
 
-# R2RMLTC0016b
+# [R2RMLTC0016b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016b)
 Table with datatypes: real and float
 
 ```diff
@@ -13,3 +13,7 @@ Table with datatypes: real and float
 <http://example.com/Patient12> <http://example.com/weight> "90.31"^^<http://www.w3.org/2001/XMLSchema#double> .
 <http://example.com/Patient12> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

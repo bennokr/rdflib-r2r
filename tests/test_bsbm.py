@@ -28,6 +28,7 @@ review = Namespace("http://purl.org/stuff/rev#Review")
 bsbm = Namespace("http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/")
 
 PATH = pathlib.Path("tests/BSBM")
+TIMEOUT = 60
 
 @pytest.fixture(scope="module")
 def path():
@@ -55,13 +56,14 @@ def dbs(path: pathlib.Path):
         dbs[engine_name] = db
     return dbs
 
+
 def yield_testcases(path: pathlib.Path):
 
     qpath = path.joinpath("queries")
     for t in ["bi", "explore"]:
         tpath = qpath.joinpath(t)
         for d in natsorted(tpath.glob("query*desc.txt"), key=lambda x: str(x)):
-            params = dict(l.split('=') for l in open(d).read().splitlines()[2:])
+            params = dict(l.split("=") for l in open(d).read().splitlines()[2:])
 
             name, _, _ = d.name.partition("desc")
             querytemplate = tpath.joinpath(name + ".txt").open().read()
@@ -77,121 +79,145 @@ def yield_testcases(path: pathlib.Path):
                 ),
                 id=str(id),
             )
- 
+
+
 def get_param_sets(path, graph):
     return {
-        'ProductFeatureURI': set(graph[ : RDF.type : bsbm.ProductFeature]),
-        'ProductURI': set(graph[ : RDF.type : bsbm.Product]),
-        'ProductTypeURI': set(graph[ : RDF.type : bsbm.ProductType]),
-        'ProductType': set(graph[ : RDF.type : bsbm.ProductType]),
-        'ProductPropertyNumericValue': [rdflib.Literal(d) for d in range(1,500)],
-        'OfferURI': set(graph[ : RDF.type : bsbm.ProductType]),
-        'CurrentDate': set(d for _, d in graph[ : bsbm.validTo : ]),
-        'ReviewURI': set(graph[ : RDF.type : review.Review]),
-        'Dictionary1': [
-            w for w in path.joinpath('titlewords.txt').open().read().splitlines()
+        "ProductFeatureURI": set(graph[: RDF.type : bsbm.ProductFeature]),
+        "ProductURI": set(graph[: RDF.type : bsbm.Product]),
+        "ProductTypeURI": set(graph[: RDF.type : bsbm.ProductType]),
+        "ProductType": set(graph[: RDF.type : bsbm.ProductType]),
+        "ProductPropertyNumericValue": [rdflib.Literal(d) for d in range(1, 500)],
+        "OfferURI": set(graph[: RDF.type : bsbm.ProductType]),
+        "CurrentDate": set(d for _, d in graph[: bsbm.validTo :]),
+        "ReviewURI": set(graph[: RDF.type : review.Review]),
+        "Dictionary1": [
+            w for w in path.joinpath("titlewords.txt").open().read().splitlines()
         ],
-        'CountryURI': set(d for _, d in graph[ : bsbm.country : ]),
-        'Date': set(d._value for _, d in graph[ : DC.date : ]),
-        'ProducerURI': set(graph[ : RDF.type : bsbm.Producer]),
+        "CountryURI": set(d for _, d in graph[: bsbm.country :]),
+        "Date": set(d._value for _, d in graph[: DC.date :]),
+        "ProducerURI": set(graph[: RDF.type : bsbm.Producer]),
     }
 
+
 TESTS = list(yield_testcases(PATH))
+
+
+def get_test_hyperlink(id):
+    _, part, q = id.split("-")
+    pre = "http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/"
+    parts = {
+        "explore": "spec/ExploreUseCase/#queryTripleQ",
+        "bi": "spec/BusinessIntelligenceUseCase/index.html#queryTripleQ",
+    }
+    link = pre + parts.get(part) + q.strip("query")
+    return f"[{id}]({link})"
+
 
 @pytest.fixture()
 def dbecho(pytestconfig):
     return pytestconfig.getoption("dbecho")
 
-@pytest.mark.timeout(60)
+
+@pytest.mark.timeout(TIMEOUT)
 @pytest.mark.parametrize("testcase", TESTS, ids=[t.id for t in TESTS])
-@pytest.mark.parametrize("engine_name", ["sqlite", "duckdb"])
+@pytest.mark.parametrize("engine_name", ["sqlite"])  # ["sqlite", "duckdb"]
 def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
-    db = dbs[engine_name]
+    test_out = pathlib.Path(f"test-results/{engine_name}-bsbm/")
+    test_out.mkdir(parents=True, exist_ok=True)
+    test_file = test_out.joinpath(f"{testcase.id}.md")
+    try:
+        db = dbs[engine_name]
 
-    mapping = R2RMapping(rdflib.Graph().parse('tests/bsbm.ttl', format='ttl'))
-    ns = mapping.graph.namespace_manager
+        mapping = R2RMapping(rdflib.Graph().parse("tests/bsbm.ttl", format="ttl"))
+        ns = mapping.graph.namespace_manager
 
-    graph_rdb = rdflib.Graph(R2RStore(db=db, mapping=mapping), namespace_manager=ns)
+        graph_rdb = rdflib.Graph(R2RStore(db=db, mapping=mapping), namespace_manager=ns)
 
-    graph = rdflib.Graph()
-    for t in graph_rdb:
-        graph.add(t)
-    param_sets = get_param_sets(path, graph)
+        graph = rdflib.Graph()
+        for t in graph_rdb:
+            graph.add(t)
+        param_sets = get_param_sets(path, graph)
 
-    logging.warn(testcase.querytemplate)
-    
-    def get_params(querytemplate):
-        params = {}
-        pnames = set(re.findall('%([^%]+)%', querytemplate))
-        if any(p.startswith('ConsecutiveMonth') for p in pnames):
-            from datetime import timedelta
-            ps = [p for p in pnames if p.startswith('ConsecutiveMonth')]
-            sample = random.choice( list(param_sets['Date']) )
-            month = sample.replace(day=1)
-            for p in sorted(ps, key=lambda x: int(x[-1])):
-                params[p] = month.isoformat()
-                month = (month + timedelta(days=40)).replace(day=1)
-        for pname in pnames:
-            if pname not in params:
-                params[pname] = sample_param(pname)
-        return params
+        logging.warn(testcase.querytemplate)
 
-    def sample_param(pname):
-        tname = testcase.params.get(pname)
-        alt = pname.split('_')[0]
-        domain = param_sets.get(tname) or param_sets[alt]
-        sample = random.choice( list(domain) )
-        return sample.n3() if isinstance(sample, rdflib.term.Node) else sample
+        def get_params(querytemplate):
+            params = {}
+            pnames = set(re.findall("%([^%]+)%", querytemplate))
+            if any(p.startswith("ConsecutiveMonth") for p in pnames):
+                from datetime import timedelta
 
-    logging.warn(f"Graph has {len(graph)} triples")
-    # gb = rdflib.term.URIRef('http://downlode.org/rdf/iso-3166/countries#GB')
-    # for s in graph[:bsbm.country:gb]:
-    #     logging.warn((s,'in gb'))
-    #     break
-    # raise
+                ps = [p for p in pnames if p.startswith("ConsecutiveMonth")]
+                sample = random.choice(list(param_sets["Date"]))
+                month = sample.replace(day=1)
+                for p in sorted(ps, key=lambda x: int(x[-1])):
+                    params[p] = month.isoformat()
+                    month = (month + timedelta(days=40)).replace(day=1)
+            for pname in pnames:
+                if pname not in params:
+                    params[pname] = sample_param(pname)
+            return params
 
-    goal = None
-    querytemplate = testcase.querytemplate
-    bad_params = set()
-    while not goal:
-        params = get_params(querytemplate)
-        if str(params) in bad_params:
-            continue
-        logging.warn(f'params: {params}')
-        query = re.sub('%([^%]+)%', lambda m: params[m.group(1)], querytemplate)
+        def sample_param(pname):
+            tname = testcase.params.get(pname)
+            alt = pname.split("_")[0]
+            domain = param_sets.get(tname) or param_sets[alt]
+            sample = random.choice(list(domain))
+            return sample.n3() if isinstance(sample, rdflib.term.Node) else sample
 
-        try:
-            goal = set(graph.query(query))
-        except TypeError as e:
-            logging.warn(f'Query failed with TypeError {e}')
-        
-        for t in goal:
-            if any(n is None for n in t):
-                logging.warn(f"None in goal result: {t}")
+        logging.warn(f"Graph has {len(graph)} triples")
+        # gb = rdflib.term.URIRef('http://downlode.org/rdf/iso-3166/countries#GB')
+        # for s in graph[:bsbm.country:gb]:
+        #     logging.warn((s,'in gb'))
+        #     break
+        # raise
 
-        gtxt = '\n'.join('\t'.join((n.n3(ns) if n else '') for n in t) for t in goal)
-        logging.warn(f'goal: {len(goal)} triples\n' + gtxt)
-        if not goal:
-            bad_params.add( str(params) )
-            logging.warn(f"Tried {len(bad_params)} options")
-            continue
+        goal = None
+        querytemplate = testcase.querytemplate
+        bad_params = set()
+        while not goal:
+            params = get_params(querytemplate)
+            if str(params) in bad_params:
+                continue
+            logging.warn(f"params: {params}")
+            query = re.sub("%([^%]+)%", lambda m: params[m.group(1)], querytemplate)
 
-        optimize_sparql()
+            try:
+                goal = tuple(graph.query(query))
+            except TypeError as e:
+                logging.warn(f"Query failed with TypeError {e}")
 
+            for t in goal:
+                if any(n is None for n in t):
+                    logging.warn(f"None in goal result: {t}")
 
-        made = set(graph_rdb.query(query))
-        mtxt = '\n'.join('\t'.join((n.n3(ns) if n else '') for n in t) for t in made)
-        logging.warn(f'made: {len(made)} triples\n' + mtxt)
-        
-        sql_query = graph_rdb.store.getSQL(query)
-        test_out = pathlib.Path(f'test-results/{engine_name}-bsbm/')
-        test_out.mkdir(parents=True, exist_ok=True)
-        test_out.joinpath(f"{testcase.id}.md").write_text(f"""
-# {testcase.id}
+            gtxt = "\n".join(
+                "\t".join((n.n3(ns) if n else "") for n in t) for t in goal
+            )
+            logging.warn(f"goal: {len(goal)} triples\n" + gtxt)
+            if not goal:
+                bad_params.add(str(params))
+                logging.warn(f"Tried {len(bad_params)} options")
+                continue
+
+            optimize_sparql()
+
+            made = tuple(graph_rdb.query(query))
+            mtxt = "\n".join(
+                "\t".join((n.n3(ns) if n else "") for n in t) for t in made
+            )
+            logging.warn(f"made: {len(made)} triples\n" + mtxt)
+
+            sql_query = graph_rdb.store.getSQL(query)
+
+            paramstr = "\n".join(f"{k} = {v}" for k, v in params.items())
+            test_file.write_text(
+                f"""
+# [{testcase.id}]({get_test_hyperlink(testcase.id)})
 
 ## Random parameter sample
 ```
-{params}
+{paramstr}
 ```
 
 ## SPARQL query
@@ -213,33 +239,33 @@ def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
 ```
 {mtxt}
 ```
-""")
 
-        assert made == goal
-        break
-    reset_sparql() 
+{'SUCCES' if made == goal else 'FAIL'}
+"""
+            )
+            assert made == goal
+            break
+        reset_sparql()
+    except Exception as e:
+        if not isinstance(e, AssertionError):
+            import traceback, os
+            tb = traceback.format_exc().replace(os.getcwd(), '')
+            txt = f"# {testcase.id} \n```\n{tb}\n```"
+            test_file.write_text(txt)
+        raise e
+
 
 def test_synthesis(module_results_df):
     df = module_results_df
-    ids = df.testcase.apply(lambda x: x.id)
-    def get_link(r):
-        _, part, q = r.testcase.id.split('-')
-        pre = 'http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/'
-        parts = {
-            'explore': 'spec/ExploreUseCase/#queryTripleQ',
-            'bi': 'spec/BusinessIntelligenceUseCase/index.html#queryTripleQ'
-        }
-        link = pre + parts.get(part) + q.strip("query")
-        return f"[{r.testcase.id}]({link})"
-    df["link"] = df.apply(get_link, axis=1)
-    
+    df["link"] = df.apply(lambda r: get_test_hyperlink(r.testcase.id), axis=1)
     status_emoji = {
         "passed": "✅",
         "failed": "❌",
         "xfailed": "🔆",
         "xpassed": "❗️",
+        "timeout": "⏱",
     }
-    testdir = pathlib.Path('test-results/')
+    testdir = pathlib.Path("test-results/")
     testdir.mkdir(parents=True, exist_ok=True)
 
     def get_status_link(row):
@@ -247,6 +273,8 @@ def test_synthesis(module_results_df):
         testcase = row.testcase
         text = status_emoji.get(row.status, "") + " " + row.status
         return f"[{text}]({row.engine_name}-bsbm/{testcase.id}.md)"
+
+    df["status"][df.duration_ms > TIMEOUT*1000] = "timeout"
     df["status"] = df.apply(get_status_link, axis=1)
 
     with testdir.joinpath("bsbm.md").open("w") as fw:

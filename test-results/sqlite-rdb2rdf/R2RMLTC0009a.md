@@ -1,5 +1,5 @@
 
-# R2RMLTC0009a
+# [R2RMLTC0009a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009a)
 Generation of triples from foreign key relations
 
 ```diff
@@ -8,3 +8,7 @@ Generation of triples from foreign key relations
 <http://example.com/resource/student_10> <http://xmlns.com/foaf/0.1/name> "Venus Williams" .
 <http://example.com/resource/student_20> <http://xmlns.com/foaf/0.1/name> "Demi Moore" .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

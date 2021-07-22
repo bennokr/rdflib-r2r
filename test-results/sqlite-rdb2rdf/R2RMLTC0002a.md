@@ -1,5 +1,5 @@
 
-# R2RMLTC0002a
+# [R2RMLTC0002a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002a)
 Two columns mapping, generation of a subject URI by the concatenation of two column values
 
 ```diff
@@ -7,3 +7,7 @@ Two columns mapping, generation of a subject URI by the concatenation of two col
 <http://example.com/10/Venus> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
 <http://example.com/10/Venus> <http://xmlns.com/foaf/0.1/name> "Venus" .
 ```
+
+SUCCES
+
+(also checking pattern queries afterwards: True)

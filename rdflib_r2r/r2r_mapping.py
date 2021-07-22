@@ -212,6 +212,7 @@ class R2RMapping:
         self.graph = g
         self.baseuri = baseuri
 
+        # Track triple maps per node pattern matcher
         self.spat_tmaps, self.ppat_pomaps, self.opat_pomaps = {}, {}, {}
         for tmap in g[: RDF.type : rr.TriplesMap]:
             t = _get_table(g, tmap)
@@ -234,6 +235,9 @@ class R2RMapping:
         return t.bindparams(**field_values)
 
     def get_node_filter(self, node, pat_maps):
+        
+        # A pattern may be used in multiple places, so use sql_or
+        # (but what happens if the table name is out of scope ...? )
         map_conditions = {}
         if node is not None:
             for pat, maps in pat_maps.items():
@@ -251,6 +255,7 @@ class R2RMapping:
                         val = str(val)
                     elif isinstance(val, bytes):
                         val = text(f"x'{base64.b16encode(val).decode()}'")
+                    
                     if pat.inverse:
                         fields = {pat.field: val}
                         where = self.inverse_condition(pat.inverse, fields)
@@ -268,6 +273,8 @@ class R2RMapping:
                         if pat.inverse:
                             where = self.inverse_condition(pat.inverse, fields)
                         else:
+                            # A template pattern may have multiple fields; 
+                            #   all must match, so use sql_and
                             where_clauses = []
                             for key, val in fields.items():
                                 key = f'"{pat.tname}"."{key.replace("__", " ")}"'
