@@ -1,5 +1,5 @@
-
-# [R2RMLTC0014d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0014d)
+# R2RMLTC0014d
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0014d)
 three tables, one primary key, one foreign key
 
 ```diff
@@ -7,5 +7,3 @@ three tables, one primary key, one foreign key
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

@@ -1,5 +1,5 @@
-
-# [R2RMLTC0002a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002a)
+# R2RMLTC0002a
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002a)
 Two columns mapping, generation of a subject URI by the concatenation of two column values
 
 ```diff
@@ -9,5 +9,3 @@ Two columns mapping, generation of a subject URI by the concatenation of two col
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

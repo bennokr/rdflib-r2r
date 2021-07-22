@@ -1,5 +1,5 @@
-
-# [DirectGraphTC0006](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0006)
+# DirectGraphTC0006
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0006)
 Generation of subjects
 
 ```diff
@@ -8,5 +8,3 @@ Generation of subjects
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

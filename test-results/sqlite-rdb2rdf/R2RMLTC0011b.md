@@ -1,5 +1,5 @@
-
-# [R2RMLTC0011b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0011b)
+# R2RMLTC0011b
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0011b)
 M to M relation, by using an additional Triples Map
 
 ```diff
@@ -22,5 +22,3 @@ M to M relation, by using an additional Triples Map
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

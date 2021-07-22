@@ -1,5 +1,5 @@
-
-# [DirectGraphTC0025](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0025)
+# DirectGraphTC0025
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0025)
 Generation of triples from three tables, three primary keys, three foreign keys
 
 ```diff
@@ -49,5 +49,3 @@ _:cb12eb4fe3bd5291acd055109f01bd0be164e00796027f06baf87339b68b3e7b20a <http://ww
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

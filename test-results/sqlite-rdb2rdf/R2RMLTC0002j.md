@@ -1,5 +1,5 @@
-
-# [R2RMLTC0002j](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002j)
+# R2RMLTC0002j
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002j)
 Two columns mapping, qualified column names
 
 ```diff
@@ -7,5 +7,3 @@ Two columns mapping, qualified column names
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

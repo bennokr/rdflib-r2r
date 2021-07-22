@@ -126,6 +126,8 @@ def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
     test_out = pathlib.Path(f"test-results/{engine_name}-bsbm/")
     test_out.mkdir(parents=True, exist_ok=True)
     test_file = test_out.joinpath(f"{testcase.id}.md")
+    report = f"# {testcase.id}\n[link]({get_test_hyperlink(testcase.id)})\n\n"
+
     try:
         db = dbs[engine_name]
 
@@ -202,47 +204,24 @@ def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
 
             optimize_sparql()
 
+            paramstr = "\n".join(f"{k} = {v}" for k, v in params.items())
+            report += f"## Random parameter sample\n```\n{paramstr}\n```\n\n"
+            report += f"## SPARQL query\n```sparql\n{query}\n```\n\n"
+            report += f"## Goal results\n```\n{gtxt}\n```\n\n"
+            
+            sql_query = graph_rdb.store.getSQL(query)
+            report += f"## Created SQL query\n```sql\n{sql_query}\n```\n\n"
+
             made = tuple(graph_rdb.query(query))
             mtxt = "\n".join(
                 "\t".join((n.n3(ns) if n else "") for n in t) for t in made
             )
             logging.warn(f"made: {len(made)} triples\n" + mtxt)
+            report += f"## Created SQL results\n```\n{mtxt}\n```\n\n"
 
-            sql_query = graph_rdb.store.getSQL(query)
+            report += ('SUCCES' if made == goal else 'FAIL')
+            test_file.write_text(report)
 
-            paramstr = "\n".join(f"{k} = {v}" for k, v in params.items())
-            test_file.write_text(
-                f"""
-# [{testcase.id}]({get_test_hyperlink(testcase.id)})
-
-## Random parameter sample
-```
-{paramstr}
-```
-
-## SPARQL query
-```sparql
-{query}
-```
-
-## Goal results
-```
-{gtxt}
-```
-
-## Created SQL query
-```sql
-{sql_query}
-```
-
-## Created SQL results
-```
-{mtxt}
-```
-
-{'SUCCES' if made == goal else 'FAIL'}
-"""
-            )
             assert made == goal
             break
         reset_sparql()
@@ -250,8 +229,8 @@ def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
         if not isinstance(e, AssertionError):
             import traceback, os
             tb = traceback.format_exc().replace(os.getcwd(), '')
-            txt = f"# {testcase.id} \n```\n{tb}\n```"
-            test_file.write_text(txt)
+            report += f"\n```\n{tb}\n```"
+            test_file.write_text(report)
         raise e
 
 

@@ -1,52 +1,95 @@
-# bsbm-explore-query8 
+# bsbm-explore-query8
+[link]([bsbm-explore-query8](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/ExploreUseCase/#queryTripleQ8))
+
+## Random parameter sample
+```
+ProductXYZ = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product78>
+```
+
+## SPARQL query
+```sparql
+PREFIX bsbm: <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX rev: <http://purl.org/stuff/rev#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+SELECT ?title ?text ?reviewDate ?reviewer ?reviewerName ?rating1 ?rating2 ?rating3 ?rating4 
+WHERE { 
+	?review bsbm:reviewFor <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product78> .
+	?review dc:title ?title .
+	?review rev:text ?text .
+	FILTER langMatches( lang(?text), "EN" ) 
+	?review bsbm:reviewDate ?reviewDate .
+	?review rev:reviewer ?reviewer .
+	?reviewer foaf:name ?reviewerName .
+	OPTIONAL { ?review bsbm:rating1 ?rating1 . }
+	OPTIONAL { ?review bsbm:rating2 ?rating2 . }
+	OPTIONAL { ?review bsbm:rating3 ?rating3 . }
+	OPTIONAL { ?review bsbm:rating4 ?rating4 . }
+}
+ORDER BY DESC(?reviewDate)
+LIMIT 20
+```
+
+## Goal results
+```
+"usurped caprioles brushoffs quaffers"@en	"harvester noblesses enlarger nurseryman straights vulgarian enticer outstretched decorativeness parishioners enthralling underhanded uncials disputable interregnal plastering ravers biologic coatroom pledgeholder stunting dataflow explainer pouffe urb heinously scrollwork clones hematozoa glories nobly burgles leathern galloot preordain condescends dissection idolizes enthrallment hardheads silentness grazer bronchoscope administrations freshened trustworthily czardases stitcher clitoral artificialness seconded loafing implicating totalisms sandhog dotters adherer dolours airbursts willers antonymies taxless adversaries slaloms closing undefeated floundered queueing fellowman adumbrations electrocutional pikemen enduros convents tunnies pustuled readopted slimier herbicide eyestones reinvokes inequable unsensitive sextuplets supt roundness abducted spectrograms communalize baddie sulfuryls chemicals carousers tisanes dangs bikers facies whirler elopes winterier handbooks unsightly droved mesopotamian dreamed kindlers basketries reoccurrence pulps unguarded tendentious rejudge lorgnettes lightheartedly carting profitable pilled auguster chelation marshmallows liturgists evokes mindfulness facets coagula checked carloads freeholds mules fumy bestiary hens portability doorknobs discoursers mechanotherapist onanism alans clapped inveiglement unjudicial romances curvey mango nonhistoric colters prestamp bigwig scored assessed futileness bathyscaphes delegated rhythmicities paradigms disservice guilelessness funked beeves bobbysocks sharecrops amu vectoring pricey retractor coddled scurrilities peepers lamentably locaters napoleons cavorting untied statisms disparagingly facetted vocalities massacred pondweeds warier phalloid guts stardust ultrasonic perpetually steadfastly reinduct provolone righter"@en	"2008-06-10"^^xsd:date	bsbm-inst:Reviewer26	"Autolycus-Christy"	"10"^^xsd:integer		"3"^^xsd:integer	"7"^^xsd:integer
+"strangulating swanherd psychol stupendously impetuosity guardhouses nonlocals shoat bobtailed passbook"@en	"doors underpricing untidily edemata leasing reassimilates sassiest jaywalker resurveyed indentions overpast philter slopes ungrudging unapportioned malayan cervical herbaceous corer alienated shaving ionize thermocauteries secularization fireworm preinstructs disliking wagtails tongues jobs absorbed vibraharp barogram deemphasized scrambled mispunctuate intervals reechoes scolders chipper bathetically friendlier calculator unaffected brinies tackified daybreaks cells emendation reglaze objectives coaxer cannonaded steepened homosexually slushily unteachable orgies broadens cartload soporific mirks asians pathfinder diagnoseable equalised unripest player daubery badlands sublicensed nullifications sheeter netless trolls flotations bennies doublers earlship sliders yokelish marketeers cardiologists restyles gilded trainfuls syncopes ropy malayalam crested station reinter glaciology commissionership precalculate retracting offender nonmetal carriageable surliest copywriters itemizers glimpser additions bunkered unshaded citeable libbers cajon fueling gyral predacious fluorinates nullity scow bedwarfs biomass dissipation intelligibility worming ethers"@en	"2008-06-08"^^xsd:date	bsbm-inst:Reviewer36	"Tabora-Blanco"	"8"^^xsd:integer	"6"^^xsd:integer	"4"^^xsd:integer	"6"^^xsd:integer
+"orphaning negus missives chitinous corded skewers fawned"@en	"theorize pansophies osmoses unprotected hickeys trailered stockier childhoods washcloths regrow legislatively planes craftsmanship refurnishing tarot designment spurry bushwhacker tuxedoes pampered gastroscope unsnap nonnumeric matadors impactors elucidating bibless bayberries decriminalizing fledgier loathers infuriated sapped amerindian coins cooperativeness disappoints supermini intrusting pulpwood limners lithely flab withdraws cusser gracefully surprising downfallen jocks blepharitis perverting sikhs radars boozers prospectuses crabbedness interviews constitutionals tasking tommyrot stockyard summating eroding foraging sparked transmogrified skins deceives educator spiller electroencephalographs"@en	"2008-05-18"^^xsd:date	bsbm-inst:Reviewer32	"Anasooya"	"1"^^xsd:integer	"7"^^xsd:integer		"9"^^xsd:integer
+"knighted conformational boffs infiltrating friendlies sandblasting"@en	"prevuing walleyes dejects undersupply towery tendons grainfield groutiest bestialize ganged drifty gratefulness clothed pleurisies sterilely inkwells puttering nonideological propitiated knobs frameworks guiltlessly stalely precises cathartic gymnasts prebend vocalists ukases breeziness physiques veiner wassailing elastin flashlamp muckrake shoetrees aviarist wassailers iuds unrecoverable clammed griddlecake fibrinous homonymic chromide stepsister roosted patronized endorses vindications premising variegating sabbaths distinctly challises comradely roentgenologies dedicating"@en	"2008-03-15"^^xsd:date	bsbm-inst:Reviewer8	"Linda-Nada"				
+"debuting shortened vatted boggier tweeds mesons moper racketing newfashioned rosewoods cataloging campos"@en	"emulative mattresses parroters tzardoms almanacs cheques wriggles bullnecks preconstruction sorbate unlace reformulated properest unstrap imperialness convexes anorexias stopple annularity mistaught ophthalmoscopies ligneous encasement autoeroticism survivability peppered handfuls disqualifying cavy wattles corruptibly podgy unactuated exchanger hazier hematinic knowledgeless earlock indefiniteness extincting sanely alluring toucan worrit coagulating versicles bosky channelizing perplexed semitranslucent harpsichordist kaffirs repositioned menads wingy nonhabituating gearwheel chams arranger tinkliest mitering floaters intercommunications parathyroid smuttiest dingey overmastering unmovable pokily seminaries muskegs unlocked disorient linings gondoliers ajowans dolorousness bullier laudator parasitologies waisting noxiousness hoosgows terraced bruits habituated parrying allegiantly included quartets shive ratings sponsored shapeups nurturer armatured conditionalities masters sforzato individuates occulted darkled stockpots eventuations flammed schistose needlessly internalizing folkway filterers sledder knowable jewing ammino suppurating abreacted fellowships folding hueless disaffirmation fertilize synthesizes naphthous witnessers ideograph lothsome zn sophistries victualled painkiller stoniest fruitiness"@en	"2008-03-04"^^xsd:date	bsbm-inst:Reviewer5	"Przemek-Berte"	"1"^^xsd:integer	"4"^^xsd:integer	"9"^^xsd:integer	
+"democracies electroencephalographic oriels minuends enjoyably submitter mitigators multilingual commerces palpitation waterbeds caustically otolaryngologist munitioned goring"@en	"landslip grasslands mineralogist muled saunas amputator scats livened robbing areal feltings sweetener determinability thermoregulation stuffing manos reaccents confirmed ceiling aftereffects finochios berthing buoyancies tonsilar beavers motels greased senses enjoiners pendently menageries bimester twiggier measures slurped zanyish godship rangelands subagent typecasts twitched augmenters malls coacher sanitaria condores satisfiable distr intersexually arsons nonfascist beakless charms yakking chirrupy serotypes crotchetiness inexactly rachitic overemphasize prodigality thuggeries nursers harnessers heterodoxy disarranging faculties nonproliferation getups processes emancipating saharan disbarments overshadow trochaic alphorns inly appears destruction calipering derailing fetters tumblings crinkliest fugitives folkmoots anxieties widest darnedest fritted hydrostatics hatters kindheartedness kayoed precognitive combustibility darkey witted mastering foliages accommodatingly setbacks fibrinous nankeen borzoi chantor pupates mobilize dominator grafting sisals ghostiest shindies parricides indentions compos disquieted bads quacky competing condos kroner snowballs mystics logicized misdrawn invalidly batrachian beaus unsafety overspecializing comportment untrammeled readerships overshoots develope bluegum ponying trunks sugarcoat indites manicuring phantomlike confesses massaged hullos espousals bimetals declined undervalue expresses boches commingles swivets squishing blowsier secureness followup parenting expectorants hailstones negativing ineluctably goaltender flavorsome kyries decapitate defies accouterment accused impurity dieting dribblers mismatches bedazzled afterdecks areolas romanism tawniest stews absolutely binds bluebell toxemic amaranthine attestant infidels whitely compensability initiations"@en	"2008-02-21"^^xsd:date	bsbm-inst:Reviewer28	"Hemanti-Suhaila"	"1"^^xsd:integer	"3"^^xsd:integer		"7"^^xsd:integer
+"warrantor decompressing globalism guidebooks transcendentalists"@en	"fortissimo redetermination expwy poorhouses metabolites respelled denser negligees husk hexahedra unbutton reaccustomed mishaps woodworking dehydrator buxomness scholastically doubtable fashioned baldness wartiest illustriousness pathogeneses goriness distractibility papillate brassish aggrieves abaft vino tokay blunge mirv beaned cyclical gravitic hardhearted furnisher carrageenin threatful preemptory malefic joggles kilotons oozy predigests gibsons insurgency brutally castrations halogenoid reaffirming unafraid calamine resp splenitises ringbolts hotcake gaoler jiggers floccular sinologies scenarios sylphid sceptering retaliated witherers endeavoured sneezing assistor bootlickers attractable distill lithographically riderless bulls streamiest"@en	"2008-01-07"^^xsd:date	bsbm-inst:Reviewer24	"Danja-Hroswitha"	"7"^^xsd:integer		"5"^^xsd:integer	
+"curiosa writing teacarts surer vileness subversively muumuus decapitator fanfarons saltires surveyance graduands breezily eights lovemaking"@en	"splotched modernness freights fatless patiences lynchers psychs suppliants prologuing tabards uplands tastelessly occasionally oleoresin sahibs victualing nickles idolaters yacked speedster obstructionism impaneled driveler sanitarians overprint bagful perfectness godchildren headhunt unverifiably chutist trichinoses hoarsening tortuosity unkindness procedures burglaries microanalysis wheedlers intermezzos greenthumbed tazze concelebrating ultrasonically unstablest suspender moralizing poachier weatherwise stabiles overimpressed fadedly titulary miniaturizations stripper sagaciously swages reactivating reattained ohioans blithering mouldering dehorner leaded stilts elasticizes"@en	"2007-12-16"^^xsd:date	bsbm-inst:Reviewer1	"Ruggiero-Delane"				
+"coryzas implementing glistens whishted blowpipe opacifying guanacos casinos reft unrequitable"@en	"fumbled regear retractions unhandicapped tautly secularity frostings blooded boondoggle headband muncher deucedly comfortless thunderclouds federalized prenatal goggling armenians toller pyrethrum fortunately quieted stilton neighborhood procommunists unhinge franker stowable majorities stereotape initiative antiinsurrectionally diogenes inflexibleness deux skywrote animisms clops imperialists preventiveness worldbeaters parodists overrules ordinands drovers asshole muckraking tumults officially electioneering zany railways multimillionaires indubitably vigors toned fleeter diptychs raffler stonish unharvested banjoist manifoldness comradeship mercurous steadiness altered giantism conceptualizations idlers landlocked capriccios foisting prostrations zoological wagnerian rallye apportionments proctorship validates bovid carcinomata strewed substituting taxistand debaucher skirls prefixion renig royally gumwoods planets conkers skunking alaruming travelers comically catechize glottises upraising hallooing understand pirojki nonproportionally directs rejoicers rarefaction wilts weensy assonants cuckolds"@en	"2007-11-04"^^xsd:date	bsbm-inst:Reviewer39	"Toson-Seki"	"5"^^xsd:integer	"1"^^xsd:integer		"4"^^xsd:integer
+"regarded tortuousness passaging cheapies morassy shrieks uninstructed sensuality inverting chartered returnable adamancies dupers"@en	"besmeared preordain olympus drownding mishmosh slowness unintellectual discountenancing crematoria prostituting stopcocks sheathes vulgarizing distinguishing methyls ruer burnouses disrobed nonexportable frizzled tuffet nonstructural lackeyed worrier airscrew valuated aiglets scragged snifters nitrification malapert mimicker popovers kitharas sections cuspidal huguenot solidi evictors eggcup platters facula overtakes geek possibler jamb photospheres palpably baying wispiest regeared intersocietal skittles enshrouds scanners cirrostratus brilliancies matrilineal antefix parasiticidal twangier partialities misdiagnose sauna idiotical stabbed marts stylists endowed serigraphers turgencies supplanter sixpenny fusileers pluribus excessively sunsuit romany saxhorns admires larding hypochondria dyed syzygal godlier caviling carolinas hardening skateboarded formulators weenier blandishers emersions mispronunciations tilters boomerangs intermarriages cranking slushiest enigmas allotter supermini casters imbalances withstanding ballyhooed physiopathologic scarlets windier shrives editorialist japanize shepherding factorship nontechnically opossums metameric phenotypically pushiness weirdie monkeyed quieters spieling roomfuls measliest millings effigies unfamiliarity komondors certitudes hares reconciled impenitently burred victualers garrets macaw unfixes rubying oversensitive tantalize unquoted acids quadriplegia dermal catchier planetoids ironware streptobacillus grubbily teethings camshaft sportful shogun misbehaving dup trucing symbolizations languidness closely perjuring vaguest holds housewarmings novenae coaler dominoes bumblings diatribes skindiving bouzouki outworking viced quizzing snafuing overindulgence psychoneurotic impeders hecklers shrouded eglantine panted laceworks salter tomfoolery snufflers appositively gratefully capering soporose"@en	"2007-10-25"^^xsd:date	bsbm-inst:Reviewer39	"Toson-Seki"	"4"^^xsd:integer	"9"^^xsd:integer		"5"^^xsd:integer
+"cenacle contends firebirds accommodator photocatalyst birdlimed dismiss fontanels"@en	"billiards wets grannie tritiums rekeyed sponsoring overbite saintlier unitedly onionskin defies hastes discolorations hebraist herbivorously resiliency bullfighting investigative inanimately guildry francs equivocates gaffs striation pushiness runes misdid ennoblement claims boarded rambles stormed riposte syncopations aspirates homey fittingness disjointedness servals unmoving inconspicuousness quired vacuoles trooping slimed forky foreboding codeines darners turbulently winced twinkler wakeless tootsie astrally squirted washstands retched revarnishing subdistricts lichis"@en	"2007-10-09"^^xsd:date	bsbm-inst:Reviewer25	"Christophe-Vizelin"	"1"^^xsd:integer		"10"^^xsd:integer	
+"snicked auditioning dropping refurnish effusively rigorously northeasterner snoopily ramifying reclamations jawboned skewness emulator"@en	"rags fizzier consecrating bemix ensphered unwitted behooving attainted beetles saturating psalmed slogans prewarmed barbarizes egotistic savager thermometrically hiphuggers jackscrew sloping impersonators infusive accidentals infrastructures extortioner ungratefully woodiest unmerged paneled sexpot wiredraw pleading reemphases foreordaining foreshows spotting campier ontogeneses mishmoshes behoves rangier trets surchargers tournaments tabooing massing plasticizing irks crocheters spooled reharden prevailer prorogues peskiness salinizes desisted birchism sprightliest dieters selenographers filmography lingula lieutenancy townlet gingerbread brusk harboured popcorns thermos insurmountably cultists spilth downgrading spirochetes tzimmes stepup archangelic displacement foxskin nonprotective fishiness sirenomelus pensiones shunner bigeye moonwalk meanies groining spooks yarded fermata knothole vilifying calderon battiks rebaters beefcakes frauleins toothiest aroynts loiteringly torpidity tubby headstones moussakas unbelievable rosinous sentimentally filarees olograph"@en	"2007-09-16"^^xsd:date	bsbm-inst:Reviewer42	"Kura-Janette"	"8"^^xsd:integer	"5"^^xsd:integer		"3"^^xsd:integer
+"sprucer stipulators wraparound samadhi poppies pylon womanize cockily slaved"@en	"nervily impeded laddies woofed billeting segregating biocidal pharmacopeias affraying confederation earaches nazifies fogs dulcimer enflamed amerindians teaberry bollixed glamorousness deviates hinted nonproliferation chlorinates helmless trimming nigglingly dynes sacerdotally madded shatters cathedrals discases footbaths sooner unblock zooplankton conjunctivae hooters dunning busywork personalities bales fustians freezing slouching photoengraved hassels pistache revolutions enumerator telluric excreting preyers traitresses fortnightly addictions infundibular tolerated quarto motivates wheelies helicoids bravest inlets mux eardrums softbound foresaw testis greco honours inharmonic bowingly hastening nosh favorableness obtrudes disapproval fronds inviting incarnates luminesces mesdemoiselles dames nightcrawler skirmisher windowing pupfishes percolator pulleys thralls instructors irrupted driftpin bastardizes delvers protuberance adits peneplains couths phalluses laughings conformist darker unengaged liverwurst touching stamper chariness superciliousness effectiveness varietally reclining automobilists unbudgeted kerfs lupins girdling flummoxed trolls pome tangled copycat feminizes outsold ragtimes ecumenicism wakers dollied subroutine pseudopod listening directorates auditories peasantry sideliner ponchos reparable quitter bibliographies victimized extermination recessionals whooped heartthrob vaultings inclusiveness overstuffed unmanning sweethearts mesmerizers resubscribing harkens kernelled pardoned kopeck podgily revisionist appropriative bubbled livable alopecic stockpiled complexions underlined unctuous dorms nuder insentient epiglottis affectations amplest defecting billable gateways diphtheritic employability"@en	"2007-07-16"^^xsd:date	bsbm-inst:Reviewer18	"Emmy"	"7"^^xsd:integer	"10"^^xsd:integer	"5"^^xsd:integer	"8"^^xsd:integer
+"ballistician rabbles steepened gangrened mapmaker allotypically reckonings spillway overawes"@en	"overwealthy pleads devaluing reportedly embarring stigmatizing estuaries sophistic prancing ripplier cryogeny baseboards espaliers performs laicizes tweaked pillows psychogenically dizziest loadstone soulless woodlands informalities memorableness winking rooster wordiness upstanding supersecret fetterer crescendos overpricing arrested psychokinesia clouted brail alembics nonathletic thresher hygienic overrank misnomers icings substantiated orients prosperousness vizards speckled cabbala tamponed slower entires bureaux bezils turgidly unhampered snufflers treed imbecilities sweating barbs principals eremitic compensator bushwhacker embroiderers intermingle clonal triumphs cyanoses lunged switchback shaved earings blocs imperilment shandies stewardesses playacted laniard blimey maladministers englutting goatee hoosgow pledges antipole lambdas effervescently obnoxiety feebleness follies quietuses teleplays triskaidekaphobe heehawing regainer diverging menstruum modeler doyen procurers convictions moldering reassure prognose crawfished roughed laudatorily untutored fowlers arsenous indigens mongering belching farms saree tinctures genres reconcilers unbosomed frontispieces dulls irked argles gombos chocked freightage ampicillin armpits tinworks proenforcement dors"@en	"2007-07-05"^^xsd:date	bsbm-inst:Reviewer22	"Toichi-Pavlya"	"9"^^xsd:integer		"4"^^xsd:integer	
+```
+
+
 ```
 Traceback (most recent call last):
-  File "/tests/test_bsbm.py", line 205, in test_bsbm
-    made = tuple(graph_rdb.query(query))
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 1131, in query
-    return result(processor.query(query_object, initBindings, initNs, **kwargs))
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/plugins/sparql/processor.py", line 80, in query
-    return evalQuery(self.graph, query, initBindings, base)
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/plugins/sparql/evaluate.py", line 532, in evalQuery
-    return evalPart(ctx, main)
-  File "/rdflib_r2r/sparql_op.py", line 40, in __evalPart__
-    return rdflib_evalPart(ctx, part)
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/plugins/sparql/evaluate.py", line 261, in evalPart
-    return evalSelectQuery(ctx, part)
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/plugins/sparql/evaluate.py", line 464, in evalSelectQuery
-    res["bindings"] = evalPart(ctx, query.p)
-  File "/rdflib_r2r/sparql_op.py", line 41, in __evalPart__
-    return freeze_bindings(ctx, ctx.graph.store.evalPart(part))
-  File "/rdflib_r2r/r2r_store.py", line 1037, in evalPart
-  File "/rdflib_r2r/r2r_store.py", line 993, in queryPart
-  File "/rdflib_r2r/r2r_store.py", line 934, in querySlice
-    if part.length:
-  File "/rdflib_r2r/r2r_store.py", line 973, in queryPart
-    if part.name == "AggregateJoin":
-  File "/rdflib_r2r/r2r_store.py", line 885, in queryProject
-    colforms = [ColForm.from_subform(cols, sf) for sf in var_subform.values()]
-  File "/rdflib_r2r/r2r_store.py", line 989, in queryPart
-    if part.name == "Slice":
-  File "/rdflib_r2r/r2r_store.py", line 894, in queryOrderBy
-  File "/rdflib_r2r/r2r_store.py", line 969, in queryPart
-    if part.name == "Project":
-  File "/rdflib_r2r/r2r_store.py", line 793, in queryFilter
-    # This is weird, but I guess that's how it is
+  File "/tests/test_bsbm.py", line 212, in test_bsbm
+    sql_query = graph_rdb.store.getSQL(query)
+  File "/rdflib_r2r/r2r_store.py", line 1045, in getSQL
+    query, var_subform = self.queryPart(conn, queryobj.algebra)
   File "/rdflib_r2r/r2r_store.py", line 995, in queryPart
     return self.queryPart(conn, part.p)
-  File "/rdflib_r2r/r2r_store.py", line 942, in queryLeftJoin
-    return query2, var_subform2
-  File "/rdflib_r2r/r2r_store.py", line 995, in queryPart
-    return self.queryPart(conn, part.p)
-  File "/rdflib_r2r/r2r_store.py", line 942, in queryLeftJoin
-    return query2, var_subform2
-  File "/rdflib_r2r/r2r_store.py", line 995, in queryPart
-    return self.queryPart(conn, part.p)
-  File "/rdflib_r2r/r2r_store.py", line 942, in queryLeftJoin
-    return query2, var_subform2
-  File "/rdflib_r2r/r2r_store.py", line 995, in queryPart
-    return self.queryPart(conn, part.p)
-  File "/rdflib_r2r/r2r_store.py", line 961, in queryLeftJoin
+  File "/rdflib_r2r/r2r_store.py", line 990, in queryPart
+    return self.querySlice(conn, part)
+  File "/rdflib_r2r/r2r_store.py", line 931, in querySlice
+    query, var_subform = self.queryPart(conn, part.p)
+  File "/rdflib_r2r/r2r_store.py", line 970, in queryPart
+    return self.queryProject(conn, part)
+  File "/rdflib_r2r/r2r_store.py", line 882, in queryProject
+    part_query, var_subform = self.queryPart(conn, part.p)
+  File "/rdflib_r2r/r2r_store.py", line 986, in queryPart
+    return self.queryOrderBy(conn, part)
+  File "/rdflib_r2r/r2r_store.py", line 891, in queryOrderBy
+    part_query, var_subform = self.queryPart(conn, part.p)
+  File "/rdflib_r2r/r2r_store.py", line 966, in queryPart
+    return self.queryFilter(conn, part)
+  File "/rdflib_r2r/r2r_store.py", line 790, in queryFilter
+    part_query, var_subform = self.queryPart(conn, part.p)
+  File "/rdflib_r2r/r2r_store.py", line 992, in queryPart
+    return self.queryLeftJoin(conn, part)
+  File "/rdflib_r2r/r2r_store.py", line 939, in queryLeftJoin
+    query1, var_subform1 = self.queryPart(conn, part.p1)
+  File "/rdflib_r2r/r2r_store.py", line 992, in queryPart
+    return self.queryLeftJoin(conn, part)
+  File "/rdflib_r2r/r2r_store.py", line 939, in queryLeftJoin
+    query1, var_subform1 = self.queryPart(conn, part.p1)
+  File "/rdflib_r2r/r2r_store.py", line 992, in queryPart
+    return self.queryLeftJoin(conn, part)
+  File "/rdflib_r2r/r2r_store.py", line 939, in queryLeftJoin
+    query1, var_subform1 = self.queryPart(conn, part.p1)
+  File "/rdflib_r2r/r2r_store.py", line 992, in queryPart
+    return self.queryLeftJoin(conn, part)
+  File "/rdflib_r2r/r2r_store.py", line 958, in queryLeftJoin
+    fromquery = query1.join(query2, onclause=onclause, isouter=True)
   File "<string>", line 2, in join
   File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/sql/base.py", line 104, in _generative
     x = fn(self, *args, **kw)
@@ -60,6 +103,6 @@ Traceback (most recent call last):
     util.raise_(exc.ArgumentError(msg, code=code), replace_context=err)
   File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/util/compat.py", line 207, in raise_
     raise exception
-sqlalchemy.exc.ArgumentError: Join target, typically a FROM expression, or ORM relationship attribute expected, got <sqlalchemy.sql.selectable.Select object at 0x7fb8466821f0>.
+sqlalchemy.exc.ArgumentError: Join target, typically a FROM expression, or ORM relationship attribute expected, got <sqlalchemy.sql.selectable.Select object at 0x7fc88eac81f0>.
 
 ```

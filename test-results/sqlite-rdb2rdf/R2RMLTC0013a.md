@@ -1,5 +1,5 @@
-
-# [R2RMLTC0013a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0013a)
+# R2RMLTC0013a
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0013a)
 Generation of empty triples from referenced columns that have null values
 
 ```diff
@@ -7,5 +7,3 @@ Generation of empty triples from referenced columns that have null values
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

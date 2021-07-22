@@ -89,6 +89,9 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
     test_out = pathlib.Path(f'test-results/{engine_name}-rdb2rdf/')
     test_out.mkdir(parents=True, exist_ok=True)
     test_file = test_out.joinpath(f"{testcase.id}.md")
+    report = f"# {testcase.id}\n"
+    report += f"[link](https://www.w3.org/TR/rdb2rdf-test-cases/#{testcase.id})\n"
+    report += testcase.meta.get(dcterms.title) + "\n\n"
 
     try:
         # Create database
@@ -144,19 +147,9 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
             for line in dump_nt_sorted(g):
                 diff_lines.append((line.decode(), p))
         difftxt = '\n'.join(p+line for line, p in sorted(diff_lines))
-
-        test_file.write_text(f"""
-# [{testcase.id}](https://www.w3.org/TR/rdb2rdf-test-cases/#{testcase.id})
-{testcase.meta.get(dcterms.title)}
-
-```diff
-{difftxt}
-```
-
-{'SUCCES' if iso_made == iso_goal else 'FAIL'}
-
-(also checking pattern queries afterwards: {not nopattern})
-""")
+        report += "```diff\n" + difftxt + "\n```\n\n"
+        report += ('SUCCES' if iso_made == iso_goal else 'FAIL')
+        test_file.write_text(report)
 
         for li, line in enumerate(dump_nt_sorted(in_both)):
             logging.warn(f"in_both {li+1}/{len(list(in_both))}: {line}")
@@ -186,10 +179,10 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
                     for _, _, o_ in o_triples:
                         assert o_.toPython() == o.toPython()
     except Exception as e:
-        import traceback
+        import traceback, os
         tb = traceback.format_exc().replace(os.getcwd(), '')
-        txt = f"# {testcase.id} \n```\n{tb}\n```"
-        test_file.write_text(txt)
+        report += f"\n```\n{tb}\n```"
+        test_file.write_text(report)
         raise e
 
 def test_synthesis(module_results_df):

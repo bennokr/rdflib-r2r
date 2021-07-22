@@ -1,5 +1,5 @@
-
-# [DirectGraphTC0023](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0023)
+# DirectGraphTC0023
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0023)
 Generation of triples for two tables, two primary keys, two foreign keys, references to a key other than primary key
 
 ```diff
@@ -17,5 +17,3 @@ Generation of triples for two tables, two primary keys, two foreign keys, refere
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

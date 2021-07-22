@@ -1,5 +1,5 @@
-
-# [R2RMLTC0008c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0008c)
+# R2RMLTC0008c
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0008c)
 Generation of triples by using multiple predicateMaps within a rr:predicateObjectMap
 
 ```diff
@@ -8,5 +8,3 @@ Generation of triples by using multiple predicateMaps within a rr:predicateObjec
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

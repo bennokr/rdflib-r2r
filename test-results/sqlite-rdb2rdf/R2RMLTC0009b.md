@@ -1,5 +1,5 @@
-
-# [R2RMLTC0009b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009b)
+# R2RMLTC0009b
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009b)
 Generation of triples to multiple graphs
 
 ```diff
@@ -13,5 +13,3 @@ Generation of triples to multiple graphs
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

@@ -1,5 +1,5 @@
-
-# [R2RMLTC0005a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0005a)
+# R2RMLTC0005a
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0005a)
 Typing of resources
 
 ```diff
@@ -10,5 +10,3 @@ Typing of resources
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

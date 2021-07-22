@@ -1,10 +1,10 @@
-
-# [bsbm-bi-query7]([bsbm-bi-query7](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/BusinessIntelligenceUseCase/index.html#queryTripleQ7))
+# bsbm-bi-query7
+[link]([bsbm-bi-query7](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/BusinessIntelligenceUseCase/index.html#queryTripleQ7))
 
 ## Random parameter sample
 ```
-ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType14>
-Country = <http://downlode.org/rdf/iso-3166/countries#FR>
+Country = <http://downlode.org/rdf/iso-3166/countries#US>
+ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType9>
 ```
 
 ## SPARQL query
@@ -19,7 +19,7 @@ Country = <http://downlode.org/rdf/iso-3166/countries#FR>
       { 
         { Select ?product (count(?offer) As ?offerCount)
           { 
-            ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType14> .
+            ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType9> .
             ?offer bsbm:product ?product .
           }
           Group By ?product
@@ -33,7 +33,7 @@ Country = <http://downlode.org/rdf/iso-3166/countries#FR>
       ?offer bsbm:product ?product .
       ?offer bsbm:vendor ?vendor .
       ?vendor bsbm:country ?country .
-      FILTER(?country=<http://downlode.org/rdf/iso-3166/countries#FR>)
+      FILTER(?country=<http://downlode.org/rdf/iso-3166/countries#US>)
     }
   }
 
@@ -41,27 +41,31 @@ Country = <http://downlode.org/rdf/iso-3166/countries#FR>
 
 ## Goal results
 ```
-bsbm-inst:Product23
-bsbm-inst:Product7
-bsbm-inst:Product88
+bsbm-inst:Product51
+bsbm-inst:Product56
+bsbm-inst:Product30
+bsbm-inst:Product29
+bsbm-inst:Product9
+bsbm-inst:Product86
+bsbm-inst:Product100
 ```
 
 ## Created SQL query
 ```sql
 SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' || replace(replace(replace(replace(replace(replace(CAST(anon_1.product AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS product
 FROM
-  (SELECT offer.nr AS offer,
-
+  (SELECT
      (SELECT "product".nr
       FROM product
-      WHERE "offer".product = "product".nr) AS product
+      WHERE "offer".product = "product".nr) AS product,
+          offer.nr AS offer
    FROM offer) AS anon_1,
 
   (SELECT producttypeproduct.product AS product,
 
      (SELECT "producttype".nr
       FROM producttype
-      WHERE "producttype"."nr" = '14'
+      WHERE "producttype"."nr" = '9'
         AND "producttypeproduct".productType = "producttype".nr) AS anon_3
    FROM producttypeproduct) AS anon_2
 WHERE anon_2.product = anon_1.product
@@ -69,41 +73,41 @@ WHERE anon_2.product = anon_1.product
              (SELECT anon_4.s,
                      anon_4.o,
                      anon_5.offer,
-                     anon_6.product
+                     anon_5.product
               FROM
-                (SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' || replace(replace(replace(replace(replace(replace(CAST(producer.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                (SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Reviewer' || replace(replace(replace(replace(replace(replace(CAST(person.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                         '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/country>' AS p,
-                        '<' || 'http://downlode.org/rdf/iso-3166/countries#' || replace(replace(replace(replace(replace(replace(CAST(producer.country AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
+                        '<' || 'http://downlode.org/rdf/iso-3166/countries#' || replace(replace(replace(replace(replace(replace(CAST(person.country AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
                         NULL AS g
+                 FROM person
+                 UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' || replace(replace(replace(replace(replace(replace(CAST(producer.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                                  '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/country>' AS p,
+                                  '<' || 'http://downlode.org/rdf/iso-3166/countries#' || replace(replace(replace(replace(replace(replace(CAST(producer.country AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
+                                  NULL AS g
                  FROM producer
                  UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Vendor' || replace(replace(replace(replace(replace(replace(CAST(vendor.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                                   '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/country>' AS p,
                                   '<' || 'http://downlode.org/rdf/iso-3166/countries#' || replace(replace(replace(replace(replace(replace(CAST(vendor.country AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
                                   NULL AS g
-                 FROM vendor
-                 UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Reviewer' || replace(replace(replace(replace(replace(replace(CAST(person.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                                  '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/country>' AS p,
-                                  '<' || 'http://downlode.org/rdf/iso-3166/countries#' || replace(replace(replace(replace(replace(replace(CAST(person.country AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
-                                  NULL AS g
-                 FROM person) AS anon_4,
+                 FROM vendor) AS anon_4,
+
+                (SELECT offer.nr AS offer,
+
+                   (SELECT "product".nr
+                    FROM product
+                    WHERE "offer".product = "product".nr) AS product
+                 FROM offer) AS anon_5,
 
                 (SELECT
                    (SELECT "vendor".nr
                     FROM vendor
                     WHERE "offer".vendor = "vendor".nr) AS vendor,
                         offer.nr AS offer
-                 FROM offer) AS anon_5,
-
-                (SELECT
-                   (SELECT "product".nr
-                    FROM product
-                    WHERE "offer".product = "product".nr) AS product,
-                        offer.nr AS offer
                  FROM offer) AS anon_6
-              WHERE anon_4.s = '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Vendor' || replace(replace(replace(replace(replace(replace(CAST(anon_5.vendor AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>'
+              WHERE anon_4.s = '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Vendor' || replace(replace(replace(replace(replace(replace(CAST(anon_6.vendor AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>'
                 AND anon_5.offer = anon_6.offer
-                AND anon_4.o = '<http://downlode.org/rdf/iso-3166/countries#FR>'
-                AND anon_1.product = anon_6.product))
+                AND anon_4.o = '<http://downlode.org/rdf/iso-3166/countries#US>'
+                AND anon_1.product = anon_5.product))
 GROUP BY anon_1.product
 ORDER BY count(anon_1.offer) DESC
 LIMIT 1000

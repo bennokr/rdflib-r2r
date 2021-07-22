@@ -1,5 +1,5 @@
-
-# [R2RMLTC0007a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007a)
+# R2RMLTC0007a
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007a)
 Typing resources by relying on rdf:type predicate
 
 ```diff
@@ -7,5 +7,3 @@ Typing resources by relying on rdf:type predicate
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

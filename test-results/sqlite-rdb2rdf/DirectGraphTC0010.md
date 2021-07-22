@@ -1,5 +1,5 @@
-
-# [DirectGraphTC0010](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0010)
+# DirectGraphTC0010
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0010)
 Generation of direct graph for table names with spaces
 
 ```diff
@@ -18,5 +18,3 @@ Generation of direct graph for table names with spaces
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

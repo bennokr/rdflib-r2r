@@ -1,5 +1,5 @@
-
-# [DirectGraphTC0015](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0015)
+# DirectGraphTC0015
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0015)
 Generation of direct graph from multi-column primary keys
 
 ```diff
@@ -22,5 +22,3 @@ Generation of direct graph from multi-column primary keys
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

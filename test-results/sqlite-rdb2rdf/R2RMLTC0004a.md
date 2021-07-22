@@ -1,5 +1,5 @@
-
-# [R2RMLTC0004a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0004a)
+# R2RMLTC0004a
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0004a)
 Two column mapping, from one row table to two different triples
 
 ```diff
@@ -10,5 +10,3 @@ Two column mapping, from one row table to two different triples
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

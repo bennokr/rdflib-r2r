@@ -1,5 +1,5 @@
-
-# [R2RMLTC0012e](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0012e)
+# R2RMLTC0012e
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0012e)
 Default mapping
 
 ```diff
@@ -22,5 +22,3 @@ _:cbfcd3cdf15ad17d859bc25b107d516065b9b13f9d6fb7ffb78cebb0860f5731f2 <http://www
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

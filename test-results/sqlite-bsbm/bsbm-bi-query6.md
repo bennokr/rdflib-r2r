@@ -1,5 +1,5 @@
-
-# [bsbm-bi-query6]([bsbm-bi-query6](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/BusinessIntelligenceUseCase/index.html#queryTripleQ6))
+# bsbm-bi-query6
+[link]([bsbm-bi-query6](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/BusinessIntelligenceUseCase/index.html#queryTripleQ6))
 
 ## Random parameter sample
 ```
@@ -55,23 +55,23 @@ FROM
    FROM
      (SELECT avg(CAST(anon_5.score AS FLOAT)) AS avg_1
       FROM
-        (SELECT anon_6.score AS score,
-                anon_6.review AS review
+        (SELECT anon_6.review AS review,
+                anon_6.score AS score
          FROM
-           (SELECT anon_7.score AS score,
-                   anon_7.review AS review
+           (SELECT anon_7.review AS review,
+                   anon_7.score AS score
             FROM
-              (SELECT anon_8.score AS score,
-                      '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_8.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review
+              (SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_8.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
+                      anon_8.score AS score
                FROM
-                 (SELECT anon_9.review AS review,
-                         anon_9.score AS score
+                 (SELECT anon_9.score AS score,
+                         anon_9.review AS review
                   FROM
-                    (SELECT review.nr AS review,
-                            review.rating1 AS score
+                    (SELECT review.rating1 AS score,
+                            review.nr AS review
                      FROM review) AS anon_9) AS anon_8
-               UNION ALL SELECT anon_10.score AS score,
-                                '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_10.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review
+               UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_10.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
+                                anon_10.score AS score
                FROM
                  (SELECT anon_11.score AS score,
                          anon_11.review AS review
@@ -79,8 +79,8 @@ FROM
                     (SELECT review.rating2 AS score,
                             review.nr AS review
                      FROM review) AS anon_11) AS anon_10) AS anon_7
-            UNION ALL SELECT anon_12.score AS score,
-                             '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_12.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review
+            UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_12.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
+                             anon_12.score AS score
             FROM
               (SELECT anon_13.review AS review,
                       anon_13.score AS score
@@ -88,14 +88,14 @@ FROM
                  (SELECT review.nr AS review,
                          review.rating3 AS score
                   FROM review) AS anon_13) AS anon_12) AS anon_6
-         UNION ALL SELECT anon_14.score AS score,
-                          '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_14.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review
+         UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_14.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
+                          anon_14.score AS score
          FROM
-           (SELECT anon_15.score AS score,
-                   anon_15.review AS review
+           (SELECT anon_15.review AS review,
+                   anon_15.score AS score
             FROM
-              (SELECT review.rating4 AS score,
-                      review.nr AS review
+              (SELECT review.nr AS review,
+                      review.rating4 AS score
                FROM review) AS anon_15) AS anon_14) AS anon_5,
 
         (SELECT anon_17.s AS s,
@@ -129,11 +129,11 @@ FROM
                              NULL AS g
             FROM product) AS anon_17,
 
-           (SELECT review.nr AS review,
-
+           (SELECT
               (SELECT "product".nr
                FROM product
-               WHERE "review".product = "product".nr) AS product
+               WHERE "review".product = "product".nr) AS product,
+                   review.nr AS review
             FROM review) AS anon_18
          WHERE anon_17.s = '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' || replace(replace(replace(replace(replace(replace(CAST(anon_18.product AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>') AS anon_16
       WHERE '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_16.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' = anon_5.review) AS anon_3,
@@ -170,11 +170,11 @@ FROM
                           NULL AS g
          FROM product) AS anon_19,
 
-        (SELECT review.nr AS review,
-
+        (SELECT
            (SELECT "product".nr
             FROM product
-            WHERE "review".product = "product".nr) AS product
+            WHERE "review".product = "product".nr) AS product,
+                review.nr AS review
          FROM review) AS anon_20,
 
         (SELECT
@@ -186,14 +186,14 @@ FROM
       WHERE anon_19.s = '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' || replace(replace(replace(replace(replace(replace(CAST(anon_20.product AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>'
         AND anon_20.review = anon_21.review) AS anon_4) AS anon_1,
 
-  (SELECT anon_22.score AS score,
-          anon_22.review AS review
+  (SELECT anon_22.review AS review,
+          anon_22.score AS score
    FROM
-     (SELECT anon_23.score AS score,
-             anon_23.review AS review
+     (SELECT anon_23.review AS review,
+             anon_23.score AS score
       FROM
-        (SELECT anon_24.score AS score,
-                '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_24.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review
+        (SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_24.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
+                anon_24.score AS score
          FROM
            (SELECT anon_25.review AS review,
                    anon_25.score AS score
@@ -201,17 +201,17 @@ FROM
               (SELECT review.nr AS review,
                       review.rating1 AS score
                FROM review) AS anon_25) AS anon_24
-         UNION ALL SELECT anon_26.score AS score,
-                          '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_26.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review
+         UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_26.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
+                          anon_26.score AS score
          FROM
-           (SELECT anon_27.review AS review,
-                   anon_27.score AS score
+           (SELECT anon_27.score AS score,
+                   anon_27.review AS review
             FROM
-              (SELECT review.nr AS review,
-                      review.rating2 AS score
+              (SELECT review.rating2 AS score,
+                      review.nr AS review
                FROM review) AS anon_27) AS anon_26) AS anon_23
-      UNION ALL SELECT anon_28.score AS score,
-                       '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_28.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review
+      UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_28.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
+                       anon_28.score AS score
       FROM
         (SELECT anon_29.score AS score,
                 anon_29.review AS review
@@ -219,14 +219,14 @@ FROM
            (SELECT review.rating3 AS score,
                    review.nr AS review
             FROM review) AS anon_29) AS anon_28) AS anon_22
-   UNION ALL SELECT anon_30.score AS score,
-                    '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_30.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review
+   UNION ALL SELECT '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_30.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS review,
+                    anon_30.score AS score
    FROM
-     (SELECT anon_31.review AS review,
-             anon_31.score AS score
+     (SELECT anon_31.score AS score,
+             anon_31.review AS review
       FROM
-        (SELECT review.nr AS review,
-                review.rating4 AS score
+        (SELECT review.rating4 AS score,
+                review.nr AS review
          FROM review) AS anon_31) AS anon_30) AS anon_2
 WHERE '<' || 'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Review' || replace(replace(replace(replace(replace(replace(CAST(anon_1.review AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' = anon_2.review
 GROUP BY anon_1.reviewer

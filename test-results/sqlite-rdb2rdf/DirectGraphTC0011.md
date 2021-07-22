@@ -1,5 +1,5 @@
-
-# [DirectGraphTC0011](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0011)
+# DirectGraphTC0011
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0011)
 Many to Many relations
 
 ```diff
@@ -47,5 +47,3 @@ Many to Many relations
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

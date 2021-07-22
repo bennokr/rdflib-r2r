@@ -1,5 +1,5 @@
-
-# [DirectGraphTC0014](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0014)
+# DirectGraphTC0014
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0014)
 Generation of direct graph from a database with primary key referencing candidate key
 
 ```diff
@@ -25,5 +25,3 @@ _:cbf819b16b453e71931b516f1cb24ba2ec539a68ac894882deacb0417ae741706d <http://www
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

@@ -1,5 +1,5 @@
-
-# [R2RMLTC0007f](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007f)
+# R2RMLTC0007f
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007f)
 One column mapping, using rr:graphMap and specifying an rr:predicateObjectMap with rdf:type
 
 ```diff
@@ -9,5 +9,3 @@ One column mapping, using rr:graphMap and specifying an rr:predicateObjectMap wi
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

@@ -1,5 +1,5 @@
-
-# [R2RMLTC0009c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009c)
+# R2RMLTC0009c
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009c)
 Unnamed column in a logical table
 
 ```diff
@@ -8,5 +8,3 @@ Unnamed column in a logical table
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

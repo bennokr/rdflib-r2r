@@ -1,5 +1,5 @@
-
-# [R2RMLTC0007g](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007g)
+# R2RMLTC0007g
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007g)
 Assigning triples to the default graph
 
 ```diff
@@ -8,5 +8,3 @@ Assigning triples to the default graph
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

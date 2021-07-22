@@ -1,5 +1,5 @@
-
-# [DirectGraphTC0008](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0008)
+# DirectGraphTC0008
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0008)
 Generation of direct graph from a table with composite primary key
 
 ```diff
@@ -10,5 +10,3 @@ Generation of direct graph from a table with composite primary key
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

@@ -1,5 +1,5 @@
-
-# [R2RMLTC0009a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009a)
+# R2RMLTC0009a
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009a)
 Generation of triples from foreign key relations
 
 ```diff
@@ -10,5 +10,3 @@ Generation of triples from foreign key relations
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

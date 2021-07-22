@@ -1,5 +1,5 @@
-
-# [R2RMLTC0016e](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016e)
+# R2RMLTC0016e
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016e)
 Table with datatypes, binary column
 
 ```diff
@@ -12,5 +12,3 @@ Table with datatypes, binary column
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

@@ -1,48 +1,82 @@
-# bsbm-explore-query3 
+# bsbm-explore-query3
+[link]([bsbm-explore-query3](http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/ExploreUseCase/#queryTripleQ3))
+
+## Random parameter sample
+```
+x = "113"^^<http://www.w3.org/2001/XMLSchema#integer>
+ProductFeature1 = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature93>
+ProductFeature2 = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature760>
+y = "429"^^<http://www.w3.org/2001/XMLSchema#integer>
+ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType15>
+```
+
+## SPARQL query
+```sparql
+PREFIX bsbm-inst: <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/>
+PREFIX bsbm: <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT ?product ?label
+WHERE {
+    ?product rdfs:label ?label .
+    ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType15> .
+	?product bsbm:productFeature <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature93> .
+	?product bsbm:productPropertyNumeric1 ?p1 .
+	FILTER ( ?p1 > "113"^^<http://www.w3.org/2001/XMLSchema#integer> ) 
+	?product bsbm:productPropertyNumeric3 ?p3 .
+	FILTER (?p3 < "429"^^<http://www.w3.org/2001/XMLSchema#integer> )
+    OPTIONAL { 
+        ?product bsbm:productFeature <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature760> .
+        ?product rdfs:label ?testVar }
+    FILTER (!bound(?testVar)) 
+}
+ORDER BY ?label
+LIMIT 10
+
+
+```
+
+## Goal results
+```
+bsbm-inst:Product4	"feistiest horst keepsake"
+```
+
+
 ```
 Traceback (most recent call last):
-  File "/tests/test_bsbm.py", line 205, in test_bsbm
-    made = tuple(graph_rdb.query(query))
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 1131, in query
-    return result(processor.query(query_object, initBindings, initNs, **kwargs))
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/plugins/sparql/processor.py", line 80, in query
-    return evalQuery(self.graph, query, initBindings, base)
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/plugins/sparql/evaluate.py", line 532, in evalQuery
-    return evalPart(ctx, main)
-  File "/rdflib_r2r/sparql_op.py", line 40, in __evalPart__
-    return rdflib_evalPart(ctx, part)
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/plugins/sparql/evaluate.py", line 261, in evalPart
-    return evalSelectQuery(ctx, part)
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/plugins/sparql/evaluate.py", line 464, in evalSelectQuery
-    res["bindings"] = evalPart(ctx, query.p)
-  File "/rdflib_r2r/sparql_op.py", line 41, in __evalPart__
-    return freeze_bindings(ctx, ctx.graph.store.evalPart(part))
-  File "/rdflib_r2r/r2r_store.py", line 1037, in evalPart
-    query, var_subform = self.queryPart(conn, part)
-  File "/rdflib_r2r/r2r_store.py", line 993, in queryPart
-    return self.querySlice(conn, part)
-  File "/rdflib_r2r/r2r_store.py", line 934, in querySlice
-    query, var_subform = self.queryPart(conn, part.p)
-  File "/rdflib_r2r/r2r_store.py", line 973, in queryPart
-    return self.queryProject(conn, part)
-  File "/rdflib_r2r/r2r_store.py", line 885, in queryProject
-    part_query, var_subform = self.queryPart(conn, part.p)
-  File "/rdflib_r2r/r2r_store.py", line 989, in queryPart
-    return self.queryOrderBy(conn, part)
-  File "/rdflib_r2r/r2r_store.py", line 894, in queryOrderBy
-    part_query, var_subform = self.queryPart(conn, part.p)
-  File "/rdflib_r2r/r2r_store.py", line 969, in queryPart
-    return self.queryFilter(conn, part)
-  File "/rdflib_r2r/r2r_store.py", line 793, in queryFilter
-    part_query, var_subform = self.queryPart(conn, part.p)
+  File "/tests/test_bsbm.py", line 212, in test_bsbm
+    sql_query = graph_rdb.store.getSQL(query)
+  File "/rdflib_r2r/r2r_store.py", line 1045, in getSQL
+    query, var_subform = self.queryPart(conn, queryobj.algebra)
   File "/rdflib_r2r/r2r_store.py", line 995, in queryPart
+    return self.queryPart(conn, part.p)
+  File "/rdflib_r2r/r2r_store.py", line 990, in queryPart
+    return self.querySlice(conn, part)
+  File "/rdflib_r2r/r2r_store.py", line 931, in querySlice
+    query, var_subform = self.queryPart(conn, part.p)
+  File "/rdflib_r2r/r2r_store.py", line 970, in queryPart
+    return self.queryProject(conn, part)
+  File "/rdflib_r2r/r2r_store.py", line 882, in queryProject
+    part_query, var_subform = self.queryPart(conn, part.p)
+  File "/rdflib_r2r/r2r_store.py", line 986, in queryPart
+    return self.queryOrderBy(conn, part)
+  File "/rdflib_r2r/r2r_store.py", line 891, in queryOrderBy
+    part_query, var_subform = self.queryPart(conn, part.p)
+  File "/rdflib_r2r/r2r_store.py", line 966, in queryPart
+    return self.queryFilter(conn, part)
+  File "/rdflib_r2r/r2r_store.py", line 790, in queryFilter
+    part_query, var_subform = self.queryPart(conn, part.p)
+  File "/rdflib_r2r/r2r_store.py", line 992, in queryPart
     return self.queryLeftJoin(conn, part)
-  File "/rdflib_r2r/r2r_store.py", line 943, in queryLeftJoin
+  File "/rdflib_r2r/r2r_store.py", line 940, in queryLeftJoin
     query2, var_subform2 = self.queryPart(conn, part.p2)
-  File "/rdflib_r2r/r2r_store.py", line 967, in queryPart
+  File "/rdflib_r2r/r2r_store.py", line 964, in queryPart
     return self.queryBGP(conn, part.triples)
-  File "/rdflib_r2r/r2r_store.py", line 674, in queryBGP
+  File "/rdflib_r2r/r2r_store.py", line 671, in queryBGP
     pat_query, subforms = self.queryPattern(metadata, pat, restriction)
-TypeError: cannot unpack non-iterable NoneType object
+  File "/rdflib_r2r/r2r_store.py", line 553, in queryPattern
+    raise Exception(f"Didn't get tmaps for {pattern} from {restrict_tmaps}!")
+Exception: Didn't get tmaps for (None, rdflib.term.URIRef('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productFeature'), rdflib.term.URIRef('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductFeature760')) from {rdflib.term.URIRef('http://example.com/base/#ProductFeature')}!
 
 ```

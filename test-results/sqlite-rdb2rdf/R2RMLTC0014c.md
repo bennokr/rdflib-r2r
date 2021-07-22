@@ -1,5 +1,5 @@
-
-# [R2RMLTC0014c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0014c)
+# R2RMLTC0014c
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0014c)
 Triplesmaps with rr:inverseExpression, rr:joinCondition, and referencing object maps
 
 ```diff
@@ -20,5 +20,3 @@ _:cb0 <http://example.com/dept#name> "APPSERVER" .
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

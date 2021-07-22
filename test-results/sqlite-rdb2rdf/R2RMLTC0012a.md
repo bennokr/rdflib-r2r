@@ -1,5 +1,5 @@
-
-# [R2RMLTC0012a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0012a)
+# R2RMLTC0012a
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0012a)
 Duplicate tuples generate same blank node
 
 ```diff
@@ -10,5 +10,3 @@ _:cb3aa145617de67873918c2ea44d39e730a9457f57aada0ab5afaadfd4384ad0c <http://xmln
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

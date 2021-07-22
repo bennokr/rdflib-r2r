@@ -1,5 +1,5 @@
-
-# [R2RMLTC0001a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0001a)
+# R2RMLTC0001a
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0001a)
 One column mapping, subject URI generation by using rr:template
 
 ```diff
@@ -7,5 +7,3 @@ One column mapping, subject URI generation by using rr:template
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

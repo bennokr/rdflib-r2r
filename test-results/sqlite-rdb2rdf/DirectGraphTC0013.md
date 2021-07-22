@@ -1,5 +1,5 @@
-
-# [DirectGraphTC0013](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0013)
+# DirectGraphTC0013
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0013)
 Generation of a direct graph from a table with NULL values
 
 ```diff
@@ -13,5 +13,3 @@ Generation of a direct graph from a table with NULL values
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

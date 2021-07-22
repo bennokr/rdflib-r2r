@@ -1,5 +1,5 @@
-
-# [R2RMLTC0003c](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0003c)
+# R2RMLTC0003c
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0003c)
 Three columns mapping, by using a rr:template to produce literal
 
 ```diff
@@ -7,5 +7,3 @@ Three columns mapping, by using a rr:template to produce literal
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

@@ -1,5 +1,5 @@
-
-# [DirectGraphTC0009](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0009)
+# DirectGraphTC0009
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0009)
 Two tables 1 primary key 1 foreign key
 
 ```diff
@@ -17,5 +17,3 @@ Two tables 1 primary key 1 foreign key
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

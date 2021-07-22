@@ -1,5 +1,5 @@
-
-# [DirectGraphTC0016](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0016)
+# DirectGraphTC0016
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0016)
 Generation of direct graph from a database with sql datatypes
 
 ```diff
@@ -39,5 +39,16 @@ Generation of direct graph from a database with sql datatypes
 ```
 
 SUCCES
+```
+Traceback (most recent call last):
+  File "/tests/test_rdb2rdf.py", line 172, in test_rdb2rdf
+    p_triples = sorted(g_made.triples([None, p, None]))
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 421, in triples
+    for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
+  File "/rdflib_r2r/r2r_store.py", line 607, in triples
+    rows = list(conn.execute(query))
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/result.py", line 382, in iterrows
+    row = make_row(row) if make_row else row
+ValueError: Couldn't parse date string 'datetime.date(1981, 10, 10)' - value is not a string.
 
-(also checking pattern queries afterwards: True)
+```

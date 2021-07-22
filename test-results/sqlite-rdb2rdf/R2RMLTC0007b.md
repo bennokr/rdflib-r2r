@@ -1,5 +1,5 @@
-
-# [R2RMLTC0007b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007b)
+# R2RMLTC0007b
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0007b)
 Assigning triples to Named Graphs
 
 ```diff
@@ -8,5 +8,3 @@ Assigning triples to Named Graphs
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

@@ -1,5 +1,5 @@
-
-# [R2RMLTC0016b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016b)
+# R2RMLTC0016b
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016b)
 Table with datatypes: real and float
 
 ```diff
@@ -15,5 +15,3 @@ Table with datatypes: real and float
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

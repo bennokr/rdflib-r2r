@@ -1,5 +1,5 @@
-
-# [R2RMLTC0009d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009d)
+# R2RMLTC0009d
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0009d)
 Named column in logical table
 
 ```diff
@@ -10,5 +10,3 @@ Named column in logical table
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

@@ -1,5 +1,5 @@
-
-# [R2RMLTC0002i](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002i)
+# R2RMLTC0002i
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0002i)
 Two columns mapping, SQL Version identifier
 
 ```diff
@@ -7,5 +7,3 @@ Two columns mapping, SQL Version identifier
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

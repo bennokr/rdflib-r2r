@@ -1,5 +1,5 @@
-
-# [R2RMLTC0018a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0018a)
+# R2RMLTC0018a
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0018a)
 Generation of triples by using CHAR datatype column
 
 ```diff
@@ -15,5 +15,3 @@ Generation of triples by using CHAR datatype column
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

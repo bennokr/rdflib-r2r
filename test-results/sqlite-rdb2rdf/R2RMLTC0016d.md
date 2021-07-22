@@ -1,5 +1,5 @@
-
-# [R2RMLTC0016d](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016d)
+# R2RMLTC0016d
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0016d)
 Table with datatypes, boolean conversions
 
 ```diff
@@ -12,5 +12,3 @@ Table with datatypes, boolean conversions
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

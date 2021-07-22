@@ -1,5 +1,5 @@
-
-# [DirectGraphTC0018](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0018)
+# DirectGraphTC0018
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0018)
 Generation of triples by using CHAR datatype column
 
 ```diff
@@ -15,5 +15,3 @@ _:cbf0dc47c4127ae186c1dd28ceaa0420e6215a04c104f252d088515d2185d037b9 <http://www
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

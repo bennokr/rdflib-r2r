@@ -1,5 +1,5 @@
-
-# [R2RMLTC0008b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0008b)
+# R2RMLTC0008b
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0008b)
 Generation of triples referencing object map
 
 ```diff
@@ -11,5 +11,3 @@ Generation of triples referencing object map
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

@@ -1,5 +1,5 @@
-
 # DirectGraphTC0005
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#DirectGraphTC0005)
 Generation of BlankNodes from duplicate tuples
 
 ```diff
@@ -27,4 +27,14 @@ Generation of BlankNodes from duplicate tuples
 + _:cb337987b5dbbb6f554e36acc2e92121ce14723fb3b1d3d2e0599b159af246158b2 <http://example.com/base/IOUs#fname> "Bob" .
 + _:cb337987b5dbbb6f554e36acc2e92121ce14723fb3b1d3d2e0599b159af246158b2 <http://example.com/base/IOUs#lname> "Smith" .
 + _:cb337987b5dbbb6f554e36acc2e92121ce14723fb3b1d3d2e0599b159af246158b2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
+```
+
+FAIL
+```
+Traceback (most recent call last):
+  File "/tests/test_rdb2rdf.py", line 160, in test_rdb2rdf
+    assert iso_made == iso_goal
+AssertionError: assert <Graph identi...rphicGraph'>)> == <Graph identi...rphicGraph'>)>
+  Use -v to get the full diff
+
 ```

@@ -1,5 +1,5 @@
-
-# [R2RMLTC0020a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0020a)
+# R2RMLTC0020a
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0020a)
 Generation of triples by using IRI value in columns
 
 ```diff
@@ -11,5 +11,3 @@ Generation of triples by using IRI value in columns
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

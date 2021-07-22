@@ -1,5 +1,5 @@
-
-# [R2RMLTC0008a](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0008a)
+# R2RMLTC0008a
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0008a)
 Generation of triples to a target graph by using rr:graphMap and rr:template
 
 ```diff
@@ -10,5 +10,3 @@ Generation of triples to a target graph by using rr:graphMap and rr:template
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)

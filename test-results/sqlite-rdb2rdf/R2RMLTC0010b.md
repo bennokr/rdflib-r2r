@@ -1,5 +1,5 @@
-
-# [R2RMLTC0010b](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0010b)
+# R2RMLTC0010b
+[link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0010b)
 Template with table columns with special chars
 
 ```diff
@@ -9,5 +9,3 @@ Template with table columns with special chars
 ```
 
 SUCCES
-
-(also checking pattern queries afterwards: True)
