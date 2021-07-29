@@ -11,6 +11,7 @@ import pathlib
 from typing import NamedTuple
 import random
 from natsort import natsorted
+import math
 
 import pytest
 import rdflib
@@ -90,7 +91,7 @@ def get_param_sets(path, graph):
         "ProductPropertyNumericValue": [rdflib.Literal(d) for d in range(1, 500)],
         "OfferURI": set(graph[: RDF.type : bsbm.ProductType]),
         "CurrentDate": set(d for _, d in graph[: bsbm.validTo :]),
-        "ReviewURI": set(graph[: RDF.type : review.Review]),
+        "ReviewURI": set(graph[: RDF.type : bsbm.Review]),
         "Dictionary1": [
             w for w in path.joinpath("titlewords.txt").open().read().splitlines()
         ],
@@ -119,6 +120,22 @@ def dbecho(pytestconfig):
     return pytestconfig.getoption("dbecho")
 
 
+def normalize(results):
+    def norm(x):
+        if x is None:
+            return None
+        x = x.toPython()
+        if isinstance(x, float):
+            return round(x, 4)
+        return x
+
+    normalized = set()
+    for row in results:
+        row = tuple(norm(x) for x in row)
+        normalized.add( row )
+    return normalized
+
+
 @pytest.mark.timeout(TIMEOUT)
 @pytest.mark.parametrize("testcase", TESTS, ids=[t.id for t in TESTS])
 @pytest.mark.parametrize("engine_name", ["sqlite"])  # ["sqlite", "duckdb"]
@@ -142,6 +159,7 @@ def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
         param_sets = get_param_sets(path, graph)
 
         logging.warn(testcase.querytemplate)
+        logging.warn(testcase.params)
 
         def get_params(querytemplate):
             params = {}
@@ -185,7 +203,7 @@ def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
             query = re.sub("%([^%]+)%", lambda m: params[m.group(1)], querytemplate)
 
             try:
-                goal = tuple(graph.query(query))
+                goal = set(graph.query(query))
             except TypeError as e:
                 logging.warn(f"Query failed with TypeError {e}")
 
@@ -209,10 +227,10 @@ def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
             report += f"## SPARQL query\n```sparql\n{query}\n```\n\n"
             report += f"## Goal results\n```\n{gtxt}\n```\n\n"
             
-            sql_query = graph_rdb.store.getSQL(query)
+            sql_query = graph_rdb.store.getSQL(query) 
             report += f"## Created SQL query\n```sql\n{sql_query}\n```\n\n"
 
-            made = tuple(graph_rdb.query(query))
+            made = set(graph_rdb.query(query))
             mtxt = "\n".join(
                 "\t".join((n.n3(ns) if n else "") for n in t) for t in made
             )
@@ -222,7 +240,7 @@ def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
             report += ('SUCCES' if made == goal else 'FAIL')
             test_file.write_text(report)
 
-            assert made == goal
+            assert normalize(goal) == normalize(made)
             break
         reset_sparql()
     except Exception as e:

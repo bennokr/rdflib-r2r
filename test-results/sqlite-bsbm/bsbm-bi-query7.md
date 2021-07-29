@@ -3,8 +3,8 @@
 
 ## Random parameter sample
 ```
-Country = <http://downlode.org/rdf/iso-3166/countries#KR>
-ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType11>
+Country = <http://downlode.org/rdf/iso-3166/countries#RU>
+ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType13>
 ```
 
 ## SPARQL query
@@ -19,7 +19,7 @@ ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductT
       { 
         { Select ?product (count(?offer) As ?offerCount)
           { 
-            ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType11> .
+            ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType13> .
             ?offer bsbm:product ?product .
           }
           Group By ?product
@@ -33,7 +33,7 @@ ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductT
       ?offer bsbm:product ?product .
       ?offer bsbm:vendor ?vendor .
       ?vendor bsbm:country ?country .
-      FILTER(?country=<http://downlode.org/rdf/iso-3166/countries#KR>)
+      FILTER(?country=<http://downlode.org/rdf/iso-3166/countries#RU>)
     }
   }
 
@@ -41,72 +41,72 @@ ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductT
 
 ## Goal results
 ```
-bsbm-inst:Product48
-bsbm-inst:Product73
-bsbm-inst:Product71
-bsbm-inst:Product75
-bsbm-inst:Product10
-bsbm-inst:Product1
-bsbm-inst:Product3
+bsbm-inst:Product90
+bsbm-inst:Product92
+bsbm-inst:Product69
+bsbm-inst:Product66
+bsbm-inst:Product67
+bsbm-inst:Product63
+bsbm-inst:Product42
 ```
 
 ## Created SQL query
 ```sql
-SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1.product AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS product
+SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Product' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."""product_ref"".nr_1" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS product
 FROM
-  (SELECT anon_2.product AS product,
-          anon_3.nr AS nr
+  (SELECT anon_2.nr AS nr,
+          anon_2."""product_ref"".nr_1" AS """product_ref"".nr_1"
    FROM
-     (SELECT producttypeproduct.product AS product
-      FROM producttypeproduct,
-           producttype AS producttype_ref
-      WHERE "producttype_ref"."nr" = '11'
-        AND "producttypeproduct".productType = "producttype_ref".nr) AS anon_2,
-
      (SELECT offer.nr AS nr,
              "product_ref".nr AS """product_ref"".nr_1"
       FROM offer,
            product AS product_ref
-      WHERE "offer".product = "product_ref".nr) AS anon_3
-   WHERE anon_2.product = anon_3."""product_ref"".nr_1") AS anon_1
+      WHERE "offer".product = "product_ref".nr) AS anon_2,
+
+     (SELECT producttypeproduct.product AS product
+      FROM producttypeproduct,
+           producttype AS producttype_ref
+      WHERE "producttype_ref"."nr" = '13'
+        AND "producttypeproduct".productType = "producttype_ref".nr) AS anon_3
+   WHERE anon_3.product = anon_2."""product_ref"".nr_1") AS anon_1
 WHERE NOT (EXISTS
-             (SELECT anon_4.s,
-                     anon_4.o,
-                     anon_5.nr,
-                     anon_6."""product_ref"".nr_2"
+             (SELECT anon_4.nr,
+                     anon_4."""product_ref"".nr_2",
+                     anon_5.s,
+                     anon_5.o
               FROM
-                (SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(producer.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                (SELECT offer.nr AS nr,
+                        "product_ref".nr AS """product_ref"".nr_2"
+                 FROM offer,
+                      product AS product_ref
+                 WHERE "offer".product = "product_ref".nr) AS anon_4,
+
+                (SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Reviewer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(person.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
                         '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/country>' AS p,
-                        CAST('<' AS VARCHAR) || CAST('http://downlode.org/rdf/iso-3166/countries#' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(producer.country AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+                        CAST('<' AS VARCHAR) || CAST('http://downlode.org/rdf/iso-3166/countries#' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(person.country AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
                         NULL AS g
+                 FROM person
+                 UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Producer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(producer.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                                  '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/country>' AS p,
+                                  CAST('<' AS VARCHAR) || CAST('http://downlode.org/rdf/iso-3166/countries#' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(producer.country AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+                                  NULL AS g
                  FROM producer
                  UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Vendor' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(vendor.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
                                   '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/country>' AS p,
                                   CAST('<' AS VARCHAR) || CAST('http://downlode.org/rdf/iso-3166/countries#' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(vendor.country AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
                                   NULL AS g
-                 FROM vendor
-                 UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Reviewer' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(person.nr AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                                  '<http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/country>' AS p,
-                                  CAST('<' AS VARCHAR) || CAST('http://downlode.org/rdf/iso-3166/countries#' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(person.country AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
-                                  NULL AS g
-                 FROM person) AS anon_4,
+                 FROM vendor) AS anon_5,
 
                 (SELECT offer.nr AS nr,
                         "vendor_ref".nr AS """vendor_ref"".nr_1"
                  FROM offer,
                       vendor AS vendor_ref
-                 WHERE "offer".vendor = "vendor_ref".nr) AS anon_5,
-
-                (SELECT offer.nr AS nr,
-                        "product_ref".nr AS """product_ref"".nr_2"
-                 FROM offer,
-                      product AS product_ref
-                 WHERE "offer".product = "product_ref".nr) AS anon_6
-              WHERE anon_4.s = CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Vendor' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_5."""vendor_ref"".nr_1" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR)
-                AND anon_5.nr = anon_6.nr
-                AND anon_4.o = '<http://downlode.org/rdf/iso-3166/countries#KR>'
-                AND anon_1.product = anon_6."""product_ref"".nr_2"))
-GROUP BY anon_1.product
+                 WHERE "offer".vendor = "vendor_ref".nr) AS anon_6
+              WHERE anon_4.nr = anon_6.nr
+                AND anon_5.s = CAST('<' AS VARCHAR) || CAST('http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/Vendor' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_6."""vendor_ref"".nr_1" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR)
+                AND anon_5.o = '<http://downlode.org/rdf/iso-3166/countries#RU>'
+                AND anon_1."""product_ref"".nr_1" = anon_4."""product_ref"".nr_2"))
+GROUP BY anon_1."""product_ref"".nr_1"
 ORDER BY count(anon_1.nr) DESC
 LIMIT 1000
 OFFSET 0
@@ -114,13 +114,13 @@ OFFSET 0
 
 ## Created SQL results
 ```
-bsbm-inst:Product48
-bsbm-inst:Product73
-bsbm-inst:Product71
-bsbm-inst:Product75
-bsbm-inst:Product10
-bsbm-inst:Product1
-bsbm-inst:Product3
+bsbm-inst:Product90
+bsbm-inst:Product92
+bsbm-inst:Product69
+bsbm-inst:Product66
+bsbm-inst:Product67
+bsbm-inst:Product63
+bsbm-inst:Product42
 ```
 
 SUCCES

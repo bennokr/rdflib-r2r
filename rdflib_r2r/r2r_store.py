@@ -14,10 +14,11 @@ import logging
 import functools
 import operator
 import base64
-import urllib.parse
+from decimal import Decimal
 import re
 from string import Formatter
 from collections import Counter
+import math
 
 from rdflib import URIRef, Literal, BNode, Variable
 from rdflib.namespace import RDF, XSD, Namespace
@@ -148,7 +149,7 @@ class ColForm:
         elif opstr == "/":
             op = sql.operators.custom_op(opstr, is_comparison=True)
             a, b = cf1.expr(), cf2.expr()
-            r = sqlfunc.cast(op(a, b), sqltypes.DECIMAL)
+            r = sqlfunc.cast(op(a, b), sqltypes.REAL)
             return cls.from_expr(r)
         else:
             op = sql.operators.custom_op(opstr, is_comparison=True)
@@ -541,7 +542,15 @@ class R2RStore(Store):
         # Triple Maps produce select queries
         for tmap in self.mapping.graph[: RDF.type : rr.TriplesMap]:
             if restrict_tmaps and (tmap not in restrict_tmaps):
-                continue
+                mg = self.mapping.graph
+                refs = set(
+                    ref
+                    for pomap in mg[tmap : rr.predicateObjectMap :]
+                    for omap in mg[pomap : rr.objectMap]
+                    for ref in mg[omap : rr.parentTriplesMap]
+                )
+                if not any(t in refs for t in restrict_tmaps):
+                    continue
             querysubforms += list(self._triplesmap_select(metadata, tmap, pattern))
 
         if len(querysubforms) > 1:
@@ -563,6 +572,10 @@ class R2RStore(Store):
                     datatype=XSD.hexBinary,
                 )
             else:
+                if type(val) == float:
+                    # TODO: actually figure out the rules for this
+                    if math.isclose(val, round(val, 2)):
+                        val = Decimal(val)
                 return Literal(val)
         elif val.startswith("<"):
             return self._iri_encode(val)
@@ -770,6 +783,14 @@ class R2RStore(Store):
                     val = sqlfunc.cast(cf.expr(), XSDToSQL[expr.iri])
                     return ColForm.from_expr(val)
 
+        if hasattr(expr, "name") and (expr.name == "UnaryNot"):
+            cf = self.queryExpr(conn, expr.expr, var_cf)
+            return ColForm.from_expr( sqlalchemy.not_(cf.expr()) ) 
+        
+        if hasattr(expr, "name") and (expr.name == "Builtin_BOUND"):
+            cf = self.queryExpr(conn, expr.arg, var_cf)
+            return ColForm.from_expr( cf.expr().is_(None) ) 
+
         if isinstance(expr, str) and (expr in var_cf):
             return var_cf[expr]
         if isinstance(expr, URIRef):
@@ -887,10 +908,14 @@ class R2RStore(Store):
 
         ordering = []
         for e in part.expr:
-            for col in self.queryExpr(conn, e.expr, var_cf).cols:
-                if e.order == "DESC":
-                    col = sqlalchemy.desc(col)
-                ordering.append(col)
+            expr_cf = self.queryExpr(conn, e.expr, var_cf)
+            if expr_cf.form[0] != '<':
+                for col in expr_cf.cols:
+                    if e.order == "DESC":
+                        col = sqlalchemy.desc(col)
+                    ordering.append(col)
+            else:
+                ordering.append(expr_cf.expr())
 
         return part_query.order_by(*ordering), var_subform
 
