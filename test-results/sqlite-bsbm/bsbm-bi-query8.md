@@ -3,7 +3,7 @@
 
 ## Random parameter sample
 ```
-ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType8>
+ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType6>
 ```
 
 ## SPARQL query
@@ -16,13 +16,13 @@ ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductT
   {
     { Select ?vendor (count(?offer) As ?belowAvg)
       {
-        { ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType8> .
+        { ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType6> .
           ?offer bsbm:product ?product .
           ?offer bsbm:vendor ?vendor .
           ?offer bsbm:price ?price .
           { Select ?product (avg(xsd:float(xsd:string(?price))) As ?avgPrice)
             {
-              ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType8> .
+              ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType6> .
               ?offer bsbm:product ?product .
               ?offer bsbm:vendor ?vendor .
               ?offer bsbm:price ?price .
@@ -36,7 +36,7 @@ ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductT
     }
     { Select ?vendor (count(?offer) As ?offerCount)
       {
-        ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType8> .
+        ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType6> .
         ?offer bsbm:product ?product .
         ?offer bsbm:vendor ?vendor .
       }
@@ -84,14 +84,14 @@ FROM
                  vendor AS vendor_ref
             WHERE "offer".vendor = "vendor_ref".nr) AS anon_7,
 
-           (SELECT offer.nr AS offer,
-                   offer.price AS price
+           (SELECT offer.price AS price,
+                   offer.nr AS offer
             FROM offer) AS anon_8,
 
            (SELECT producttypeproduct.product AS product
             FROM producttypeproduct,
                  producttype AS producttype_ref
-            WHERE "producttype_ref"."nr" = '8'
+            WHERE "producttype_ref"."nr" = '6'
               AND "producttypeproduct".productType = "producttype_ref".nr) AS anon_9
          WHERE anon_6.nr = anon_7.nr
            AND anon_6.nr = anon_8.offer
@@ -124,7 +124,7 @@ FROM
               (SELECT producttypeproduct.product AS product
                FROM producttypeproduct,
                     producttype AS producttype_ref
-               WHERE "producttype_ref"."nr" = '8'
+               WHERE "producttype_ref"."nr" = '6'
                  AND "producttypeproduct".productType = "producttype_ref".nr) AS anon_14
             WHERE anon_11.nr = anon_12.nr
               AND anon_11.nr = anon_13.offer
@@ -156,7 +156,7 @@ FROM
         (SELECT producttypeproduct.product AS product
          FROM producttypeproduct,
               producttype AS producttype_ref
-         WHERE "producttype_ref"."nr" = '8'
+         WHERE "producttype_ref"."nr" = '6'
            AND "producttypeproduct".productType = "producttype_ref".nr) AS anon_18
       WHERE anon_16.nr = anon_17.nr
         AND anon_18.product = anon_16."""product_ref"".nr_3") AS anon_15
@@ -169,7 +169,7 @@ OFFSET 0
 
 ## Created SQL results
 ```
-bsbm-inst:Vendor1	"0.48186528497409326"^^xsd:double
+bsbm-inst:Vendor1	"0.5081967213114754"^^xsd:double
 ```
 
 FAIL

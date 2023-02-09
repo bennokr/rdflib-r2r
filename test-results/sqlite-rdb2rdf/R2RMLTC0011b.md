@@ -8,31 +8,31 @@ SELECT anon_1.s AS s,
        anon_1.p AS p,
        anon_1.o AS o
 FROM
-  (SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/student/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Student" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-          '<http://example.com/plays>' AS p,
-          CAST('<' AS VARCHAR) || CAST('http://example.com/sport/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Sport" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+  (SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/student/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+          '<http://example.com/firstName>' AS p,
+          "Student"."FirstName" AS o,
           NULL AS g
-   FROM "Student_Sport"
+   FROM "Student"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/student/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
                     '<http://example.com/lastName>' AS p,
                     "Student"."LastName" AS o,
                     NULL AS g
    FROM "Student"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/student/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/firstName>' AS p,
-                    "Student"."FirstName" AS o,
+   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/sport/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Sport"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                    '<http://example.com/id>' AS p,
+                    "Sport"."ID" AS o,
                     NULL AS g
-   FROM "Student"
+   FROM "Sport"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/sport/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Sport"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
                     '<http://example.com/description>' AS p,
                     "Sport"."Description" AS o,
                     NULL AS g
    FROM "Sport"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/sport/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Sport"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/id>' AS p,
-                    "Sport"."ID" AS o,
+   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/student/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Student" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                    '<http://example.com/plays>' AS p,
+                    CAST('<' AS VARCHAR) || CAST('http://example.com/sport/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Sport" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
                     NULL AS g
-   FROM "Sport") AS anon_1
+   FROM "Student_Sport") AS anon_1
 ```
 
 ## Triple Diff

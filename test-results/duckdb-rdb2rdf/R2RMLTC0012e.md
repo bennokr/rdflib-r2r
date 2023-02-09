@@ -9,8 +9,8 @@ SELECT anon_1.s AS s,
        anon_1.o AS o
 FROM
   (SELECT CAST('_:' AS VARCHAR) || CAST("IOUs"."fname" AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs"."lname" AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs"."amount" AS VARCHAR) AS s,
-          '<http://example.com/base/IOUs#fname>' AS p,
-          "IOUs"."fname" AS o,
+          '<http://example.com/base/IOUs#amount>' AS p,
+          "IOUs"."amount" AS o,
           NULL AS g
    FROM "IOUs"
    UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("IOUs"."fname" AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs"."lname" AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs"."amount" AS VARCHAR) AS s,
@@ -19,8 +19,8 @@ FROM
                     NULL AS g
    FROM "IOUs"
    UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("IOUs"."fname" AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs"."lname" AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs"."amount" AS VARCHAR) AS s,
-                    '<http://example.com/base/IOUs#amount>' AS p,
-                    "IOUs"."amount" AS o,
+                    '<http://example.com/base/IOUs#fname>' AS p,
+                    "IOUs"."fname" AS o,
                     NULL AS g
    FROM "IOUs"
    UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("IOUs"."fname" AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs"."lname" AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs"."amount" AS VARCHAR) AS s,
@@ -39,13 +39,13 @@ FROM
                     NULL AS g
    FROM "Lives"
    UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("Lives"."fname" AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("Lives"."lname" AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("Lives"."city" AS VARCHAR) AS s,
-                    '<http://example.com/base/IOUs#lname>' AS p,
-                    "Lives"."lname" AS o,
+                    '<http://example.com/base/IOUs#fname>' AS p,
+                    "Lives"."fname" AS o,
                     NULL AS g
    FROM "Lives"
    UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("Lives"."fname" AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("Lives"."lname" AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("Lives"."city" AS VARCHAR) AS s,
-                    '<http://example.com/base/IOUs#fname>' AS p,
-                    "Lives"."fname" AS o,
+                    '<http://example.com/base/IOUs#lname>' AS p,
+                    "Lives"."lname" AS o,
                     NULL AS g
    FROM "Lives") AS anon_1
 ```

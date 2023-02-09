@@ -5,12 +5,12 @@ Template with table columns with special chars and backslashes
 ## Created SQL query
 ```sql
 SELECT CAST('{' AS VARCHAR) || CAST('{' AS VARCHAR) || CAST('{' AS VARCHAR) || CAST(' ' AS VARCHAR) || CAST(anon_1.o AS VARCHAR) || CAST(' }' AS VARCHAR) || CAST('}' AS VARCHAR) || CAST('}' AS VARCHAR) AS o,
-       CAST('<' AS VARCHAR) || CAST('http://example.com/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1.s AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1.p AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-       '<http://example.com/code>' AS p
+       '<http://example.com/code>' AS p,
+       CAST('<' AS VARCHAR) || CAST('http://example.com/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1.p AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1.s AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s
 FROM
   (SELECT "Country Info"."ISO 3166" AS o,
-          "Country Info"."Country Code" AS s,
-          "Country Info"."Name" AS p
+          "Country Info"."Country Code" AS p,
+          "Country Info"."Name" AS s
    FROM "Country Info") AS anon_1
 ```
 

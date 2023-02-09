@@ -5,11 +5,11 @@ Generation of triples by using IRI value in columns
 ## Created SQL query
 ```sql
 SELECT '<http://xmlns.com/foaf/0.1/name>' AS p,
-       anon_1.p AS o,
-       CAST('<' AS VARCHAR) || CAST(anon_1.o AS VARCHAR) || CAST('>' AS VARCHAR) AS s
+       CAST('<' AS VARCHAR) || CAST(anon_1.p AS VARCHAR) || CAST('>' AS VARCHAR) AS s,
+       anon_1.s AS o
 FROM
   (SELECT "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."FirstName" AS p,
-          "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."FirstName" AS o
+          "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."FirstName" AS s
    FROM
      (SELECT "ID",
              "FirstName",

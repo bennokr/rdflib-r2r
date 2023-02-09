@@ -19,13 +19,13 @@ FROM
                     NULL AS g
    FROM "Student"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Student/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';Name=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Student#Sport>' AS p,
-                    "Student"."Sport" AS o,
+                    '<http://example.com/base/Student#Name>' AS p,
+                    "Student"."Name" AS o,
                     NULL AS g
    FROM "Student"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Student/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';Name=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Student#Name>' AS p,
-                    "Student"."Name" AS o,
+                    '<http://example.com/base/Student#Sport>' AS p,
+                    "Student"."Sport" AS o,
                     NULL AS g
    FROM "Student") AS anon_1
 ```
@@ -44,9 +44,9 @@ SUCCES
 Traceback (most recent call last):
   File "/tests/test_rdb2rdf.py", line 185, in test_rdb2rdf
     o_triples = sorted(g_made.triples([None, None, o]))
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 421, in triples
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 448, in triples
     for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
-  File "/rdflib_r2r/r2r_store.py", line 606, in triples
+  File "/rdflib_r2r/r2r_store.py", line 619, in triples
     rows = list(conn.execute(query))
   File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1262, in execute
     return meth(self, multiparams, params, _EMPTY_EXECUTION_OPTS)

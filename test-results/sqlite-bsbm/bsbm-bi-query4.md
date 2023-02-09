@@ -3,7 +3,7 @@
 
 ## Random parameter sample
 ```
-ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType6>
+ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType21>
 ```
 
 ## SPARQL query
@@ -16,7 +16,7 @@ ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductT
   {
     { Select ?feature (avg(xsd:float(xsd:string(?price))) As ?withFeaturePrice)
       {
-        ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType6> ;
+        ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType21> ;
                  bsbm:productFeature ?feature .
         ?offer bsbm:product ?product ;
                bsbm:price ?price .
@@ -26,10 +26,10 @@ ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductT
     { Select ?feature (avg(xsd:float(xsd:string(?price))) As ?withoutFeaturePrice)
       {
         { Select distinct ?feature { 
-          ?p a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType6> ;
+          ?p a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType21> ;
              bsbm:productFeature ?feature .
         } }
-        ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType6> .
+        ?product a <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType21> .
         ?offer bsbm:product ?product ;
                bsbm:price ?price .
         FILTER NOT EXISTS { ?product bsbm:productFeature ?feature }
@@ -44,16 +44,16 @@ ProductType = <http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductT
 
 ## Goal results
 ```
-bsbm-inst:ProductFeature24	"1.259561207826258"^^xsd:double
-bsbm-inst:ProductFeature188	"1.2556040041761343"^^xsd:double
-bsbm-inst:ProductFeature204	"1.2556040041761343"^^xsd:double
-bsbm-inst:ProductFeature192	"1.3154491134790216"^^xsd:double
-bsbm-inst:ProductFeature32	"1.3503245989096258"^^xsd:double
-bsbm-inst:ProductFeature29	"1.4046384162624663"^^xsd:double
-bsbm-inst:ProductFeature21	"1.2556040041761343"^^xsd:double
-bsbm-inst:ProductFeature211	"1.2556040041761343"^^xsd:double
-bsbm-inst:ProductFeature194	"1.4027255189393937"^^xsd:double
-bsbm-inst:ProductFeature202	"1.2590702833251517"^^xsd:double
+bsbm-inst:ProductFeature163	"1.4537786987227632"^^xsd:double
+bsbm-inst:ProductFeature952	"1.4537786987227632"^^xsd:double
+bsbm-inst:ProductFeature152	"1.3602918904288603"^^xsd:double
+bsbm-inst:ProductFeature146	"1.3602918904288603"^^xsd:double
+bsbm-inst:ProductFeature958	"1.4537786987227632"^^xsd:double
+bsbm-inst:ProductFeature145	"1.4537786987227632"^^xsd:double
+bsbm-inst:ProductFeature147	"1.3602918904288603"^^xsd:double
+bsbm-inst:ProductFeature154	"1.3602918904288603"^^xsd:double
+bsbm-inst:ProductFeature949	"1.4537786987227632"^^xsd:double
+bsbm-inst:ProductFeature142	"1.3602918904288603"^^xsd:double
 ```
 
 ## Created SQL query
@@ -88,7 +88,7 @@ FROM
         (SELECT producttypeproduct.product AS product
          FROM producttypeproduct,
               producttype AS producttype_ref
-         WHERE "producttype_ref"."nr" = '6'
+         WHERE "producttype_ref"."nr" = '21'
            AND "producttypeproduct".productType = "producttype_ref".nr) AS anon_7
       WHERE anon_4.nr = anon_6.offer
         AND anon_7.product = anon_4."""product_ref"".nr_1"
@@ -114,9 +114,9 @@ FROM
            (SELECT producttypeproduct.product AS product
             FROM producttypeproduct,
                  producttype AS producttype_ref
-            WHERE "producttype_ref"."nr" = '6'
+            WHERE "producttype_ref"."nr" = '21'
               AND "producttypeproduct".productType = "producttype_ref".nr) AS anon_12
-         WHERE anon_11.product = anon_12.product) AS anon_9,
+         WHERE anon_12.product = anon_11.product) AS anon_9,
 
         (SELECT anon_13.nr AS nr,
                 anon_13."""product_ref"".nr_2" AS """product_ref"".nr_2",
@@ -128,14 +128,14 @@ FROM
                  product AS product_ref
             WHERE "offer".product = "product_ref".nr) AS anon_13,
 
-           (SELECT offer.price AS price,
-                   offer.nr AS offer
+           (SELECT offer.nr AS offer,
+                   offer.price AS price
             FROM offer) AS anon_14,
 
            (SELECT producttypeproduct.product AS product
             FROM producttypeproduct,
                  producttype AS producttype_ref
-            WHERE "producttype_ref"."nr" = '6'
+            WHERE "producttype_ref"."nr" = '21'
               AND "producttypeproduct".productType = "producttype_ref".nr) AS anon_15
          WHERE anon_13.nr = anon_14.offer
            AND anon_15.product = anon_13."""product_ref"".nr_2") AS anon_10
@@ -159,16 +159,16 @@ OFFSET 0
 
 ## Created SQL results
 ```
-bsbm-inst:ProductFeature29	"1.404638416262466"^^xsd:double
-bsbm-inst:ProductFeature188	"1.2556040041761343"^^xsd:double
-bsbm-inst:ProductFeature32	"1.3503245989096262"^^xsd:double
-bsbm-inst:ProductFeature202	"1.2590702833251513"^^xsd:double
-bsbm-inst:ProductFeature204	"1.2556040041761343"^^xsd:double
-bsbm-inst:ProductFeature192	"1.3154491134790216"^^xsd:double
-bsbm-inst:ProductFeature24	"1.2595612078262581"^^xsd:double
-bsbm-inst:ProductFeature194	"1.4027255189393946"^^xsd:double
-bsbm-inst:ProductFeature21	"1.2556040041761343"^^xsd:double
-bsbm-inst:ProductFeature211	"1.2556040041761343"^^xsd:double
+bsbm-inst:ProductFeature958	"1.453778698722763"^^xsd:double
+bsbm-inst:ProductFeature145	"1.453778698722763"^^xsd:double
+bsbm-inst:ProductFeature146	"1.3602918904288603"^^xsd:double
+bsbm-inst:ProductFeature949	"1.453778698722763"^^xsd:double
+bsbm-inst:ProductFeature147	"1.3602918904288603"^^xsd:double
+bsbm-inst:ProductFeature142	"1.3602918904288603"^^xsd:double
+bsbm-inst:ProductFeature154	"1.3602918904288603"^^xsd:double
+bsbm-inst:ProductFeature152	"1.3602918904288603"^^xsd:double
+bsbm-inst:ProductFeature163	"1.453778698722763"^^xsd:double
+bsbm-inst:ProductFeature952	"1.453778698722763"^^xsd:double
 ```
 
 FAIL

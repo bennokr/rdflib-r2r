@@ -2,26 +2,22 @@
 [link](https://www.w3.org/TR/rdb2rdf-test-cases/#R2RMLTC0013a)
 Generation of empty triples from referenced columns that have null values
 
-
-
+## Created SQL query
+```sql
+SELECT anon_1."DateOfBirth" AS o,
+       '<http://example.com/BirthDay>' AS p,
+       CAST('<' AS VARCHAR) || CAST('http://example.com/Person/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."DateOfBirth" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s
+FROM
+  (SELECT "Person"."DateOfBirth" AS "DateOfBirth",
+          "Person"."ID" AS "ID",
+          "Person"."Name" AS "Name",
+          "Person"."DateOfBirth" AS "DateOfBirth__1"
+   FROM "Person") AS anon_1
 ```
-Traceback (most recent call last):
-  File "/tests/test_rdb2rdf.py", line 155, in test_rdb2rdf
-    sql_query = g_made.store.getSQL("SELECT * WHERE {?s ?p ?o}")
-  File "/rdflib_r2r/r2r_store.py", line 1038, in getSQL
-    query, var_subform = self.queryPart(conn, queryobj.algebra)
-  File "/rdflib_r2r/r2r_store.py", line 988, in queryPart
-    return self.queryPart(conn, part.p)
-  File "/rdflib_r2r/r2r_store.py", line 963, in queryPart
-    return self.queryProject(conn, part)
-  File "/rdflib_r2r/r2r_store.py", line 875, in queryProject
-    part_query, var_subform = self.queryPart(conn, part.p)
-  File "/rdflib_r2r/r2r_store.py", line 957, in queryPart
-    return self.queryBGP(conn, part.triples)
-  File "/rdflib_r2r/r2r_store.py", line 713, in queryBGP
-    cols = [incols[i] for i in idx]
-  File "/rdflib_r2r/r2r_store.py", line 713, in <listcomp>
-    cols = [incols[i] for i in idx]
-IndexError: list index out of range
 
+## Triple Diff
+```diff
+<http://example.com/Person/2/Bob/September%2C%202010> <http://example.com/BirthDay> "September, 2010" .
 ```
+
+SUCCES

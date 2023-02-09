@@ -4,12 +4,12 @@ One column mapping, generation of a BlankNode subject by using rr:termType
 
 ## Created SQL query
 ```sql
-SELECT '<http://xmlns.com/foaf/0.1/name>' AS p,
-       CAST('_:' AS VARCHAR) || CAST(anon_1.p AS VARCHAR) AS s,
-       anon_1.s AS o
+SELECT CAST('_:' AS VARCHAR) || CAST(anon_1."Name" AS VARCHAR) AS s,
+       '<http://xmlns.com/foaf/0.1/name>' AS p,
+       anon_1."Name" AS o
 FROM
-  (SELECT "Student"."Name" AS p,
-          "Student"."Name" AS s
+  (SELECT "Student"."Name" AS "Name",
+          "Student"."Name" AS "Name__1"
    FROM "Student") AS anon_1
 ```
 

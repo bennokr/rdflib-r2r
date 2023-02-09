@@ -14,13 +14,13 @@ FROM
           NULL AS g
    FROM "Student"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://xmlns.com/foaf/0.1/name>' AS p,
-                    substr("Student"."Name" || '               ', 1, 15) AS o,
+                    '<http://example.com/id>' AS p,
+                    "Student"."ID" AS o,
                     NULL AS g
    FROM "Student"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/id>' AS p,
-                    "Student"."ID" AS o,
+                    '<http://xmlns.com/foaf/0.1/name>' AS p,
+                    substr("Student"."Name" || '               ', 1, 15) AS o,
                     NULL AS g
    FROM "Student") AS anon_1
 ```

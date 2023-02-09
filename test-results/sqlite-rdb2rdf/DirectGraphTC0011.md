@@ -14,44 +14,15 @@ FROM
           NULL AS g
    FROM "Sport"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Sport/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Sport"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Sport#Description>' AS p,
-                    "Sport"."Description" AS o,
-                    NULL AS g
-   FROM "Sport"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Sport/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Sport"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
                     '<http://example.com/base/Sport#ID>' AS p,
                     CAST('"' AS VARCHAR) || CAST(CAST("Sport"."ID" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
                     NULL AS g
    FROM "Sport"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Student_Sport/ID_Student=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Student" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';ID_Sport=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Sport" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
-                    '<http://example.com/base/Student_Sport>' AS o,
+   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Sport/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Sport"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                    '<http://example.com/base/Sport#Description>' AS p,
+                    "Sport"."Description" AS o,
                     NULL AS g
-   FROM "Student_Sport"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Student_Sport/ID_Student=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Student" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';ID_Sport=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Sport" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Student_Sport#ref-ID_Sport>' AS p,
-                    CAST('<' AS VARCHAR) || CAST('Sport/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Sport_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
-                    NULL AS g
-   FROM "Student_Sport",
-        "Sport" AS "Sport_ref"
-   WHERE "Student_Sport"."ID_Sport" = "Sport_ref"."ID"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Student_Sport/ID_Student=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Student" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';ID_Sport=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Sport" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Student_Sport#ID_Student>' AS p,
-                    CAST('"' AS VARCHAR) || CAST(CAST("Student_Sport"."ID_Student" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
-                    NULL AS g
-   FROM "Student_Sport"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Student_Sport/ID_Student=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Student" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';ID_Sport=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Sport" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Student_Sport#ID_Sport>' AS p,
-                    CAST('"' AS VARCHAR) || CAST(CAST("Student_Sport"."ID_Sport" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
-                    NULL AS g
-   FROM "Student_Sport"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Student_Sport/ID_Student=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Student" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';ID_Sport=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Sport" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Student_Sport#ref-ID_Student>' AS p,
-                    CAST('<' AS VARCHAR) || CAST('Student/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
-                    NULL AS g
-   FROM "Student_Sport",
-        "Student" AS "Student_ref"
-   WHERE "Student_Sport"."ID_Student" = "Student_ref"."ID"
+   FROM "Sport"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Student/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
                     '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
                     '<http://example.com/base/Student>' AS o,
@@ -71,7 +42,36 @@ FROM
                     '<http://example.com/base/Student#ID>' AS p,
                     CAST('"' AS VARCHAR) || CAST(CAST("Student"."ID" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
                     NULL AS g
-   FROM "Student") AS anon_1
+   FROM "Student"
+   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Student_Sport/ID_Student=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Student" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';ID_Sport=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Sport" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                    '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
+                    '<http://example.com/base/Student_Sport>' AS o,
+                    NULL AS g
+   FROM "Student_Sport"
+   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Student_Sport/ID_Student=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Student" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';ID_Sport=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Sport" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                    '<http://example.com/base/Student_Sport#ref-ID_Sport>' AS p,
+                    CAST('<' AS VARCHAR) || CAST('Sport/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Sport_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+                    NULL AS g
+   FROM "Student_Sport",
+        "Sport" AS "Sport_ref"
+   WHERE "Student_Sport"."ID_Sport" = "Sport_ref"."ID"
+   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Student_Sport/ID_Student=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Student" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';ID_Sport=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Sport" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                    '<http://example.com/base/Student_Sport#ID_Sport>' AS p,
+                    CAST('"' AS VARCHAR) || CAST(CAST("Student_Sport"."ID_Sport" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
+                    NULL AS g
+   FROM "Student_Sport"
+   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Student_Sport/ID_Student=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Student" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';ID_Sport=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Sport" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                    '<http://example.com/base/Student_Sport#ref-ID_Student>' AS p,
+                    CAST('<' AS VARCHAR) || CAST('Student/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+                    NULL AS g
+   FROM "Student_Sport",
+        "Student" AS "Student_ref"
+   WHERE "Student_Sport"."ID_Student" = "Student_ref"."ID"
+   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Student_Sport/ID_Student=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Student" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';ID_Sport=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Sport" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                    '<http://example.com/base/Student_Sport#ID_Student>' AS p,
+                    CAST('"' AS VARCHAR) || CAST(CAST("Student_Sport"."ID_Student" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
+                    NULL AS g
+   FROM "Student_Sport") AS anon_1
 ```
 
 ## Triple Diff

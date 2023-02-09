@@ -32,8 +32,8 @@ FROM
                     '<http://example.com/Sport>' AS p,
                     CAST('<' AS VARCHAR) || CAST('http://example.com/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_ref"."Sport" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
                     NULL AS g
-   FROM "Student",
-        "Student" AS "Student_ref") AS anon_1
+   FROM "Student" AS "Student_ref",
+        "Student") AS anon_1
 ```
 
 ## Triple Diff

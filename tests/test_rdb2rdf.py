@@ -149,7 +149,7 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
         diff_lines = []
         for g,p in zip([in_both, in_made, in_goal], ['','+ ','- ']):
             for line in dump_nt_sorted(g):
-                diff_lines.append((line.decode(), p))
+                diff_lines.append((line, p))
         difftxt = '\n'.join(p+line for line, p in sorted(diff_lines))
         
         sql_query = g_made.store.getSQL("SELECT * WHERE {?s ?p ?o}")

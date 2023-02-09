@@ -14,6 +14,11 @@ FROM
           NULL AS g
    FROM "Country"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Country/Code=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country"."Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';Lan=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country"."Lan" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                    '<http://example.com/base/Country#Name>' AS p,
+                    "Country"."Name" AS o,
+                    NULL AS g
+   FROM "Country"
+   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Country/Code=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country"."Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';Lan=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country"."Lan" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
                     '<http://example.com/base/Country#Code>' AS p,
                     "Country"."Code" AS o,
                     NULL AS g
@@ -21,11 +26,6 @@ FROM
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Country/Code=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country"."Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';Lan=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country"."Lan" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
                     '<http://example.com/base/Country#Lan>' AS p,
                     "Country"."Lan" AS o,
-                    NULL AS g
-   FROM "Country"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Country/Code=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country"."Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';Lan=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country"."Lan" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Country#Name>' AS p,
-                    "Country"."Name" AS o,
                     NULL AS g
    FROM "Country") AS anon_1
 ```

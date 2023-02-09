@@ -161,6 +161,12 @@ def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
         logging.warn(testcase.querytemplate)
         logging.warn(testcase.params)
 
+        import pickle
+        cache_params = {}
+        cachefile = pathlib.Path("test-results/bsbm-params.pickle")
+        if cachefile.exists():
+            cache_params = pickle.load(cachefile.open('rb'))
+
         def get_params(querytemplate):
             params = {}
             pnames = set(re.findall("%([^%]+)%", querytemplate))
@@ -176,6 +182,7 @@ def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
             for pname in pnames:
                 if pname not in params:
                     params[pname] = sample_param(pname)
+            
             return params
 
         def sample_param(pname):
@@ -186,20 +193,17 @@ def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
             return sample.n3() if isinstance(sample, rdflib.term.Node) else sample
 
         logging.warn(f"Graph has {len(graph)} triples")
-        # gb = rdflib.term.URIRef('http://downlode.org/rdf/iso-3166/countries#GB')
-        # for s in graph[:bsbm.country:gb]:
-        #     logging.warn((s,'in gb'))
-        #     break
-        # raise
 
         goal = None
         querytemplate = testcase.querytemplate
         bad_params = set()
         while not goal:
-            params = get_params(querytemplate)
+            if testcase.id in cache_params:
+                params = cache_params[testcase.id]
+            else:
+                params = get_params(querytemplate)
             if str(params) in bad_params:
                 continue
-            logging.warn(f"params: {params}")
             query = re.sub("%([^%]+)%", lambda m: params[m.group(1)], querytemplate)
 
             try:
@@ -207,18 +211,23 @@ def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
             except TypeError as e:
                 logging.warn(f"Query failed with TypeError {e}")
 
-            for t in goal:
-                if any(n is None for n in t):
-                    logging.warn(f"None in goal result: {t}")
-
             gtxt = "\n".join(
                 "\t".join((n.n3(ns) if n else "") for n in t) for t in goal
             )
-            logging.warn(f"goal: {len(goal)} triples\n" + gtxt)
+            if goal:
+                logging.warn(f"goal: {len(goal)} triples\n" + gtxt)
+                logging.warn(f"Tried {len(bad_params)} options")
+                logging.warn(f"params: {params}")
+                cache_params[testcase.id] = params
+                pickle.dump(cache_params, cachefile.open('wb'))
+            
             if not goal:
                 bad_params.add(str(params))
-                logging.warn(f"Tried {len(bad_params)} options")
                 continue
+            
+            for t in goal:
+                if any(n is None for n in t):
+                    logging.warn(f"None in goal result: {t}")
 
             optimize_sparql()
 

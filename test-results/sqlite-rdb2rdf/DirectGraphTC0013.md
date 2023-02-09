@@ -14,8 +14,8 @@ FROM
           NULL AS g
    FROM "Person"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Person/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Person"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Person#DateOfBirth>' AS p,
-                    "Person"."DateOfBirth" AS o,
+                    '<http://example.com/base/Person#ID>' AS p,
+                    CAST('"' AS VARCHAR) || CAST(CAST("Person"."ID" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
                     NULL AS g
    FROM "Person"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Person/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Person"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
@@ -24,8 +24,8 @@ FROM
                     NULL AS g
    FROM "Person"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Person/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Person"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Person#ID>' AS p,
-                    CAST('"' AS VARCHAR) || CAST(CAST("Person"."ID" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
+                    '<http://example.com/base/Person#DateOfBirth>' AS p,
+                    "Person"."DateOfBirth" AS o,
                     NULL AS g
    FROM "Person") AS anon_1
 ```

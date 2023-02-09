@@ -14,13 +14,13 @@ FROM
           NULL AS g
    FROM "Student"
    UNION ALL SELECT CAST('_:Student#' AS VARCHAR) || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Student#ID>' AS p,
-                    CAST('"' AS VARCHAR) || CAST(CAST("Student"."ID" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
+                    '<http://example.com/base/Student#Name>' AS p,
+                    "Student"."Name" AS o,
                     NULL AS g
    FROM "Student"
    UNION ALL SELECT CAST('_:Student#' AS VARCHAR) || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Student#Name>' AS p,
-                    "Student"."Name" AS o,
+                    '<http://example.com/base/Student#ID>' AS p,
+                    CAST('"' AS VARCHAR) || CAST(CAST("Student"."ID" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
                     NULL AS g
    FROM "Student") AS anon_1
 ```
@@ -38,9 +38,9 @@ SUCCES
 Traceback (most recent call last):
   File "/tests/test_rdb2rdf.py", line 185, in test_rdb2rdf
     o_triples = sorted(g_made.triples([None, None, o]))
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 421, in triples
+  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 448, in triples
     for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
-  File "/rdflib_r2r/r2r_store.py", line 606, in triples
+  File "/rdflib_r2r/r2r_store.py", line 619, in triples
     rows = list(conn.execute(query))
   File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1262, in execute
     return meth(self, multiparams, params, _EMPTY_EXECUTION_OPTS)
@@ -60,6 +60,6 @@ Traceback (most recent call last):
     cursor.execute(statement, parameters, context)
   File "/opt/miniconda3/lib/python3.8/site-packages/duckdb_engine/__init__.py", line 35, in execute
     self.c.execute(statement, parameters)
-RuntimeError: Binder Error: Type mismatch for binding parameter with index 5, expected type VARCHAR but got type INTEGER
+RuntimeError: Binder Error: Type mismatch for binding parameter with index 7, expected type VARCHAR but got type INTEGER
 
 ```

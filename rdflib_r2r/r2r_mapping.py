@@ -140,7 +140,7 @@ class R2RMapping:
                         mg.add([join, rr.child, Literal(f'"{colname}"')])
                         mg.add([join, rr.parent, Literal(f'"{refcol}"')])
 
-        logging.warn("\n" + mg.serialize(format="turtle").decode())
+        logging.warn("\n" + mg.serialize(format="turtle"))
         return cls(mg, baseuri=baseuri)
 
     @classmethod

@@ -572,10 +572,10 @@ class R2RStore(Store):
                     datatype=XSD.hexBinary,
                 )
             else:
-                if type(val) == float:
-                    # TODO: actually figure out the rules for this
-                    if math.isclose(val, round(val, 2)):
-                        val = Decimal(val)
+                # TODO: actually figure out the rules for this
+                # if type(val) == float:
+                    # if math.isclose(val, round(val, 2)):
+                    #     val = Decimal(val)
                 return Literal(val)
         elif val.startswith("<"):
             return self._iri_encode(val)
@@ -693,26 +693,25 @@ class R2RStore(Store):
                     # Single table, so try to merge shared-subject terms
                     table = pat_query._from_obj[0], pat_query.whereclause
                     table_varcolforms.setdefault(table, set()).update(qvar_colform)
-                    continue
-
-                qvars, colforms = zip(*qvar_colform)
-                subforms, allcols = ColForm.to_subforms_columns(*colforms)
-                pat_query = pat_query.with_only_columns(allcols)
-                qvar_subform = zip(qvars, subforms)
+                else:
+                    qvars, colforms = zip(*qvar_colform)
+                    subforms, allcols = ColForm.to_subforms_columns(*colforms)
+                    pat_query = pat_query.with_only_columns(allcols)
+                    qvar_subform = zip(qvars, subforms)
+                    query_varsubforms.append((pat_query, qvar_subform))
             else:
                 qvar_subform = [
                     (q, subform)
                     for q, subform in zip((qs, qp, qo), subforms)
                     if isinstance(q, Variable)
                 ]
-            query_varsubforms.append((pat_query, qvar_subform))
+                query_varsubforms.append((pat_query, qvar_subform))
 
         # Merge simple select statements on same table
         for (table, where), var_colforms in table_varcolforms.items():
             qvars, colforms = zip(*dict(var_colforms).items())
             subform, allcols = ColForm.to_subforms_columns(*colforms)
-            cols = [col.label(str(var)) for var, col in zip(qvars, allcols)]
-            query = select(*cols).select_from(table)
+            query = select(*allcols).select_from(table)
             if where is not None:
                 query = query.where(where)
             query_varsubforms.append((query, zip(qvars, subform)))
@@ -733,7 +732,7 @@ class R2RStore(Store):
         return select(*allcols).where(*where), dict(zip(var_colforms, subforms))
 
     def queryExpr(self, conn, expr, var_cf) -> ColForm:
-        # this all could get really complicated with expression types...
+        # TODO: this all could get really complicated with expression types...
         agg_funcs = {
             "Aggregate_Sample": lambda x: x,
             "Aggregate_Count": sqlfunc.count,
@@ -825,6 +824,7 @@ class R2RStore(Store):
         var_cf = {v: ColForm.from_subform(cols, sf) for v, sf in var_subform.items()}
         logging.warn(('Building filter clause from', part.expr, var_cf))
         clause = self.queryExpr(conn, part.expr, var_cf).expr()
+        logging.warn(('Built filter clause', str(clause.compile())))
 
         # Filter should be HAVING for aggregates
         if part.p.name == "AggregateJoin":
@@ -954,6 +954,7 @@ class R2RStore(Store):
         return query, var_subform
 
     def queryLeftJoin(self, conn, part) -> SelectVarSubForm:
+
         query1, var_subform1 = self.queryPart(conn, part.p1)
         query2, var_subform2 = self.queryPart(conn, part.p2)
         if not query1.c:
@@ -962,20 +963,38 @@ class R2RStore(Store):
             return query1, var_subform1
 
         var_colforms = {}
+        allcols1, allcols2 = [], []
         cols1 = list(query1.c)
         for v, sf1 in var_subform1.items():
-            var_colforms.setdefault(v, []).append(ColForm.from_subform(cols1, sf1))
+            cf = ColForm.from_subform(cols1, sf1)
+            var_colforms.setdefault(v, []).append(cf)
+            allcols1.append(cf.expr().label(str(v)))
+        
+        query2 = query2.subquery()
         cols2 = list(query2.c)
         for v, sf2 in var_subform2.items():
-            var_colforms.setdefault(v, []).append(ColForm.from_subform(cols2, sf2))
+            cf = ColForm.from_subform(cols2, sf2)
+            var_colforms.setdefault(v, []).append(cf)
+            allcols2.append(cf.expr().label(str(v)))
 
         colforms = [cfs[0] for cfs in var_colforms.values()]
         subforms, allcols = ColForm.to_subforms_columns(*colforms)
         where = [eq for cs in var_colforms.values() for eq in ColForm.equal(*cs)]
-        # onclause = sql_and(*where)
-        # fromquery = query1.outerjoin(query2.subquery(), onclause=onclause)
-        query = select(*allcols).where(*where)
-        return query, dict(zip(var_colforms, subforms))
+
+        outer = select(*allcols1).outerjoin(
+            query2, 
+            onclause=sql_and(*where)
+        )
+        logging.warn("query1:\n" + sql_pretty( select(*allcols1) ))
+        logging.warn("query2:\n" + sql_pretty( select(*allcols2) ))
+
+        logging.warn(("outerjoin cols:", list(outer.c)))
+        varcols = [literal_column(str(v)) for v in var_colforms]
+        query = select(varcols).select_from(outer)
+        logging.warn(("query cols:", list(query.c)))
+        logging.warn(("variables:", list(var_colforms)))
+
+        return query, {v: ([i], [None]) for i,v in enumerate(var_colforms)}
 
     def queryPart(self, conn, part) -> SelectVarSubForm:
         if part.name == "BGP":
