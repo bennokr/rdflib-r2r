@@ -22,7 +22,7 @@ Traceback (most recent call last):
     self.addN((s, p, o, self) for s, p, o in other)
   File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 448, in triples
     for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
-  File "/rdflib_r2r/r2r_store.py", line 611, in triples
+  File "/rdflib_r2r/r2r_store.py", line 613, in triples
     col = ColForm.from_subform(cols, subform).expr()
   File "/rdflib_r2r/r2r_store.py", line 103, in from_subform
     return cls(form, [cols[i] for i in idxs])
