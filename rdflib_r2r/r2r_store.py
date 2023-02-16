@@ -515,7 +515,7 @@ class R2RStore(Store):
         queries = []
         # Make expressions from ColForms
         for query, q_subforms in queryforms:
-            cols = list(query.inner_columns)
+            cols = list(query.exported_columns)
             onlycols = []
             assert len(q_subforms) == 4  # spog
             for subform, name in zip(q_subforms, "spog"):
@@ -526,12 +526,12 @@ class R2RStore(Store):
 
         # If the object columns have different datatypes, cast them to n3 strings
         # WARNING: In most cases, this should be fine but it might mess up!
-        _, _, o_cols, *_ = zip(*[q.inner_columns for q in queries])
+        _, _, o_cols, *_ = zip(*[q.exported_columns for q in queries])
         kwargs = lambda c: tuple((k, v) for k, v in vars(c).items() if k[0] != "_")
         o_types = set((c.type.__class__, kwargs(c.type)) for c in o_cols)
         if len(o_types) > 1:
             for qi, query in enumerate(queries):
-                s, p, o, g = query.inner_columns
+                s, p, o, g = query.exported_columns
                 queries[qi] = query.with_only_columns(*[s, p, self.col_n3(o), g])
         return union_all(*queries), subforms
 
@@ -686,7 +686,7 @@ class R2RStore(Store):
             pat_query, subforms = self.queryPattern(metadata, pat, restriction)
             if isinstance(pat_query, Select):
                 # Restrict selected terms from pattern query to query variables
-                cols = list(pat_query.inner_columns)
+                cols = list(pat_query.exported_columns)
                 qvar_colform = [
                     (q, ColForm.from_subform(cols, *subform))
                     for q, subform in zip((qs, qp, qo), subforms)
@@ -813,17 +813,17 @@ class R2RStore(Store):
             query2, var_subform2 = self.queryPart(conn, part.expr.graph)
 
             var_colforms = {}
-            cols1 = list(part_query.inner_columns)
+            cols1 = list(part_query.exported_columns)
             for v, sf1 in var_subform.items():
                 var_colforms.setdefault(v, []).append(ColForm.from_subform(cols1, *sf1))
-            cols2 = list(query2.inner_columns)
+            cols2 = list(query2.exported_columns)
             for v, sf2 in var_subform2.items():
                 var_colforms.setdefault(v, []).append(ColForm.from_subform(cols2, *sf2))
 
             where = [eq for cs in var_colforms.values() for eq in ColForm.equal(*cs)]
             return part_query.filter(~query2.where(*where).exists()), var_subform
 
-        cols = list(getattr(part_query, "inner_columns", part_query.c))
+        cols = list(getattr(part_query, "exported_columns", part_query.c))
         var_cf = {v: ColForm.from_subform(cols, *sf) for v, sf in var_subform.items()}
         logging.warn(('Building filter clause from', part.expr, var_cf))
         clause = self.queryExpr(conn, part.expr, var_cf).expr()
@@ -879,7 +879,7 @@ class R2RStore(Store):
     def queryExtend(self, conn, part) -> SelectVarSubForm:
         part_query, var_subform = self.queryPart(conn, part.p)
         assert isinstance(part_query, Select)  # ?
-        cols = list(part_query.inner_columns)
+        cols = list(part_query.exported_columns)
         var_cf = {v: ColForm.from_subform(cols, *sf) for v, sf in var_subform.items()}
 
         cf = self.queryExpr(conn, part.expr, var_cf)
@@ -898,7 +898,7 @@ class R2RStore(Store):
     def queryProject(self, conn, part) -> SelectVarSubForm:
         part_query, var_subform = self.queryPart(conn, part.p)
         var_subform = {v: sf for v, sf in var_subform.items() if v in part.PV}
-        cols = list(part_query.inner_columns)
+        cols = list(part_query.exported_columns)
         colforms = [ColForm.from_subform(cols, *sf) for sf in var_subform.values()]
         subforms, allcols = ColForm.to_subforms_columns(*colforms)
         part_query = part_query.with_only_columns(*allcols)
@@ -906,7 +906,7 @@ class R2RStore(Store):
 
     def queryOrderBy(self, conn, part) -> SelectVarSubForm:
         part_query, var_subform = self.queryPart(conn, part.p)
-        cols = list(part_query.inner_columns)
+        cols = list(part_query.exported_columns)
         var_cf = {v: ColForm.from_subform(cols, *sf) for v, sf in var_subform.items()}
 
         ordering = []
@@ -1058,7 +1058,7 @@ class R2RStore(Store):
     def _apply_subforms(query, var_subform):
         if isinstance(query, Select):
             cols = [
-                ColForm.from_subform(query.inner_columns, *sf).expr().label(str(var))
+                ColForm.from_subform(query.exported_columns, *sf).expr().label(str(var))
                 for var, sf in var_subform.items()
             ]
             return query.with_only_columns(*cols)
