@@ -19,13 +19,13 @@ FROM
                     NULL AS g
    FROM "Student"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Student/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';Name=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Student#Name>' AS p,
-                    "Student"."Name" AS o,
+                    '<http://example.com/base/Student#Sport>' AS p,
+                    "Student"."Sport" AS o,
                     NULL AS g
    FROM "Student"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Student/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';Name=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Student#Sport>' AS p,
-                    "Student"."Sport" AS o,
+                    '<http://example.com/base/Student#Name>' AS p,
+                    "Student"."Name" AS o,
                     NULL AS g
    FROM "Student") AS anon_1
 ```

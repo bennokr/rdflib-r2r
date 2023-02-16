@@ -532,7 +532,7 @@ class R2RStore(Store):
         if len(o_types) > 1:
             for qi, query in enumerate(queries):
                 s, p, o, g = query.inner_columns
-                queries[qi] = query.with_only_columns([s, p, self.col_n3(o), g])
+                queries[qi] = query.with_only_columns(*[s, p, self.col_n3(o), g])
         return union_all(*queries), subforms
 
     def queryPattern(
@@ -600,7 +600,7 @@ class R2RStore(Store):
 
         result_count = 0
         with self.db.connect() as conn:
-            metadata = MetaData(conn)
+            metadata = MetaData()
             if "duckdb" not in type(self.db.dialect).__module__:
                 metadata.reflect(self.db)
 
@@ -611,7 +611,7 @@ class R2RStore(Store):
                 col = ColForm.from_subform(cols, subform).expr()
                 onlycols.append(col.label(colname))
             if isinstance(query, Select):
-                query = query.with_only_columns(onlycols)
+                query = query.with_only_columns(*onlycols)
             else:
                 query = select(*onlycols)
 
@@ -640,7 +640,7 @@ class R2RStore(Store):
     def queryBGP(self, conn, bgp) -> GenerativeSelect:
         bgp = set(bgp)
 
-        metadata = MetaData(conn)
+        metadata = MetaData()
         if "duckdb" not in type(self.db.dialect).__module__:
             metadata.reflect(self.db)
 
@@ -696,7 +696,7 @@ class R2RStore(Store):
                 else:
                     qvars, colforms = zip(*qvar_colform)
                     subforms, allcols = ColForm.to_subforms_columns(*colforms)
-                    pat_query = pat_query.with_only_columns(allcols)
+                    pat_query = pat_query.with_only_columns(*allcols)
                     qvar_subform = zip(qvars, subforms)
                     query_varsubforms.append((pat_query, qvar_subform))
             else:
@@ -890,7 +890,7 @@ class R2RStore(Store):
 
         var_subform[part.var] = (idxs, cf.form)
 
-        return part_query.with_only_columns(cols + list(cf.cols)), var_subform
+        return part_query.with_only_columns(*(cols + list(cf.cols))), var_subform
 
     def queryProject(self, conn, part) -> SelectVarSubForm:
         part_query, var_subform = self.queryPart(conn, part.p)
@@ -898,7 +898,7 @@ class R2RStore(Store):
         cols = list(part_query.inner_columns)
         colforms = [ColForm.from_subform(cols, sf) for sf in var_subform.values()]
         subforms, allcols = ColForm.to_subforms_columns(*colforms)
-        part_query = part_query.with_only_columns(allcols)
+        part_query = part_query.with_only_columns(*allcols)
         return part_query, dict(zip(var_subform, subforms))
 
     def queryOrderBy(self, conn, part) -> SelectVarSubForm:
@@ -1058,7 +1058,7 @@ class R2RStore(Store):
                 ColForm.from_subform(query.inner_columns, sf).expr().label(str(var))
                 for var, sf in var_subform.items()
             ]
-            return query.with_only_columns(cols)
+            return query.with_only_columns(*cols)
         else:
             cols = [
                 ColForm.from_subform(query.c, sf).expr().label(str(var))

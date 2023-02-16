@@ -14,11 +14,6 @@ FROM
           NULL AS g
    FROM "IOUs"
    UNION ALL SELECT CAST('_:IOUs#' AS VARCHAR) || CAST(CAST("IOUs".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/IOUs#fname>' AS p,
-                    "IOUs".fname AS o,
-                    NULL AS g
-   FROM "IOUs"
-   UNION ALL SELECT CAST('_:IOUs#' AS VARCHAR) || CAST(CAST("IOUs".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/IOUs#lname>' AS p,
                     "IOUs".lname AS o,
                     NULL AS g
@@ -26,6 +21,11 @@ FROM
    UNION ALL SELECT CAST('_:IOUs#' AS VARCHAR) || CAST(CAST("IOUs".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/IOUs#amount>' AS p,
                     "IOUs".amount AS o,
+                    NULL AS g
+   FROM "IOUs"
+   UNION ALL SELECT CAST('_:IOUs#' AS VARCHAR) || CAST(CAST("IOUs".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/IOUs#fname>' AS p,
+                    "IOUs".fname AS o,
                     NULL AS g
    FROM "IOUs"
    UNION ALL SELECT CAST('_:Lives#' AS VARCHAR) || CAST(CAST("Lives".rowid AS VARCHAR) AS VARCHAR) AS s,

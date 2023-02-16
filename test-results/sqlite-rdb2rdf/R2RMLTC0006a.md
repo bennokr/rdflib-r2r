@@ -4,9 +4,9 @@ Long form of R2RML by using rr:constant in rr:subjectMap, rr:predicateMap, rr:ob
 
 ## Created SQL query
 ```sql
-SELECT '"Bad Student"' AS o,
-       '<http://example.com/BadStudent>' AS s,
-       '<http://example.com/description>' AS p
+SELECT '<http://example.com/description>' AS p,
+       '"Bad Student"' AS o,
+       '<http://example.com/BadStudent>' AS s
 ```
 
 ## Triple Diff
