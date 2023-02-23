@@ -605,6 +605,7 @@ class R2RStore(Store):
                 metadata.reflect(self.db)
 
             query, subforms = self.queryPattern(metadata, pattern)
+            query = query.subquery()
             print('query', query)
             print('subforms', subforms)
             cols = getattr(query, "exported_columns", query.c)
@@ -613,6 +614,7 @@ class R2RStore(Store):
             for subform, colname in zip(subforms, "spog"):
                 col = ColForm.from_subform(cols, *subform).expr()
                 onlycols.append(col.label(colname))
+            
             if isinstance(query, Select):
                 query = query.with_only_columns(*onlycols)
             else:

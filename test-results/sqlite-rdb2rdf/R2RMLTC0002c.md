@@ -20,8 +20,8 @@ Traceback (most recent call last):
     colform = ColForm.from_expr(cls._get_col(dbtable, colname))
   File "/rdflib_r2r/r2r_store.py", line 290, in _get_col
     dbcol = dbtable.c[colname.strip('"')]
-  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/sql/base.py", line 1158, in __getitem__
-    return self._index[key]
+  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/sql/base.py", line 1556, in __getitem__
+    return self._index[key][1]
 KeyError: 'IDs'
 
 ```
