@@ -618,7 +618,7 @@ class R2RStore(Store):
             else:
                 query = select(*onlycols)
 
-            # logging.warn(sql_pretty(query))
+            logging.warn(sql_pretty(query))
             rows = list(conn.execute(query))
             for s, p, o, g in rows:
                 gnode = from_n3(g)
