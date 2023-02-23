@@ -14,13 +14,13 @@ FROM
           NULL AS g
    FROM "Country Info"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Country%20Info/Country%20Code=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country Info"."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Country%20Info#Name>' AS p,
-                    "Country Info"."Name" AS o,
+                    '<http://example.com/base/Country%20Info#Country%20Code>' AS p,
+                    CAST('"' AS VARCHAR) || CAST(CAST("Country Info"."Country Code" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
                     NULL AS g
    FROM "Country Info"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Country%20Info/Country%20Code=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country Info"."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Country%20Info#Country%20Code>' AS p,
-                    CAST('"' AS VARCHAR) || CAST(CAST("Country Info"."Country Code" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
+                    '<http://example.com/base/Country%20Info#Name>' AS p,
+                    "Country Info"."Name" AS o,
                     NULL AS g
    FROM "Country Info"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Country%20Info/Country%20Code=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country Info"."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,

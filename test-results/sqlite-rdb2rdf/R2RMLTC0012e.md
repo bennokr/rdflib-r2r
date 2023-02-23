@@ -9,18 +9,18 @@ SELECT anon_1.s AS s,
        anon_1.o AS o
 FROM
   (SELECT CAST('_:' AS VARCHAR) || CAST("IOUs".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".amount AS VARCHAR) AS s,
-          '<http://example.com/base/IOUs#amount>' AS p,
-          "IOUs".amount AS o,
+          '<http://example.com/base/IOUs#fname>' AS p,
+          "IOUs".fname AS o,
           NULL AS g
-   FROM "IOUs"
-   UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("IOUs".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".amount AS VARCHAR) AS s,
-                    '<http://example.com/base/IOUs#fname>' AS p,
-                    "IOUs".fname AS o,
-                    NULL AS g
    FROM "IOUs"
    UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("IOUs".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".amount AS VARCHAR) AS s,
                     '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
                     '<http://example.com/base/IOUs>' AS o,
+                    NULL AS g
+   FROM "IOUs"
+   UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("IOUs".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".amount AS VARCHAR) AS s,
+                    '<http://example.com/base/IOUs#amount>' AS p,
+                    "IOUs".amount AS o,
                     NULL AS g
    FROM "IOUs"
    UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("IOUs".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".amount AS VARCHAR) AS s,
@@ -29,13 +29,13 @@ FROM
                     NULL AS g
    FROM "IOUs"
    UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("Lives".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("Lives".lname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("Lives".city AS VARCHAR) AS s,
-                    '<http://example.com/base/IOUs#city>' AS p,
-                    "Lives".city AS o,
+                    '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
+                    '<http://example.com/base/Lives>' AS o,
                     NULL AS g
    FROM "Lives"
    UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("Lives".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("Lives".lname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("Lives".city AS VARCHAR) AS s,
-                    '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
-                    '<http://example.com/base/Lives>' AS o,
+                    '<http://example.com/base/IOUs#city>' AS p,
+                    "Lives".city AS o,
                     NULL AS g
    FROM "Lives"
    UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("Lives".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("Lives".lname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("Lives".city AS VARCHAR) AS s,

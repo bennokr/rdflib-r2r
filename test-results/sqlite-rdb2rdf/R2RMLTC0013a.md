@@ -4,8 +4,8 @@ Generation of empty triples from referenced columns that have null values
 
 ## Created SQL query
 ```sql
-SELECT '<http://example.com/BirthDay>' AS p,
-       anon_1."DateOfBirth" AS o,
+SELECT anon_1."DateOfBirth" AS o,
+       '<http://example.com/BirthDay>' AS p,
        CAST('<' AS VARCHAR) || CAST('http://example.com/Person/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."DateOfBirth" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s
 FROM
   (SELECT "Person"."DateOfBirth" AS "DateOfBirth",

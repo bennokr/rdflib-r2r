@@ -31,7 +31,7 @@ from sqlalchemy import union_all, or_ as sql_or, and_ as sql_and
 from sqlalchemy import schema as sqlschema, types as sqltypes, func as sqlfunc
 import sqlalchemy.sql as sql
 from sqlalchemy.sql.expression import ColumnElement, GenerativeSelect, Select
-from sqlalchemy.sql.selectable import ScalarSelect
+from sqlalchemy.sql.selectable import ScalarSelect, CompoundSelect
 
 FormStrings = Tuple[Union[str, bool]]  # booleans indicate SQL escaping of columns
 SubForm = Tuple[Iterable[int], FormStrings]
@@ -605,7 +605,8 @@ class R2RStore(Store):
                 metadata.reflect(self.db)
 
             query, subforms = self.queryPattern(metadata, pattern)
-            query = query.subquery()
+            if isinstance(query, CompoundSelect):
+                query = query.subquery()
             print('query', query)
             print('subforms', subforms)
             cols = getattr(query, "exported_columns", query.c)
