@@ -14,13 +14,13 @@ FROM
           NULL AS g
    FROM "IOUs"
    UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("IOUs".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) AS s,
-                    '<http://example.com/base/IOUs#amount>' AS p,
-                    "IOUs".amount AS o,
+                    '<http://example.com/base/IOUs#lname>' AS p,
+                    "IOUs".lname AS o,
                     NULL AS g
    FROM "IOUs"
    UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("IOUs".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) AS s,
-                    '<http://example.com/base/IOUs#lname>' AS p,
-                    "IOUs".lname AS o,
+                    '<http://example.com/base/IOUs#amount>' AS p,
+                    "IOUs".amount AS o,
                     NULL AS g
    FROM "IOUs"
    UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("IOUs".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) AS s,

@@ -19,13 +19,13 @@ FROM
                     NULL AS g
    FROM "Student"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/sport/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Sport"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/description>' AS p,
-                    "Sport"."Description" AS o,
+                    '<http://example.com/id>' AS p,
+                    "Sport"."ID" AS o,
                     NULL AS g
    FROM "Sport"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/sport/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Sport"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/id>' AS p,
-                    "Sport"."ID" AS o,
+                    '<http://example.com/description>' AS p,
+                    "Sport"."Description" AS o,
                     NULL AS g
    FROM "Sport"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/student/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student_Sport"."ID_Student" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,

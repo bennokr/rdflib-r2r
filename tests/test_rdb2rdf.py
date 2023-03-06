@@ -140,6 +140,8 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
                 )
             )
 
+        
+
         iso_made, iso_goal = to_isomorphic(g_made), to_isomorphic(g_goal)
         in_both, in_made, in_goal = graph_diff(iso_made, iso_goal)
         
@@ -154,6 +156,10 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
         
         sql_query = g_made.store.getSQL("SELECT * WHERE {?s ?p ?o}")
         report += f"## Created SQL query\n```sql\n{sql_query}\n```\n\n"
+
+        dump_made = '\n'.join(dump_nt_sorted(g_made))
+        logging.warn(f"Raw triples:\n{dump_made}")
+        report += f"## Raw ouput triples\n```\n{dump_made}\n```\n\n"
         
         report += "## Triple Diff\n```diff\n" + difftxt + "\n```\n\n"
         report += ('SUCCES' if iso_made == iso_goal else 'FAIL')
@@ -168,24 +174,26 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
         assert iso_made == iso_goal
 
         if not nopattern:
+            # Test graph pattern filters
             made_triples = sorted(g_made)
             if any(made_triples):
                 g_ss, g_ps, g_os = zip(*made_triples)
                 for s in sorted(set(g_ss)):
                     s_triples = sorted(g_made.triples([s, None, None]))
-                    assert s_triples
+                    assert s_triples, f'subject filter {s}'
                     for s_, _, _ in s_triples:
-                        assert s_ == s
+                        assert s_ == s, 'subject equality'
                 for p in sorted(set(g_ps)):
                     p_triples = sorted(g_made.triples([None, p, None]))
-                    assert p_triples
+                    assert p_triples, f'predicate filter {p}'
                     for _, p_, _ in p_triples:
-                        assert p_ == p
+                        assert p_ == p, 'predicate equality'
                 for o in sorted(set(g_os)):
                     o_triples = sorted(g_made.triples([None, None, o]))
-                    assert o_triples
+                    assert o_triples, f'object filter {o}'
                     for _, _, o_ in o_triples:
-                        assert o_.toPython() == o.toPython()
+                        assert o_.toPython() == o.toPython(), 'object equality'
+            
     except Exception as e:
         import traceback, os
         tb = traceback.format_exc().replace(os.getcwd(), '')

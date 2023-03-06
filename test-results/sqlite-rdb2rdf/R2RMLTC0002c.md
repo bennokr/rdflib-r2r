@@ -10,11 +10,11 @@ Traceback (most recent call last):
     tuple(g_made)
   File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 448, in triples
     for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
-  File "/rdflib_r2r/r2r_store.py", line 607, in triples
+  File "/rdflib_r2r/r2r_store.py", line 608, in triples
     query, subforms = self.queryPattern(metadata, pattern)
-  File "/rdflib_r2r/r2r_store.py", line 554, in queryPattern
+  File "/rdflib_r2r/r2r_store.py", line 555, in queryPattern
     querysubforms += list(self._triplesmap_select(metadata, tmap, pattern))
-  File "/rdflib_r2r/r2r_store.py", line 465, in _triplesmap_select
+  File "/rdflib_r2r/r2r_store.py", line 466, in _triplesmap_select
     ocolforms = list(
   File "/rdflib_r2r/r2r_store.py", line 341, in _term_map_colforms
     colform = ColForm.from_expr(cls._get_col(dbtable, colname))

@@ -355,6 +355,7 @@ class R2RStore(Store):
                         # push the where clauses into the subquery
                         joins = wheres
                         for join in graph[tmap : rr.joinCondition]:
+                            # child column and parent column
                             ccol = f'"{dbtable.name}".{graph.value(join, rr.child)}'
                             pcol = f'"{ptable.name}".{graph.value(join, rr.parent)}'
                             joins.append(literal_column(ccol) == literal_column(pcol))
@@ -371,7 +372,7 @@ class R2RStore(Store):
                         rowid = literal_column(f'"{dbtable.name}".rowid').cast(
                             sqltypes.VARCHAR
                         )
-                        form = ["_:" + dbtable.name + "#", None]
+                        form = ["_:" + dbtable.name.replace('_ref','') + "#", None]
                         yield ColForm(form, [rowid]), dbtable
                         continue
 

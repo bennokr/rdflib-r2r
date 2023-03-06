@@ -19,7 +19,7 @@ Traceback (most recent call last):
     tuple(g_made)
   File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 448, in triples
     for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
-  File "/rdflib_r2r/r2r_store.py", line 625, in triples
+  File "/rdflib_r2r/r2r_store.py", line 626, in triples
     rows = list(conn.execute(query))
   File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/engine/base.py", line 1414, in execute
     return meth(

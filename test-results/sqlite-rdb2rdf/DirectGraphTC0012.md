@@ -14,6 +14,11 @@ FROM
           NULL AS g
    FROM "IOUs"
    UNION ALL SELECT CAST('_:IOUs#' AS VARCHAR) || CAST(CAST("IOUs".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/IOUs#lname>' AS p,
+                    "IOUs".lname AS o,
+                    NULL AS g
+   FROM "IOUs"
+   UNION ALL SELECT CAST('_:IOUs#' AS VARCHAR) || CAST(CAST("IOUs".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/IOUs#fname>' AS p,
                     "IOUs".fname AS o,
                     NULL AS g
@@ -23,19 +28,14 @@ FROM
                     "IOUs".amount AS o,
                     NULL AS g
    FROM "IOUs"
-   UNION ALL SELECT CAST('_:IOUs#' AS VARCHAR) || CAST(CAST("IOUs".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/IOUs#lname>' AS p,
-                    "IOUs".lname AS o,
-                    NULL AS g
-   FROM "IOUs"
    UNION ALL SELECT CAST('_:Lives#' AS VARCHAR) || CAST(CAST("Lives".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
                     '<http://example.com/base/Lives>' AS o,
                     NULL AS g
    FROM "Lives"
    UNION ALL SELECT CAST('_:Lives#' AS VARCHAR) || CAST(CAST("Lives".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Lives#lname>' AS p,
-                    "Lives".lname AS o,
+                    '<http://example.com/base/Lives#city>' AS p,
+                    "Lives".city AS o,
                     NULL AS g
    FROM "Lives"
    UNION ALL SELECT CAST('_:Lives#' AS VARCHAR) || CAST(CAST("Lives".rowid AS VARCHAR) AS VARCHAR) AS s,
@@ -44,10 +44,38 @@ FROM
                     NULL AS g
    FROM "Lives"
    UNION ALL SELECT CAST('_:Lives#' AS VARCHAR) || CAST(CAST("Lives".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Lives#city>' AS p,
-                    "Lives".city AS o,
+                    '<http://example.com/base/Lives#lname>' AS p,
+                    "Lives".lname AS o,
                     NULL AS g
    FROM "Lives") AS anon_1
+```
+
+## Raw ouput triples
+```
+_:IOUs#1 <http://example.com/base/IOUs#amount> "30.0"^^<http://www.w3.org/2001/XMLSchema#double> .
+_:IOUs#1 <http://example.com/base/IOUs#fname> "Bob" .
+_:IOUs#1 <http://example.com/base/IOUs#lname> "Smith" .
+_:IOUs#1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
+_:IOUs#2 <http://example.com/base/IOUs#amount> "20.0"^^<http://www.w3.org/2001/XMLSchema#double> .
+_:IOUs#2 <http://example.com/base/IOUs#fname> "Sue" .
+_:IOUs#2 <http://example.com/base/IOUs#lname> "Jones" .
+_:IOUs#2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
+_:IOUs#3 <http://example.com/base/IOUs#amount> "30.0"^^<http://www.w3.org/2001/XMLSchema#double> .
+_:IOUs#3 <http://example.com/base/IOUs#fname> "Bob" .
+_:IOUs#3 <http://example.com/base/IOUs#lname> "Smith" .
+_:IOUs#3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
+_:Lives#1 <http://example.com/base/Lives#city> "London" .
+_:Lives#1 <http://example.com/base/Lives#fname> "Bob" .
+_:Lives#1 <http://example.com/base/Lives#lname> "Smith" .
+_:Lives#1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Lives> .
+_:Lives#2 <http://example.com/base/Lives#city> "Madrid" .
+_:Lives#2 <http://example.com/base/Lives#fname> "Sue" .
+_:Lives#2 <http://example.com/base/Lives#lname> "Jones" .
+_:Lives#2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Lives> .
+_:Lives#3 <http://example.com/base/Lives#city> "London" .
+_:Lives#3 <http://example.com/base/Lives#fname> "Bob" .
+_:Lives#3 <http://example.com/base/Lives#lname> "Smith" .
+_:Lives#3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Lives> .
 ```
 
 ## Triple Diff

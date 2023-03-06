@@ -10,6 +10,7 @@ Use `pytest -k` to perform selected tests, `pytest -x` to stop after failure. Ex
 
 ```
 pytest -xk "test_rdb2rdf[sqlite-"
+pytest --nopattern -xk "test_rdb2rdf[sqlite-DirectGraphTC0014"
 pytest -k "test_bsbm[sqlite-bsbm-explore-query3]"
 ```
 
