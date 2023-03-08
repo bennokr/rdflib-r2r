@@ -200,6 +200,7 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
         report += f"\n\n```\n{tb}\n```"
         test_file.write_text(report)
         raise e
+        
 
 def test_synthesis(module_results_df):
     df = module_results_df

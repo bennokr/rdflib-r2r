@@ -30,6 +30,22 @@ FROM
    FROM "IOUs") AS anon_1
 ```
 
+## Raw ouput triples
+```
+_:IOUs#1 <http://example.com/base/IOUs#amount> "30.0"^^<http://www.w3.org/2001/XMLSchema#double> .
+_:IOUs#1 <http://example.com/base/IOUs#fname> "Bob" .
+_:IOUs#1 <http://example.com/base/IOUs#lname> "Smith" .
+_:IOUs#1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
+_:IOUs#2 <http://example.com/base/IOUs#amount> "20.0"^^<http://www.w3.org/2001/XMLSchema#double> .
+_:IOUs#2 <http://example.com/base/IOUs#fname> "Sue" .
+_:IOUs#2 <http://example.com/base/IOUs#lname> "Jones" .
+_:IOUs#2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
+_:IOUs#3 <http://example.com/base/IOUs#amount> "30.0"^^<http://www.w3.org/2001/XMLSchema#double> .
+_:IOUs#3 <http://example.com/base/IOUs#fname> "Bob" .
+_:IOUs#3 <http://example.com/base/IOUs#lname> "Smith" .
+_:IOUs#3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
+```
+
 ## Triple Diff
 ```diff
 _:cb21650a665ae41f6fa71adf668f84a44c399c8239fc0d008f357bb7a98e81dd0ec <http://example.com/base/IOUs#amount> "30.0"^^<http://www.w3.org/2001/XMLSchema#double> .

@@ -1,2 +1,4 @@
-rdflib>=5.0.0
+rdflib>=6.0.0
 sqlalchemy
+natsort
+parse

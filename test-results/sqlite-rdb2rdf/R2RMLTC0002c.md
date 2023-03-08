@@ -8,8 +8,8 @@ Two columns mapping, an undefined SQL identifier
 Traceback (most recent call last):
   File "/tests/test_rdb2rdf.py", line 115, in test_rdb2rdf
     tuple(g_made)
-  File "/opt/miniconda3/lib/python3.8/site-packages/rdflib/graph.py", line 448, in triples
-    for (s, p, o), cg in self.__store.triples((s, p, o), context=self):
+  File "/opt/miniconda3/envs/rdf/lib/python3.9/site-packages/rdflib/graph.py", line 530, in triples
+    for (_s, _p, _o), cg in self.__store.triples((s, p, o), context=self):  # type: ignore  [arg-type]
   File "/rdflib_r2r/r2r_store.py", line 608, in triples
     query, subforms = self.queryPattern(metadata, pattern)
   File "/rdflib_r2r/r2r_store.py", line 555, in queryPattern
@@ -20,8 +20,8 @@ Traceback (most recent call last):
     colform = ColForm.from_expr(cls._get_col(dbtable, colname))
   File "/rdflib_r2r/r2r_store.py", line 290, in _get_col
     dbcol = dbtable.c[colname.strip('"')]
-  File "/opt/miniconda3/lib/python3.8/site-packages/sqlalchemy/sql/base.py", line 1556, in __getitem__
-    return self._index[key][1]
+  File "/opt/miniconda3/envs/rdf/lib/python3.9/site-packages/sqlalchemy/sql/base.py", line 1192, in __getitem__
+    return self._index[key]
 KeyError: 'IDs'
 
 ```

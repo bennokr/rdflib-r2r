@@ -7,11 +7,14 @@ import datetime
 import parse
 from string import Formatter
 
+from typing import Iterable, List, Tuple, Union, Dict
+
 from rdflib import Graph, URIRef, Literal, BNode
 from rdflib.namespace import RDF, XSD, Namespace
 
 from sqlalchemy import text, table, literal_column, types as sqltypes
 from sqlalchemy import or_ as sql_or, and_ as sql_and
+from sqlalchemy.sql.expression import ClauseElement
 
 from rdflib_r2r.sql_view import view2obj
 
@@ -46,7 +49,7 @@ class R2RMapping:
     baseuri = None
 
     @dataclass(eq=True, order=True, frozen=True)
-    class Matcher:
+    class Pattern:
         tname: str
         const: str = None
         field: str = None
@@ -157,8 +160,8 @@ class R2RMapping:
         return template
 
     @classmethod
-    def _term_pat(cls, graph, dbtable, parent, mapper, shortcut, obj=False):
-        """Get pattern matchers based on term mappings
+    def _term_pat(cls, graph, dbtable, parent, mapper, shortcut, obj=False) -> Iterable[Pattern]:
+        """Get pattern Patterns based on term mappings
 
         Args:
             graph: Mapping graph
@@ -168,18 +171,18 @@ class R2RMapping:
             obj (bool, optional): Whether this is an object mapping. Defaults to False.
 
         Yields:
-            R2RMapping.Matcher: Node n3 pattern
+            R2RMapping.Pattern: Node n3 pattern
         """
         if graph.value(parent, shortcut):
             # constant shortcut properties
             for const in graph[parent:shortcut]:
-                yield cls.Matcher(const=const.toPython(), tname=dbtable.name)
+                yield cls.Pattern(const=const.toPython(), tname=dbtable.name)
         elif graph.value(parent, mapper):
             for tmap in graph[parent:mapper]:
                 if graph.value(tmap, rr.constant):
                     # constant value
                     for const in graph[tmap : rr.constant]:
-                        yield cls.Matcher(const=const.toPython(), tname=dbtable.name)
+                        yield cls.Pattern(const=const.toPython(), tname=dbtable.name)
                 else:
                     # Inverse Expression
                     inverse = None
@@ -190,13 +193,13 @@ class R2RMapping:
                     if graph.value(tmap, rr.column):
                         col = graph.value(tmap, rr.column)
                         col = re.sub('(^"|"$)', "", col)
-                        yield cls.Matcher(field=col, inverse=inverse, tname=dbtable.name)
+                        yield cls.Pattern(field=col, inverse=inverse, tname=dbtable.name)
                     elif graph.value(tmap, rr.template):
                         template = graph.value(tmap, rr.template)
                         parser = cls._template_to_parser(
                             template, irisafe=(termtype == rr.IRI)
                         )
-                        yield cls.Matcher(parser=parser, inverse=inverse, tname=dbtable.name)
+                        yield cls.Pattern(parser=parser, inverse=inverse, tname=dbtable.name)
                     elif graph.value(tmap, rr.parentTriplesMap):
                         # referencing object map
                         ref = graph.value(tmap, rr.parentTriplesMap)
@@ -207,13 +210,13 @@ class R2RMapping:
                     else:
                         t = dbtable.name
                         parser = cls._template_to_parser(f"{t}#{{rowid}}")
-                        yield cls.Matcher(parser=parser, inverse=inverse, tname=t)
+                        yield cls.Pattern(parser=parser, inverse=inverse, tname=t)
 
     def __init__(self, g, baseuri="http://example.com/base/"):
         self.graph = g
         self.baseuri = baseuri
 
-        # Track triple maps per node pattern matcher
+        # Track triple maps per node pattern Pattern
         self.spat_tmaps, self.ppat_pomaps, self.opat_pomaps = {}, {}, {}
         for tmap in g[: RDF.type : rr.TriplesMap]:
             t = _get_table(g, tmap)
@@ -225,7 +228,7 @@ class R2RMapping:
                 for o_pat in self._term_pat(g, t, pomap, rr.objectMap, rr.object, True):
                     self.opat_pomaps.setdefault(o_pat, []).append(pomap)
 
-    def inverse_condition(self, inverse_expr, field_values):
+    def inverse_condition(self, inverse_expr: str, field_values: Dict) -> ClauseElement:
         col_replace = {
             col: f'"{col}"'
             for _, col, _, _ in Formatter().parse(inverse_expr)
@@ -235,7 +238,7 @@ class R2RMapping:
         t = text(inverse_expr.format(**col_replace, **param_replace))
         return t.bindparams(**field_values)
 
-    def get_node_filter(self, node, pat_maps):
+    def get_node_filter(self, node, pat_maps) -> Dict[Pattern, List[ClauseElement]]:
         
         # A pattern may be used in multiple places, so use sql_or
         # (but what happens if the table name is out of scope ...? )

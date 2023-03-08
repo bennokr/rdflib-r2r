@@ -14,11 +14,6 @@ FROM
           NULL AS g
    FROM "IOUs"
    UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("IOUs".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) AS s,
-                    '<http://example.com/base/IOUs#lname>' AS p,
-                    "IOUs".lname AS o,
-                    NULL AS g
-   FROM "IOUs"
-   UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("IOUs".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) AS s,
                     '<http://example.com/base/IOUs#amount>' AS p,
                     "IOUs".amount AS o,
                     NULL AS g
@@ -27,7 +22,28 @@ FROM
                     '<http://example.com/base/IOUs#fname>' AS p,
                     "IOUs".fname AS o,
                     NULL AS g
+   FROM "IOUs"
+   UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("IOUs".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) AS s,
+                    '<http://example.com/base/IOUs#lname>' AS p,
+                    "IOUs".lname AS o,
+                    NULL AS g
    FROM "IOUs") AS anon_1
+```
+
+## Raw ouput triples
+```
+_:Bob_Smith <http://example.com/base/IOUs#amount> "30.0"^^<http://www.w3.org/2001/XMLSchema#double> .
+_:Bob_Smith <http://example.com/base/IOUs#amount> "30.0"^^<http://www.w3.org/2001/XMLSchema#double> .
+_:Bob_Smith <http://example.com/base/IOUs#fname> "Bob" .
+_:Bob_Smith <http://example.com/base/IOUs#fname> "Bob" .
+_:Bob_Smith <http://example.com/base/IOUs#lname> "Smith" .
+_:Bob_Smith <http://example.com/base/IOUs#lname> "Smith" .
+_:Bob_Smith <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
+_:Bob_Smith <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
+_:Sue_Jones <http://example.com/base/IOUs#amount> "20.0"^^<http://www.w3.org/2001/XMLSchema#double> .
+_:Sue_Jones <http://example.com/base/IOUs#fname> "Sue" .
+_:Sue_Jones <http://example.com/base/IOUs#lname> "Jones" .
+_:Sue_Jones <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/IOUs> .
 ```
 
 ## Triple Diff

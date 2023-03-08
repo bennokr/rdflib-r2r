@@ -20,6 +20,11 @@ FROM
    FROM "Student") AS anon_1
 ```
 
+## Raw ouput triples
+```
+
+```
+
 ## Triple Diff
 ```diff
 

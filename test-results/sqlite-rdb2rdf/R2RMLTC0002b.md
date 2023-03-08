@@ -13,6 +13,11 @@ FROM
    FROM "Student") AS anon_1
 ```
 
+## Raw ouput triples
+```
+_:students10 <http://xmlns.com/foaf/0.1/name> "Venus" .
+```
+
 ## Triple Diff
 ```diff
 _:cb0 <http://xmlns.com/foaf/0.1/name> "Venus" .

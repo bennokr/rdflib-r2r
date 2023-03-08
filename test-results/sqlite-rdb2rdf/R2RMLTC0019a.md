@@ -4,18 +4,24 @@ Generation of triples by using IRI value in columns
 
 ## Created SQL query
 ```sql
-SELECT '<http://xmlns.com/foaf/0.1/name>' AS p,
-       CAST('<' AS VARCHAR) || CAST(anon_1.p AS VARCHAR) || CAST('>' AS VARCHAR) AS s,
-       anon_1.s AS o
+SELECT CAST('<' AS VARCHAR) || CAST(anon_1."View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."FirstName" AS VARCHAR) || CAST('>' AS VARCHAR) AS s,
+       anon_1."View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."FirstName" AS o,
+       '<http://xmlns.com/foaf/0.1/name>' AS p
 FROM
-  (SELECT "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."FirstName" AS p,
-          "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."FirstName" AS s
+  (SELECT "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."FirstName",
+          "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."FirstName"
    FROM
      (SELECT "ID",
              "FirstName",
              "LastName"
       FROM "Employee"
       WHERE "ID" < 30) AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR") AS anon_1
+```
+
+## Raw ouput triples
+```
+<http://example.com/base/Carlos> <http://xmlns.com/foaf/0.1/name> "Carlos" .
+<http://example.com/ns#Jhon> <http://xmlns.com/foaf/0.1/name> "http://example.com/ns#Jhon" .
 ```
 
 ## Triple Diff

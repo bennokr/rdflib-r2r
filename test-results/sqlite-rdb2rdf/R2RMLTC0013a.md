@@ -4,15 +4,20 @@ Generation of empty triples from referenced columns that have null values
 
 ## Created SQL query
 ```sql
-SELECT '<http://example.com/BirthDay>' AS p,
-       anon_1."DateOfBirth" AS o,
-       CAST('<' AS VARCHAR) || CAST('http://example.com/Person/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."DateOfBirth" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s
+SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/Person/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."DateOfBirth" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+       '<http://example.com/BirthDay>' AS p,
+       anon_1."DateOfBirth" AS o
 FROM
-  (SELECT "Person"."DateOfBirth" AS "DateOfBirth",
-          "Person"."ID" AS "ID",
+  (SELECT "Person"."ID" AS "ID",
           "Person"."Name" AS "Name",
+          "Person"."DateOfBirth" AS "DateOfBirth",
           "Person"."DateOfBirth" AS "DateOfBirth__1"
    FROM "Person") AS anon_1
+```
+
+## Raw ouput triples
+```
+<http://example.com/Person/2/Bob/September%2C%202010> <http://example.com/BirthDay> "September, 2010" .
 ```
 
 ## Triple Diff

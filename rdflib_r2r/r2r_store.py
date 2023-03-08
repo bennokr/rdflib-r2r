@@ -539,6 +539,16 @@ class R2RStore(Store):
     def queryPattern(
         self, metadata, pattern, restrict_tmaps=None
     ) -> GenerativeSelectSubForm:
+        """Make a set of SubForms for a GenerativeSelect query from a triple pattern
+
+        Args:
+            metadata: Database Metadata object
+            pattern: Triple pattern
+            restrict_tmaps: 
+
+        Returns:
+            GenerativeSelectSubForm: _description_
+        """
         querysubforms: List[SelectSubForm] = []
         # Triple Maps produce select queries
         for tmap in self.mapping.graph[: RDF.type : rr.TriplesMap]:

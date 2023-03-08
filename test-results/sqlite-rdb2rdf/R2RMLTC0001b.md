@@ -4,13 +4,18 @@ One column mapping, generation of a BlankNode subject by using rr:termType
 
 ## Created SQL query
 ```sql
-SELECT anon_1."Name" AS o,
-       '<http://xmlns.com/foaf/0.1/name>' AS p,
-       CAST('_:' AS VARCHAR) || CAST(anon_1."Name" AS VARCHAR) AS s
+SELECT CAST('_:' AS VARCHAR) || CAST(anon_1."Name" AS VARCHAR) AS s,
+       anon_1."Name" AS o,
+       '<http://xmlns.com/foaf/0.1/name>' AS p
 FROM
   (SELECT "Student"."Name" AS "Name",
           "Student"."Name" AS "Name__1"
    FROM "Student") AS anon_1
+```
+
+## Raw ouput triples
+```
+_:Venus <http://xmlns.com/foaf/0.1/name> "Venus" .
 ```
 
 ## Triple Diff

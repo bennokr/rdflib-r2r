@@ -20,6 +20,12 @@ FROM
    FROM "Student") AS anon_1
 ```
 
+## Raw ouput triples
+```
+_:Student#1 <http://example.com/base/Student#Name> "Venus" .
+_:Student#1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Student> .
+```
+
 ## Triple Diff
 ```diff
 _:cb0 <http://example.com/base/Student#Name> "Venus" .

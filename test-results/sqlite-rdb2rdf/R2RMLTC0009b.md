@@ -17,8 +17,8 @@ FROM
                     '<http://example.com/ontology/practises>' AS p,
                     CAST('<' AS VARCHAR) || CAST('http://example.com/resource/sport_' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Sport_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
                     '<http://example.com/graph/practise>' AS g
-   FROM "Sport" AS "Sport_ref",
-        "Student"
+   FROM "Student",
+        "Sport" AS "Sport_ref"
    WHERE "Student"."Sport" = "Sport_ref"."ID"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/resource/student_' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
                     '<http://xmlns.com/foaf/0.1/name>' AS p,
@@ -35,6 +35,17 @@ FROM
                     "Sport"."Name" AS o,
                     NULL AS g
    FROM "Sport") AS anon_1
+```
+
+## Raw ouput triples
+```
+<http://example.com/resource/sport_100> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/ontology/Sport> .
+<http://example.com/resource/sport_100> <http://www.w3.org/2000/01/rdf-schema#label> "Tennis" .
+<http://example.com/resource/student_10> <http://example.com/ontology/practises> <http://example.com/resource/sport_100> .
+<http://example.com/resource/student_10> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/ontology/Student> .
+<http://example.com/resource/student_10> <http://xmlns.com/foaf/0.1/name> "Venus Williams" .
+<http://example.com/resource/student_20> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/ontology/Student> .
+<http://example.com/resource/student_20> <http://xmlns.com/foaf/0.1/name> "Demi Moore" .
 ```
 
 ## Triple Diff

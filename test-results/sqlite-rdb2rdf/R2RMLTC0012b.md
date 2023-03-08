@@ -20,6 +20,16 @@ FROM
    FROM "Lives") AS anon_1
 ```
 
+## Raw ouput triples
+```
+_:Bob_Smith <http://example.com/city> "London" .
+_:Bob_Smith <http://example.com/city> "London" .
+_:Bob_Smith <http://xmlns.com/foaf/0.1/name> "Bob Smith" .
+_:Bob_Smith <http://xmlns.com/foaf/0.1/name> "Bob Smith" .
+_:Sue_Jones <http://example.com/city> "Madrid" .
+_:Sue_Jones <http://xmlns.com/foaf/0.1/name> "Sue Jones" .
+```
+
 ## Triple Diff
 ```diff
 _:cb0 <http://example.com/city> "Madrid" .

@@ -3,10 +3,12 @@
 Assigning triples to a non-IRI named graph
 
 
+
 ```
 Traceback (most recent call last):
-  File "/tests/test_rdb2rdf.py", line 114, in test_rdb2rdf
-    outfile = testcase.path.joinpath(testcase.meta[rdb2rdftest.output])
-KeyError: rdflib.term.URIRef('http://purl.org/NET/rdb2rdf-test#output')
+  File "/tests/test_rdb2rdf.py", line 116, in test_rdb2rdf
+    assert False, 'no output'
+AssertionError: no output
+assert False
 
 ```

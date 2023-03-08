@@ -25,6 +25,13 @@ FROM
    FROM "Student_Sport") AS anon_1
 ```
 
+## Raw ouput triples
+```
+_:Student_Sport#1 <http://example.com/base/Student_Sport#Sport> "Tennis" .
+_:Student_Sport#1 <http://example.com/base/Student_Sport#Student> "Venus" .
+_:Student_Sport#1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Student_Sport> .
+```
+
 ## Triple Diff
 ```diff
 _:cb0 <http://example.com/base/Student_Sport#Sport> "Tennis" .
