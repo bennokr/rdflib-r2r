@@ -2,10 +2,11 @@
 rdflib_r2r.r2r_store
 =======================
 
-TODO:
+**TODO**
+
 - delay the UNION creation longer, so that we can use colforms to filter them
     - This is SUPER complicated because you'd need to explode the BGPs 
-        because each triple pattern becomes a set of selects, which you'd need to join
+      because each triple pattern becomes a set of selects, which you'd need to join
 
 """
 from os import linesep
@@ -30,14 +31,14 @@ from sqlalchemy import MetaData, select, text, null, literal_column, literal
 from sqlalchemy import union_all, or_ as sql_or, and_ as sql_and
 from sqlalchemy import schema as sqlschema, types as sqltypes, func as sqlfunc
 import sqlalchemy.sql as sql
-from sqlalchemy.sql.expression import ColumnElement, GenerativeSelect, Select
+from sqlalchemy.sql.expression import ColumnElement, GenerativeSelect, Select, ColumnClause
 from sqlalchemy.sql.selectable import ScalarSelect, CompoundSelect
 
 FormStrings = Tuple[Union[str, bool]]  # booleans indicate SQL escaping of columns
 SubForm = Tuple[Iterable[int], FormStrings]
 SelectSubForm = Tuple[Select, List[SubForm]]
 GenerativeSelectSubForm = Tuple[GenerativeSelect, List[SubForm]]
-
+SelectVarSubForm = Tuple[Select, Dict[Variable, SubForm]]
 
 class ColForm:
     """A template object for creating SQL expressions that represent RDF nodes.
@@ -45,8 +46,8 @@ class ColForm:
     Because the columns are separated from the template, this allows for efficient
     joins, filters, and aggregates.
 
-    The `form` and `cols` list are combined by replacing non-strings in `form` by
-    elements of `cols` sequentially.
+    The ``form`` and ``cols`` list are combined by replacing non-strings in ``form`` by
+    elements of ``cols`` sequentially.
     """
 
     form: FormStrings
@@ -61,7 +62,7 @@ class ColForm:
     def __repr__(self):
         return f"ColForm(form={self.form}, cols={self.cols})"
 
-    def expr(self):
+    def expr(self) -> ColumnElement:
         if self.cols == ():
             return literal_column("".join(self.form))
         if list(self.form) == [None]:
@@ -97,17 +98,17 @@ class ColForm:
         return cls(form, cols)
 
     @classmethod
-    def from_subform(cls, cols, idxs, form):
+    def from_subform(cls, cols, idxs, form) -> "ColForm":
         # A subform is a tuple of indexes+template
         cols = list(cols)
         return cls(form, [cols[i] for i in idxs])
 
     @classmethod
-    def from_expr(cls, expr):
+    def from_expr(cls, expr) -> "ColForm":
         return cls([None], [expr])
 
     @classmethod
-    def null(cls):
+    def null(cls) -> "ColForm":
         return cls.from_expr(null())
 
     @staticmethod
@@ -123,7 +124,7 @@ class ColForm:
         return subforms, allcols
 
     @staticmethod
-    def equal(*colforms, eq=True):
+    def equal(*colforms, eq=True) -> ColumnElement:
         if colforms:
             # Sort colforms by descending frequency of form (for efficient equalities)
             form_count = Counter(cf.form for cf in colforms)
@@ -141,7 +142,7 @@ class ColForm:
                     yield (expr0 == cf.expr()) if eq else (expr0 != cf.expr())
 
     @classmethod
-    def op(cls, opstr, cf1, cf2):
+    def op(cls, opstr, cf1, cf2) -> ColumnElement:
         if opstr in ["=", "=="]:
             return cls.from_expr(sql_and(*cls.equal(cf1, cf2)))
         elif opstr in ["!=", "<>"]:
@@ -156,8 +157,6 @@ class ColForm:
             # TODO: fancy type casting
             return cls.from_expr(op(cf1.expr(), cf2.expr()))
 
-
-SelectVarSubForm = Tuple[Select, Dict[Variable, SubForm]]
 
 
 class SparqlNotImplementedError(NotImplementedError):
@@ -235,7 +234,7 @@ def sql_pretty(query):
 class R2RStore(Store):
     """
     Args:
-      - db: SQLAlchemy engine.
+        db: SQLAlchemy engine.
     """
 
     def __init__(
@@ -279,13 +278,13 @@ class R2RStore(Store):
         """The number of shared subject-object in the DB mapping."""
         raise NotImplementedError
 
-    def _iri_encode(self, iri_n3):
+    def _iri_encode(self, iri_n3) -> URIRef:
         iri = iri_n3[1:-1]
         uri = re.sub("<ENCODE>(.+?)</ENCODE>", lambda x: iri_safe(x.group(1)), iri)
         return URIRef(uri, base=self.base)
 
     @staticmethod
-    def _get_col(dbtable, colname, template=False):
+    def _get_col(dbtable, colname, template=False) -> ColumnClause:
         if type(dbtable) is sqlschema.Table:
             dbcol = dbtable.c[colname.strip('"')]
 
@@ -601,10 +600,11 @@ class R2RStore(Store):
         """Search for a triple pattern in a DB mapping.
 
         Args:
-        - pattern: The triple pattern (s, p, o) to search.
-        - context: The query execution context.
+            pattern: The triple pattern (s, p, o) to search.
+            context: The query execution context.
 
-        Returns: An iterator that produces RDF triples matching the input triple pattern.
+        Returns:
+            An iterator that produces RDF triples matching the input triple pattern.
         """
         nonvar = lambda n: n if not isinstance(n, Variable) else None
         pattern = tuple(nonvar(n) for n in pattern)
