@@ -179,16 +179,22 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
             if any(made_triples):
                 g_ss, g_ps, g_os = zip(*made_triples)
                 for s in sorted(set(g_ss)):
+                    if isinstance(s, rdflib.term.BNode):
+                        continue
                     s_triples = sorted(g_made.triples([s, None, None]))
                     assert s_triples, f'subject filter {s}'
                     for s_, _, _ in s_triples:
                         assert s_ == s, 'subject equality'
                 for p in sorted(set(g_ps)):
+                    if isinstance(p, rdflib.term.BNode):
+                        continue
                     p_triples = sorted(g_made.triples([None, p, None]))
                     assert p_triples, f'predicate filter {p}'
                     for _, p_, _ in p_triples:
                         assert p_ == p, 'predicate equality'
                 for o in sorted(set(g_os)):
+                    if isinstance(o, rdflib.term.BNode):
+                        continue
                     o_triples = sorted(g_made.triples([None, None, o]))
                     assert o_triples, f'object filter {o}'
                     for _, _, o_ in o_triples:

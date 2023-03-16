@@ -14,11 +14,6 @@ FROM
           NULL AS g
    FROM "DEPT"
    UNION ALL SELECT CAST('_:DEPT#' AS VARCHAR) || CAST(CAST("DEPT".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/DEPT#dname>' AS p,
-                    "DEPT".dname AS o,
-                    NULL AS g
-   FROM "DEPT"
-   UNION ALL SELECT CAST('_:DEPT#' AS VARCHAR) || CAST(CAST("DEPT".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/DEPT#deptno>' AS p,
                     CAST('"' AS VARCHAR) || CAST(CAST("DEPT".deptno AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
                     NULL AS g
@@ -26,6 +21,11 @@ FROM
    UNION ALL SELECT CAST('_:DEPT#' AS VARCHAR) || CAST(CAST("DEPT".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/DEPT#loc>' AS p,
                     "DEPT".loc AS o,
+                    NULL AS g
+   FROM "DEPT"
+   UNION ALL SELECT CAST('_:DEPT#' AS VARCHAR) || CAST(CAST("DEPT".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/DEPT#dname>' AS p,
+                    "DEPT".dname AS o,
                     NULL AS g
    FROM "DEPT"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('EMP/empno=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("EMP".empno AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
@@ -39,13 +39,15 @@ FROM
                     NULL AS g
    FROM "EMP"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('EMP/empno=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("EMP".empno AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+                    '<http://example.com/base/EMP#ref-deptno>' AS p,
+                    CAST('_:DEPT#' AS VARCHAR) || CAST(CAST("DEPT_ref".rowid AS VARCHAR) AS VARCHAR) AS o,
+                    NULL AS g
+   FROM "EMP",
+        "DEPT" AS "DEPT_ref"
+   WHERE "EMP"."deptno" = "DEPT_ref"."deptno"
+   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('EMP/empno=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("EMP".empno AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
                     '<http://example.com/base/EMP#ename>' AS p,
                     "EMP".ename AS o,
-                    NULL AS g
-   FROM "EMP"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('EMP/empno=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("EMP".empno AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/EMP#empno>' AS p,
-                    CAST('"' AS VARCHAR) || CAST(CAST("EMP".empno AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
                     NULL AS g
    FROM "EMP"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('EMP/empno=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("EMP".empno AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
@@ -54,12 +56,10 @@ FROM
                     NULL AS g
    FROM "EMP"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('EMP/empno=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("EMP".empno AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/EMP#ref-deptno>' AS p,
-                    CAST('_:DEPT#' AS VARCHAR) || CAST(CAST("DEPT_ref".rowid AS VARCHAR) AS VARCHAR) AS o,
+                    '<http://example.com/base/EMP#empno>' AS p,
+                    CAST('"' AS VARCHAR) || CAST(CAST("EMP".empno AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
                     NULL AS g
-   FROM "EMP",
-        "DEPT" AS "DEPT_ref"
-   WHERE "EMP"."deptno" = "DEPT_ref"."deptno"
+   FROM "EMP"
    UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('EMP/empno=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("EMP".empno AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
                     '<http://example.com/base/EMP#etype>' AS p,
                     "EMP".etype AS o,
@@ -134,12 +134,3 @@ _:cbf819b16b453e71931b516f1cb24ba2ec539a68ac894882deacb0417ae741706d <http://www
 ```
 
 SUCCES
-
-```
-Traceback (most recent call last):
-  File "/tests/test_rdb2rdf.py", line 193, in test_rdb2rdf
-    assert o_triples, f'object filter {o}'
-AssertionError: object filter DEPT#1
-assert []
-
-```
