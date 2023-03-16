@@ -25,7 +25,9 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.todo',
     'sphinx_rtd_theme',
+    'myst_parser',
 ]
 
 # Apidoc and autodoc config

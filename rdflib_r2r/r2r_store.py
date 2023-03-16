@@ -1,16 +1,19 @@
 """
-rdflib_r2r.r2r_store
-=======================
+The mapped SQL database as an RDF graph store object
 
-**TODO**
+.. note::
+   TODO:
+   
+   * delay the UNION creation longer, so that we can use colforms to filter them
 
-- delay the UNION creation longer, so that we can use colforms to filter them
-    - This is SUPER complicated because you'd need to explode the BGPs 
+    * This could be complicated because you'd need to explode the BGPs 
       because each triple pattern becomes a set of selects, which you'd need to join
+
+
 
 """
 from os import linesep
-from typing import Iterable, List, Tuple, Union, Dict
+from typing import Any, Optional, Iterable, List, Tuple, Union, Dict, NamedTuple
 import logging
 import functools
 import operator
@@ -34,11 +37,30 @@ import sqlalchemy.sql as sql
 from sqlalchemy.sql.expression import ColumnElement, GenerativeSelect, Select, ColumnClause
 from sqlalchemy.sql.selectable import ScalarSelect, CompoundSelect
 
-FormStrings = Tuple[Union[str, bool]]  # booleans indicate SQL escaping of columns
-SubForm = Tuple[Iterable[int], FormStrings]
-SelectSubForm = Tuple[Select, List[SubForm]]
-GenerativeSelectSubForm = Tuple[GenerativeSelect, List[SubForm]]
-SelectVarSubForm = Tuple[Select, Dict[Variable, SubForm]]
+from sqlalchemy.engine import Engine, Connection
+
+from rdflib_r2r.types import Triple, BGP
+from rdflib_r2r.r2r_mapping import R2RMapping, _get_table, iri_safe, iri_unsafe
+
+class SubForm(NamedTuple):
+    """A template for generating an RDF node from an _external_ list of SQL expressions"""
+    #: Offsets of variables in a SQL Select statement to use in RDF node template
+    select_var_indices: Iterable[int]
+    #: RDF node template; booleans indicate whether to SQL-escape the columns
+    form: Tuple[Union[str, bool]]
+
+class SelectSubForm(NamedTuple):
+    select: Select #: 
+    subforms: List[SubForm] #: 
+
+class GenerativeSelectSubForm(NamedTuple):
+    select: GenerativeSelect #: 
+    subforms: List[SubForm] #: 
+
+class SelectVarSubForm(NamedTuple):
+    select: Select #: 
+    #: A map of RDF variables to the subforms that generate them from SQL expressions
+    varsubforms: Dict[Variable, SubForm]
 
 class ColForm:
     """A template object for creating SQL expressions that represent RDF nodes.
@@ -50,7 +72,8 @@ class ColForm:
     elements of ``cols`` sequentially.
     """
 
-    form: FormStrings
+    #: booleans indicate whether to SQL-escape the columns
+    form: Tuple[Union[str, bool]]
     cols: Tuple[ColumnElement]
 
     def __init__(self, form, cols):
@@ -161,12 +184,6 @@ class ColForm:
 
 class SparqlNotImplementedError(NotImplementedError):
     pass
-
-
-from sqlalchemy.engine import Engine
-
-from rdflib_r2r.types import Any, Optional, Triple
-from rdflib_r2r.r2r_mapping import R2RMapping, _get_table, iri_safe, iri_unsafe
 
 rr = Namespace("http://www.w3.org/ns/r2rml#")
 
@@ -514,11 +531,10 @@ class R2RStore(Store):
     def union_spog_querysubforms(self, *queryforms) -> GenerativeSelectSubForm:
         queries = []
         # Make expressions from ColForms
-        for query, q_subforms in queryforms:
+        for query, (s,p,o,g) in queryforms:
             cols = list(query.exported_columns)
             onlycols = []
-            assert len(q_subforms) == 4  # spog
-            for subform, name in zip(q_subforms, "spog"):
+            for subform, name in zip((s,p,o,g), "spog"):
                 col = ColForm.from_subform(cols, *subform).expr()
                 onlycols.append(col.label(name))
             queries.append(query.with_only_columns(*onlycols))
@@ -615,15 +631,15 @@ class R2RStore(Store):
             if "duckdb" not in type(self.db.dialect).__module__:
                 metadata.reflect(self.db)
 
-            query, subforms = self.queryPattern(metadata, pattern)
+            query, (s,p,o,g) = self.queryPattern(metadata, pattern)
             if isinstance(query, CompoundSelect):
                 query = query.subquery()
-            print('query', query)
-            print('subforms', subforms)
+            # logging.warn('query:' + str(query))
+            # logging.warn('subforms:' + str(s,p,o,g))
             cols = getattr(query, "exported_columns", query.c)
-            print('cols', list(cols))
+            # logging.war('cols:' + str(list(cols)))
             onlycols = []
-            for subform, colname in zip(subforms, "spog"):
+            for subform, colname in zip((s,p,o,g), "spog"):
                 col = ColForm.from_subform(cols, *subform).expr()
                 onlycols.append(col.label(colname))
             
@@ -632,7 +648,7 @@ class R2RStore(Store):
             else:
                 query = select(*onlycols)
 
-            logging.warn(sql_pretty(query))
+            # logging.warn('final query:' + sql_pretty(query))
             rows = list(conn.execute(query))
             for s, p, o, g in rows:
                 gnode = from_n3(g)
@@ -654,7 +670,16 @@ class R2RStore(Store):
 
     ###### SPARQL #######
 
-    def queryBGP(self, conn, bgp) -> GenerativeSelect:
+    def queryBGP(self, conn: Connection, bgp: BGP) -> GenerativeSelect:
+        """Generate a Basic Graph Pattern subquery
+
+        Args:
+            conn: SQLAlchemy database connection
+            bgp: Basic Graph Pattern
+
+        Returns:
+            GenerativeSelect: Subquery that matches the BGP
+        """
         bgp = set(bgp)
 
         metadata = MetaData()
@@ -748,7 +773,7 @@ class R2RStore(Store):
         where = [eq for cs in var_colforms.values() for eq in ColForm.equal(*cs)]
         return select(*allcols).where(*where), dict(zip(var_colforms, subforms))
 
-    def queryExpr(self, conn, expr, var_cf) -> ColForm:
+    def queryExpr(self, conn: Connection, expr, var_cf) -> ColForm:
         # TODO: this all could get really complicated with expression types...
         agg_funcs = {
             "Aggregate_Sample": lambda x: x,
@@ -819,7 +844,7 @@ class R2RStore(Store):
         e = f'Expr not implemented: {getattr(expr, "name", None).__repr__()} {expr}'
         raise SparqlNotImplementedError(e)
 
-    def queryFilter(self, conn, part) -> Select:
+    def queryFilter(self, conn: Connection, part) -> Select:
         part_query, var_subform = self.queryPart(conn, part.p)
 
         if getattr(part.expr, "name", None) == "Builtin_NOTEXISTS":
@@ -849,7 +874,7 @@ class R2RStore(Store):
         else:
             return part_query.where(clause), var_subform
 
-    def queryJoin(self, conn, part) -> Select:
+    def queryJoin(self, conn: Connection, part) -> Select:
         query1, var_subform1 = self.queryPart(conn, part.p1)
         query2, var_subform2 = self.queryPart(conn, part.p2)
         if not query1.c:
@@ -870,7 +895,7 @@ class R2RStore(Store):
         where = [eq for cs in var_colforms.values() for eq in ColForm.equal(*cs)]
         return select(*allcols).where(*where), dict(zip(var_colforms, subforms))
 
-    def queryAggregateJoin(self, conn, agg) -> SelectVarSubForm:
+    def queryAggregateJoin(self, conn: Connection, agg) -> SelectVarSubForm:
         # Assume agg.p is always a Group
         group_expr, group_part = agg.p.expr, agg.p.p
         part_query, var_subform = self.queryPart(conn, group_part)
@@ -890,7 +915,7 @@ class R2RStore(Store):
         query = select(*allcols).group_by(*groups)
         return query, dict(zip(var_agg, subforms))
 
-    def queryExtend(self, conn, part) -> SelectVarSubForm:
+    def queryExtend(self, conn: Connection, part) -> SelectVarSubForm:
         part_query, var_subform = self.queryPart(conn, part.p)
         assert isinstance(part_query, Select)  # ?
         cols = list(part_query.exported_columns)
@@ -909,7 +934,7 @@ class R2RStore(Store):
 
         return part_query.with_only_columns(*(cols + list(cf.cols))), var_subform
 
-    def queryProject(self, conn, part) -> SelectVarSubForm:
+    def queryProject(self, conn: Connection, part) -> SelectVarSubForm:
         part_query, var_subform = self.queryPart(conn, part.p)
         var_subform = {v: sf for v, sf in var_subform.items() if v in part.PV}
         cols = list(part_query.exported_columns)
@@ -918,7 +943,7 @@ class R2RStore(Store):
         part_query = part_query.with_only_columns(*allcols)
         return part_query, dict(zip(var_subform, subforms))
 
-    def queryOrderBy(self, conn, part) -> SelectVarSubForm:
+    def queryOrderBy(self, conn: Connection, part) -> SelectVarSubForm:
         part_query, var_subform = self.queryPart(conn, part.p)
         cols = list(part_query.exported_columns)
         var_cf = {v: ColForm.from_subform(cols, *sf) for v, sf in var_subform.items()}
@@ -936,7 +961,7 @@ class R2RStore(Store):
 
         return part_query.order_by(*ordering), var_subform
 
-    def queryUnion(self, conn, part) -> SelectVarSubForm:
+    def queryUnion(self, conn: Connection, part) -> SelectVarSubForm:
         query1, var_subform1 = self.queryPart(conn, part.p1)
         query2, var_subform2 = self.queryPart(conn, part.p2)
 
@@ -962,7 +987,7 @@ class R2RStore(Store):
         query2 = select(*allcols2)
         return union_all(query1, query2), var_sf
 
-    def querySlice(self, conn, part) -> SelectVarSubForm:
+    def querySlice(self, conn: Connection, part) -> SelectVarSubForm:
         query, var_subform = self.queryPart(conn, part.p)
         if part.start:
             query = query.offset(part.start)
@@ -970,7 +995,7 @@ class R2RStore(Store):
             query = query.limit(part.length)
         return query, var_subform
 
-    def queryLeftJoin(self, conn, part) -> SelectVarSubForm:
+    def queryLeftJoin(self, conn: Connection, part) -> SelectVarSubForm:
 
         query1, var_subform1 = self.queryPart(conn, part.p1)
         query2, var_subform2 = self.queryPart(conn, part.p2)
@@ -1013,7 +1038,7 @@ class R2RStore(Store):
 
         return query, {v: ([i], [None]) for i,v in enumerate(var_colforms)}
 
-    def queryPart(self, conn, part) -> SelectVarSubForm:
+    def queryPart(self, conn: Connection, part) -> SelectVarSubForm:
         if part.name == "BGP":
             return self.queryBGP(conn, part.triples)
         if part.name == "Filter":

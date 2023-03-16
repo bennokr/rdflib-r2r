@@ -23,6 +23,7 @@ def freeze_bindings(ctx, res):
 
 def optimize_sparql():
     """Overrides the RDFlib SPARQL engine to optimize SPARQL query execution over HDT documents.
+    
     .. note::
       Calling this function triggers a global modification of the RDFlib SPARQL engine.
       However, executing SPARQL queries using other RDFlib stores will continue to work as before,

@@ -1,13 +1,11 @@
 """
-rdflib_vkg.types
-=======================
-All commons types found in the rdflib_vkg package
+All commons types found in the rdflib_r2r package
 """
 from typing import Optional, Set, Tuple, Union, Any, NamedTuple
 from rdflib import Literal, URIRef, Variable
 
-Term = Union[URIRef, Literal]
-Triple = Tuple[Term, Term, Term]
+AnyTerm = Union[URIRef, Literal]
+Triple = Tuple[URIRef, URIRef, AnyTerm]
 TriplePattern = Union[URIRef, Literal, Variable]
-SearchQuery = Tuple[Optional[Term], Optional[Term], Optional[Term]]
-BGP = Set[TriplePattern]
+SearchQuery = Tuple[Optional[URIRef], Optional[URIRef], Optional[AnyTerm]]
+BGP = Set[SearchQuery]
