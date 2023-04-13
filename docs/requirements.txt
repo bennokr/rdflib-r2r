@@ -1,4 +1,5 @@
 sphinxcontrib-apidoc
+myst_parser
 rdflib>=6.0.0
 sqlalchemy
 natsort
