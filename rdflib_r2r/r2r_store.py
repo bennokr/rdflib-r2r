@@ -70,6 +70,22 @@ class ColForm:
 
     The ``form`` and ``cols`` list are combined by replacing non-strings in ``form`` by
     elements of ``cols`` sequentially.
+
+    >>> from sqlalchemy import MetaData, Table, Column, Integer, String
+    >>> metadata_obj = MetaData()
+    >>> students_table = Table(
+    >>>     "students",
+    >>>     metadata_obj,
+    >>>     Column("ID", Integer, primary_key=True),
+    >>>     Column("FirstName", String(60), nullable=False),
+    >>>     Column("LastName", String(60), nullable=False),
+    >>> )
+    >>> template = "http://example.com/Student/{\"ID\"}/{\"FirstName\"}-{\"LastName\"}"
+    >>> from rdflib_r2r.r2r_store import ColForm, sql_pretty
+    >>> colform = ColForm.from_template(students_table, template, irisafe=False)
+    >>> display(colform)
+    >>> print(sql_pretty( colform.expr() ))
+    >>> display(ColForm.to_subforms_columns(colform))
     """
 
     #: booleans indicate whether to SQL-escape the columns
@@ -86,26 +102,29 @@ class ColForm:
         return f"ColForm(form={self.form}, cols={self.cols})"
 
     def expr(self) -> ColumnElement:
+        """Turn this ColForm into a SQL expression object"""
         if self.cols == ():
             return literal_column("".join(self.form))
         if list(self.form) == [None]:
             return self.cols[0]
         cols = list(self.cols)
         parts = []
-        for s in self.form:
-            if s in [True, None, False]:
+        for formpart in self.form:
+            if formpart in [True, None, False]:
                 col = cols.pop(0)
                 if col.type != sqltypes.VARCHAR:
                     col = sqlfunc.cast(col, sqltypes.VARCHAR)
                 # non-string values indicate whether to escape URI terms
-                part = sql_safe(col) if s else col
+                part = sql_safe(col) if (formpart == True) else col
             else:
-                part = sqlfunc.cast(literal(s), sqltypes.VARCHAR)
+                part = formpart
+                # part = sqlfunc.cast(literal(formpart), sqltypes.VARCHAR)
             parts.append(part)
         return functools.reduce(operator.add, parts)
 
     @classmethod
     def from_template(cls, dbtable, template, irisafe=False) -> "ColForm":
+        """Parse RDB2RDF template into ColForm object"""
         # make python format string: escape curly braces by doubling {{ }}
         template = re.sub("\\\\[{}]", lambda x: x.group(0)[1] * 2, template)
 
@@ -115,14 +134,14 @@ class ColForm:
                 form.append(prefix)
             if colname:
                 col = R2RStore._get_col(dbtable, colname, template=True)
-                form.append(irisafe)  # sorry not sorry
+                form.append(irisafe)
                 cols.append(col)
 
         return cls(form, cols)
 
     @classmethod
     def from_subform(cls, cols, idxs, form) -> "ColForm":
-        # A subform is a tuple of indexes+template
+        """A subform is a tuple of (external indexes, form sequence of strings) """
         cols = list(cols)
         return cls(form, [cols[i] for i in idxs])
 
@@ -136,6 +155,7 @@ class ColForm:
 
     @staticmethod
     def to_subforms_columns(*colforms) -> Tuple[List[SubForm], List[ColumnElement]]:
+        """Return a tuple of subforms and columns for these colforms"""
         subforms, allcols = [], []
         i = 0
         for cf in colforms:
