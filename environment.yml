@@ -1,0 +1,15 @@
+channels:
+  - conda-forge
+  - anaconda
+dependencies:
+  - ipykernel>=6
+  - jupyterlab
+  - numpy
+  - pip
+  - pip:
+    - jupyter_contrib_nbextensions
+    - jupyterlab-link-share
+    - rdflib>=6.0.0
+    - sqlalchemy
+    - natsort
+    - parse
