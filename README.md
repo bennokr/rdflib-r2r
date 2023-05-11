@@ -1,4 +1,4 @@
-# rdflib-r2r
+# rdflib-r2r [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bennokr/rdflib-r2r/HEAD)
 
 A wrapper for accessing existing relational databases from rdflib using r2rml rdb2rdf mappings.
 
