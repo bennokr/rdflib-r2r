@@ -8,192 +8,192 @@ SELECT anon_1.s AS s,
        anon_1.p AS p,
        anon_1.o AS o
 FROM
-  (SELECT CAST('<' AS VARCHAR) || CAST('Addresses/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Addresses"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+  (SELECT '<Addresses/ID=' || replace(replace(replace(replace(replace(replace(CAST("Addresses"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
           '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
           '<http://example.com/base/Addresses>' AS o,
           NULL AS g
    FROM "Addresses"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Addresses/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Addresses"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '<Addresses/ID=' || replace(replace(replace(replace(replace(replace(CAST("Addresses"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/Addresses#ID>' AS p,
+                    '"' || CAST(CAST("Addresses"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    NULL AS g
+   FROM "Addresses"
+   UNION ALL SELECT '<Addresses/ID=' || replace(replace(replace(replace(replace(replace(CAST("Addresses"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/Addresses#state>' AS p,
                     substr("Addresses".state || '  ', 1, 2) AS o,
                     NULL AS g
    FROM "Addresses"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Addresses/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Addresses"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '<Addresses/ID=' || replace(replace(replace(replace(replace(replace(CAST("Addresses"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/Addresses#city>' AS p,
                     "Addresses".city AS o,
                     NULL AS g
    FROM "Addresses"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Addresses/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Addresses"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Addresses#ID>' AS p,
-                    CAST('"' AS VARCHAR) || CAST(CAST("Addresses"."ID" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
-                    NULL AS g
-   FROM "Addresses"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Department/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Department"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '<Department/ID=' || replace(replace(replace(replace(replace(replace(CAST("Department"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
                     '<http://example.com/base/Department>' AS o,
                     NULL AS g
    FROM "Department"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Department/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Department"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Department#manager>' AS p,
-                    CAST('"' AS VARCHAR) || CAST(CAST("Department".manager AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
-                    NULL AS g
-   FROM "Department"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Department/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Department"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '<Department/ID=' || replace(replace(replace(replace(replace(replace(CAST("Department"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/Department#city>' AS p,
                     "Department".city AS o,
                     NULL AS g
    FROM "Department"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Department/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Department"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '<Department/ID=' || replace(replace(replace(replace(replace(replace(CAST("Department"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/Department#ID>' AS p,
+                    '"' || CAST(CAST("Department"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    NULL AS g
+   FROM "Department"
+   UNION ALL SELECT '<Department/ID=' || replace(replace(replace(replace(replace(replace(CAST("Department"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/Department#name>' AS p,
                     "Department".name AS o,
                     NULL AS g
    FROM "Department"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Department/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Department"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '<Department/ID=' || replace(replace(replace(replace(replace(replace(CAST("Department"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/Department#ref-manager>' AS p,
-                    CAST('<' AS VARCHAR) || CAST('People/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("People_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+                    '<People/ID=' || replace(replace(replace(replace(replace(replace(CAST("People_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
                     NULL AS g
    FROM "Department",
         "People" AS "People_ref"
    WHERE "Department"."manager" = "People_ref"."ID"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Department/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Department"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Department#ID>' AS p,
-                    CAST('"' AS VARCHAR) || CAST(CAST("Department"."ID" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
+   UNION ALL SELECT '<Department/ID=' || replace(replace(replace(replace(replace(replace(CAST("Department"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/Department#manager>' AS p,
+                    '"' || CAST(CAST("Department".manager AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
                     NULL AS g
    FROM "Department"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('People/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '<People/ID=' || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
                     '<http://example.com/base/People>' AS o,
                     NULL AS g
    FROM "People"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('People/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '<People/ID=' || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/People#ID>' AS p,
+                    '"' || CAST(CAST("People"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    NULL AS g
+   FROM "People"
+   UNION ALL SELECT '<People/ID=' || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/People#deptName>' AS p,
                     "People"."deptName" AS o,
                     NULL AS g
    FROM "People"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('People/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/People#addr>' AS p,
-                    CAST('"' AS VARCHAR) || CAST(CAST("People".addr AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
-                    NULL AS g
-   FROM "People"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('People/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/People#deptCity>' AS p,
-                    "People"."deptCity" AS o,
-                    NULL AS g
-   FROM "People"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('People/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '<People/ID=' || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/People#ref-deptName;deptCity>' AS p,
-                    CAST('<' AS VARCHAR) || CAST('Department/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Department_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+                    '<Department/ID=' || replace(replace(replace(replace(replace(replace(CAST("Department_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
                     NULL AS g
-   FROM "People",
-        "Department" AS "Department_ref"
+   FROM "Department" AS "Department_ref",
+        "People"
    WHERE "People"."deptName" = "Department_ref"."name"
      AND "People"."deptCity" = "Department_ref"."city"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('People/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/People#ID>' AS p,
-                    CAST('"' AS VARCHAR) || CAST(CAST("People"."ID" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
-                    NULL AS g
-   FROM "People"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('People/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '<People/ID=' || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/People#ref-addr>' AS p,
-                    CAST('<' AS VARCHAR) || CAST('Addresses/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Addresses_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
+                    '<Addresses/ID=' || replace(replace(replace(replace(replace(replace(CAST("Addresses_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
                     NULL AS g
-   FROM "People",
-        "Addresses" AS "Addresses_ref"
+   FROM "Addresses" AS "Addresses_ref",
+        "People"
    WHERE "People"."addr" = "Addresses_ref"."ID"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('People/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '<People/ID=' || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/People#fname>' AS p,
                     "People".fname AS o,
                     NULL AS g
    FROM "People"
-   UNION ALL SELECT CAST('_:Projects#' AS VARCHAR) || CAST(CAST("Projects".rowid AS VARCHAR) AS VARCHAR) AS s,
+   UNION ALL SELECT '<People/ID=' || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/People#deptCity>' AS p,
+                    "People"."deptCity" AS o,
+                    NULL AS g
+   FROM "People"
+   UNION ALL SELECT '<People/ID=' || replace(replace(replace(replace(replace(replace(CAST("People"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/People#addr>' AS p,
+                    '"' || CAST(CAST("People".addr AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    NULL AS g
+   FROM "People"
+   UNION ALL SELECT '_:Projects#' || CAST(CAST("Projects".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
                     '<http://example.com/base/Projects>' AS o,
                     NULL AS g
    FROM "Projects"
-   UNION ALL SELECT CAST('_:Projects#' AS VARCHAR) || CAST(CAST("Projects".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Projects#ref-deptName;deptCity>' AS p,
-                    CAST('<' AS VARCHAR) || CAST('Department/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Department_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
-                    NULL AS g
-   FROM "Department" AS "Department_ref",
-        "Projects"
-   WHERE "Projects"."deptName" = "Department_ref"."name"
-     AND "Projects"."deptCity" = "Department_ref"."city"
-   UNION ALL SELECT CAST('_:Projects#' AS VARCHAR) || CAST(CAST("Projects".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Projects#name>' AS p,
-                    "Projects".name AS o,
-                    NULL AS g
-   FROM "Projects"
-   UNION ALL SELECT CAST('_:Projects#' AS VARCHAR) || CAST(CAST("Projects".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Projects#ref-lead>' AS p,
-                    CAST('<' AS VARCHAR) || CAST('People/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("People_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
-                    NULL AS g
-   FROM "Projects",
-        "People" AS "People_ref"
-   WHERE "Projects"."lead" = "People_ref"."ID"
-   UNION ALL SELECT CAST('_:Projects#' AS VARCHAR) || CAST(CAST("Projects".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Projects#lead>' AS p,
-                    CAST('"' AS VARCHAR) || CAST(CAST("Projects".lead AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
-                    NULL AS g
-   FROM "Projects"
-   UNION ALL SELECT CAST('_:Projects#' AS VARCHAR) || CAST(CAST("Projects".rowid AS VARCHAR) AS VARCHAR) AS s,
+   UNION ALL SELECT '_:Projects#' || CAST(CAST("Projects".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Projects#deptCity>' AS p,
                     "Projects"."deptCity" AS o,
                     NULL AS g
    FROM "Projects"
-   UNION ALL SELECT CAST('_:Projects#' AS VARCHAR) || CAST(CAST("Projects".rowid AS VARCHAR) AS VARCHAR) AS s,
+   UNION ALL SELECT '_:Projects#' || CAST(CAST("Projects".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/Projects#ref-deptName;deptCity>' AS p,
+                    '<Department/ID=' || replace(replace(replace(replace(replace(replace(CAST("Department_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
+                    NULL AS g
+   FROM "Projects",
+        "Department" AS "Department_ref"
+   WHERE "Projects"."deptName" = "Department_ref"."name"
+     AND "Projects"."deptCity" = "Department_ref"."city"
+   UNION ALL SELECT '_:Projects#' || CAST(CAST("Projects".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Projects#deptName>' AS p,
                     "Projects"."deptName" AS o,
                     NULL AS g
    FROM "Projects"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('TaskAssignments/worker=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';project=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '_:Projects#' || CAST(CAST("Projects".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/Projects#name>' AS p,
+                    "Projects".name AS o,
+                    NULL AS g
+   FROM "Projects"
+   UNION ALL SELECT '_:Projects#' || CAST(CAST("Projects".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/Projects#lead>' AS p,
+                    '"' || CAST(CAST("Projects".lead AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    NULL AS g
+   FROM "Projects"
+   UNION ALL SELECT '_:Projects#' || CAST(CAST("Projects".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/Projects#ref-lead>' AS p,
+                    '<People/ID=' || replace(replace(replace(replace(replace(replace(CAST("People_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
+                    NULL AS g
+   FROM "Projects",
+        "People" AS "People_ref"
+   WHERE "Projects"."lead" = "People_ref"."ID"
+   UNION ALL SELECT '<TaskAssignments/worker=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || ';project=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
                     '<http://example.com/base/TaskAssignments>' AS o,
                     NULL AS g
    FROM "TaskAssignments"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('TaskAssignments/worker=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';project=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '<TaskAssignments/worker=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || ';project=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/TaskAssignments#ref-deptName;deptCity>' AS p,
+                    '<Department/ID=' || replace(replace(replace(replace(replace(replace(CAST("Department_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
+                    NULL AS g
+   FROM "TaskAssignments",
+        "Department" AS "Department_ref"
+   WHERE "TaskAssignments"."deptName" = "Department_ref"."name"
+     AND "TaskAssignments"."deptCity" = "Department_ref"."city"
+   UNION ALL SELECT '<TaskAssignments/worker=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || ';project=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/TaskAssignments#project>' AS p,
+                    "TaskAssignments".project AS o,
+                    NULL AS g
+   FROM "TaskAssignments"
+   UNION ALL SELECT '<TaskAssignments/worker=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || ';project=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/TaskAssignments#worker>' AS p,
+                    '"' || CAST(CAST("TaskAssignments".worker AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    NULL AS g
+   FROM "TaskAssignments"
+   UNION ALL SELECT '<TaskAssignments/worker=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || ';project=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/TaskAssignments#deptCity>' AS p,
+                    "TaskAssignments"."deptCity" AS o,
+                    NULL AS g
+   FROM "TaskAssignments"
+   UNION ALL SELECT '<TaskAssignments/worker=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || ';project=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/TaskAssignments#ref-worker>' AS p,
+                    '<People/ID=' || replace(replace(replace(replace(replace(replace(CAST("People_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
+                    NULL AS g
+   FROM "TaskAssignments",
+        "People" AS "People_ref"
+   WHERE "TaskAssignments"."worker" = "People_ref"."ID"
+   UNION ALL SELECT '<TaskAssignments/worker=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || ';project=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/TaskAssignments#deptName>' AS p,
                     "TaskAssignments"."deptName" AS o,
                     NULL AS g
    FROM "TaskAssignments"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('TaskAssignments/worker=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';project=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/TaskAssignments#worker>' AS p,
-                    CAST('"' AS VARCHAR) || CAST(CAST("TaskAssignments".worker AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
-                    NULL AS g
-   FROM "TaskAssignments"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('TaskAssignments/worker=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';project=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '<TaskAssignments/worker=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || ';project=' || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/TaskAssignments#ref-project;deptName;deptCity>' AS p,
-                    CAST('_:Projects#' AS VARCHAR) || CAST(CAST("Projects_ref".rowid AS VARCHAR) AS VARCHAR) AS o,
+                    '_:Projects#' || CAST(CAST("Projects_ref".rowid AS VARCHAR) AS VARCHAR) AS o,
                     NULL AS g
    FROM "TaskAssignments",
         "Projects" AS "Projects_ref"
    WHERE "TaskAssignments"."project" = "Projects_ref"."name"
      AND "TaskAssignments"."deptName" = "Projects_ref"."deptName"
-     AND "TaskAssignments"."deptCity" = "Projects_ref"."deptCity"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('TaskAssignments/worker=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';project=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/TaskAssignments#ref-worker>' AS p,
-                    CAST('<' AS VARCHAR) || CAST('People/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("People_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
-                    NULL AS g
-   FROM "TaskAssignments",
-        "People" AS "People_ref"
-   WHERE "TaskAssignments"."worker" = "People_ref"."ID"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('TaskAssignments/worker=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';project=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/TaskAssignments#project>' AS p,
-                    "TaskAssignments".project AS o,
-                    NULL AS g
-   FROM "TaskAssignments"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('TaskAssignments/worker=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';project=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/TaskAssignments#deptCity>' AS p,
-                    "TaskAssignments"."deptCity" AS o,
-                    NULL AS g
-   FROM "TaskAssignments"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('TaskAssignments/worker=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".worker AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST(';project=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("TaskAssignments".project AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/TaskAssignments#ref-deptName;deptCity>' AS p,
-                    CAST('<' AS VARCHAR) || CAST('Department/ID=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Department_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS o,
-                    NULL AS g
-   FROM "TaskAssignments",
-        "Department" AS "Department_ref"
-   WHERE "TaskAssignments"."deptName" = "Department_ref"."name"
-     AND "TaskAssignments"."deptCity" = "Department_ref"."city") AS anon_1
+     AND "TaskAssignments"."deptCity" = "Projects_ref"."deptCity") AS anon_1
 ```
 
 ## Raw ouput triples

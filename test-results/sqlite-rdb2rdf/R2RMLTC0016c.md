@@ -8,19 +8,19 @@ SELECT anon_1.s AS s,
        anon_1.p AS p,
        anon_1.anon_2 AS o
 FROM
-  (SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/Patient' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+  (SELECT '<http://example.com/Patient' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
           '<http://example.com/entrancedate>' AS p,
           '"' || replace(CAST("Patient"."EntranceDate" AS VARCHAR), ' ', 'T') || '"^^<http://www.w3.org/2001/XMLSchema#dateTime>' AS anon_2,
           NULL AS g
    FROM "Patient"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/Patient' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
-                    '<http://xmlns.com/foaf/0.1/Person>' AS o,
-                    NULL AS g
-   FROM "Patient"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/Patient' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '<http://example.com/Patient' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/birthdate>' AS p,
                     '"' || CAST("Patient"."BirthDate" AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#date>' AS anon_3,
+                    NULL AS g
+   FROM "Patient"
+   UNION ALL SELECT '<http://example.com/Patient' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
+                    '<http://xmlns.com/foaf/0.1/Person>' AS o,
                     NULL AS g
    FROM "Patient") AS anon_1
 ```

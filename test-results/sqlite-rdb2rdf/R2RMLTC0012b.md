@@ -8,12 +8,12 @@ SELECT anon_1.s AS s,
        anon_1.p AS p,
        anon_1.o AS o
 FROM
-  (SELECT CAST('_:' AS VARCHAR) || CAST("IOUs".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) AS s,
+  (SELECT '_:' || CAST("IOUs".fname AS VARCHAR) || '_' || CAST("IOUs".lname AS VARCHAR) AS s,
           '<http://xmlns.com/foaf/0.1/name>' AS p,
-          CAST("IOUs".fname AS VARCHAR) || CAST(' ' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) AS o,
+          CAST("IOUs".fname AS VARCHAR) || ' ' || CAST("IOUs".lname AS VARCHAR) AS o,
           NULL AS g
    FROM "IOUs"
-   UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("Lives".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("Lives".lname AS VARCHAR) AS s,
+   UNION ALL SELECT '_:' || CAST("Lives".fname AS VARCHAR) || '_' || CAST("Lives".lname AS VARCHAR) AS s,
                     '<http://example.com/city>' AS p,
                     "Lives".city AS o,
                     NULL AS g

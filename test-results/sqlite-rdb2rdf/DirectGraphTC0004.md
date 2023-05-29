@@ -8,17 +8,17 @@ SELECT anon_1.s AS s,
        anon_1.p AS p,
        anon_1.o AS o
 FROM
-  (SELECT CAST('_:Student_Sport#' AS VARCHAR) || CAST(CAST("Student_Sport".rowid AS VARCHAR) AS VARCHAR) AS s,
+  (SELECT '_:Student_Sport#' || CAST(CAST("Student_Sport".rowid AS VARCHAR) AS VARCHAR) AS s,
           '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
           '<http://example.com/base/Student_Sport>' AS o,
           NULL AS g
    FROM "Student_Sport"
-   UNION ALL SELECT CAST('_:Student_Sport#' AS VARCHAR) || CAST(CAST("Student_Sport".rowid AS VARCHAR) AS VARCHAR) AS s,
+   UNION ALL SELECT '_:Student_Sport#' || CAST(CAST("Student_Sport".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Student_Sport#Sport>' AS p,
                     "Student_Sport"."Sport" AS o,
                     NULL AS g
    FROM "Student_Sport"
-   UNION ALL SELECT CAST('_:Student_Sport#' AS VARCHAR) || CAST(CAST("Student_Sport".rowid AS VARCHAR) AS VARCHAR) AS s,
+   UNION ALL SELECT '_:Student_Sport#' || CAST(CAST("Student_Sport".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Student_Sport#Student>' AS p,
                     "Student_Sport"."Student" AS o,
                     NULL AS g

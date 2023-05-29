@@ -8,14 +8,14 @@ SELECT anon_1.s AS s,
        anon_1.p AS p,
        anon_1.o AS o
 FROM
-  (SELECT CAST('_:' AS VARCHAR) || CAST("IOUs".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".amount AS VARCHAR) AS s,
-          '<http://xmlns.com/foaf/0.1/name>' AS p,
-          CAST("IOUs".fname AS VARCHAR) || CAST(' ' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) AS o,
+  (SELECT '_:' || CAST("IOUs".fname AS VARCHAR) || '_' || CAST("IOUs".lname AS VARCHAR) || '_' || CAST("IOUs".amount AS VARCHAR) AS s,
+          '<http://example.com/amount>' AS p,
+          "IOUs".amount AS o,
           NULL AS g
    FROM "IOUs"
-   UNION ALL SELECT CAST('_:' AS VARCHAR) || CAST("IOUs".fname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".lname AS VARCHAR) || CAST('_' AS VARCHAR) || CAST("IOUs".amount AS VARCHAR) AS s,
-                    '<http://example.com/amount>' AS p,
-                    "IOUs".amount AS o,
+   UNION ALL SELECT '_:' || CAST("IOUs".fname AS VARCHAR) || '_' || CAST("IOUs".lname AS VARCHAR) || '_' || CAST("IOUs".amount AS VARCHAR) AS s,
+                    '<http://xmlns.com/foaf/0.1/name>' AS p,
+                    CAST("IOUs".fname AS VARCHAR) || ' ' || CAST("IOUs".lname AS VARCHAR) AS o,
                     NULL AS g
    FROM "IOUs") AS anon_1
 ```

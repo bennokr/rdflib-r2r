@@ -262,7 +262,7 @@ class R2RMapping:
                     
                     if pat.inverse:
                         fields = {pat.field: val}
-                        where = self.inverse_condition(pat.inverse, fields)
+                        where = self.inverse_condition(f'"{pat.tname}".{pat.inverse}', fields)
                     else:
                         where = literal_column(f'"{pat.tname}"."{pat.field}"') == val
                     for m in maps:
@@ -276,8 +276,9 @@ class R2RMapping:
                         fields = parser.parse(val).named
                         if pat.inverse:
                             where = self.inverse_condition(pat.inverse, fields)
+                            # where = literal_column(f'"{pat.tname}".{where}')
                         else:
-                            # A template pattern may have multiple fields; 
+                            # A template pattern may have multiple fields;
                             #   all must match, so use sql_and
                             where_clauses = []
                             for key, val in fields.items():

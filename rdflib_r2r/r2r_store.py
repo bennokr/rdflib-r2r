@@ -662,7 +662,7 @@ class R2RStore(Store):
             for subform, colname in zip((s,p,o,g), "spog"):
                 col = ColForm.from_subform(cols, *subform).expr()
                 onlycols.append(col.label(colname))
-            
+
             if isinstance(query, Select):
                 query = query.with_only_columns(*onlycols)
             else:
@@ -670,6 +670,7 @@ class R2RStore(Store):
 
             # logging.warn('final query:' + sql_pretty(query))
             rows = list(conn.execute(query))
+
             for s, p, o, g in rows:
                 gnode = from_n3(g)
                 snode = self.make_node(s)
@@ -686,7 +687,7 @@ class R2RStore(Store):
 
         ns = self.mapping.graph.namespace_manager
         patstr = " ".join((n.n3(ns) if n else "_") for n in pattern)
-        logging.warn(f"pattern: {patstr}, results: {result_count}")
+        # logging.warn(f"pattern: {patstr}, results: {result_count}")
 
     ###### SPARQL #######
 
@@ -1089,7 +1090,6 @@ class R2RStore(Store):
             return self.querySlice(conn, part)
         if part.name == "LeftJoin":
             return self.queryLeftJoin(conn, part)
-
         if part.name == "SelectQuery":
             return self.queryPart(conn, part.p)
 
@@ -1099,9 +1099,7 @@ class R2RStore(Store):
     def exec(self, query):
         with self.db.connect() as conn:
             logging.warn("Executing:\n" + sql_pretty(query))
-
             # raise Exception
-
             results = conn.execute(query)
             rows = list(results)
             keys = [Variable(v) for v in results.keys()]

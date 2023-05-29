@@ -8,24 +8,24 @@ SELECT anon_1.s AS s,
        anon_1.p AS p,
        anon_1.o AS o
 FROM
-  (SELECT CAST('_:IOUs#' AS VARCHAR) || CAST(CAST("IOUs".rowid AS VARCHAR) AS VARCHAR) AS s,
+  (SELECT '_:IOUs#' || CAST(CAST("IOUs".rowid AS VARCHAR) AS VARCHAR) AS s,
           '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
           '<http://example.com/base/IOUs>' AS o,
           NULL AS g
    FROM "IOUs"
-   UNION ALL SELECT CAST('_:IOUs#' AS VARCHAR) || CAST(CAST("IOUs".rowid AS VARCHAR) AS VARCHAR) AS s,
+   UNION ALL SELECT '_:IOUs#' || CAST(CAST("IOUs".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/IOUs#lname>' AS p,
+                    "IOUs".lname AS o,
+                    NULL AS g
+   FROM "IOUs"
+   UNION ALL SELECT '_:IOUs#' || CAST(CAST("IOUs".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/IOUs#fname>' AS p,
                     "IOUs".fname AS o,
                     NULL AS g
    FROM "IOUs"
-   UNION ALL SELECT CAST('_:IOUs#' AS VARCHAR) || CAST(CAST("IOUs".rowid AS VARCHAR) AS VARCHAR) AS s,
+   UNION ALL SELECT '_:IOUs#' || CAST(CAST("IOUs".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/IOUs#amount>' AS p,
                     "IOUs".amount AS o,
-                    NULL AS g
-   FROM "IOUs"
-   UNION ALL SELECT CAST('_:IOUs#' AS VARCHAR) || CAST(CAST("IOUs".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/IOUs#lname>' AS p,
-                    "IOUs".lname AS o,
                     NULL AS g
    FROM "IOUs") AS anon_1
 ```

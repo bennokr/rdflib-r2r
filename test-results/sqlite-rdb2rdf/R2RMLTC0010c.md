@@ -4,13 +4,13 @@ Template with table columns with special chars and backslashes
 
 ## Created SQL query
 ```sql
-SELECT CAST('{' AS VARCHAR) || CAST('{' AS VARCHAR) || CAST('{' AS VARCHAR) || CAST(' ' AS VARCHAR) || CAST(anon_1."ISO 3166" AS VARCHAR) || CAST(' }' AS VARCHAR) || CAST('}' AS VARCHAR) || CAST('}' AS VARCHAR) AS o,
+SELECT '<http://example.com/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
        '<http://example.com/code>' AS p,
-       CAST('<' AS VARCHAR) || CAST('http://example.com/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('/' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST(anon_1."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s
+       '{{{ ' || CAST(anon_1."ISO 3166" AS VARCHAR) || ' }' || '}' || '}' AS o
 FROM
-  (SELECT "Country Info"."ISO 3166" AS "ISO 3166",
-          "Country Info"."Country Code" AS "Country Code",
-          "Country Info"."Name" AS "Name"
+  (SELECT "Country Info"."Country Code" AS "Country Code",
+          "Country Info"."Name" AS "Name",
+          "Country Info"."ISO 3166" AS "ISO 3166"
    FROM "Country Info") AS anon_1
 ```
 

@@ -6,7 +6,7 @@ TriplesMap without subjectMap
 
 ```
 Traceback (most recent call last):
-  File "/rdflib_r2r/r2r_store.py", line 444, in _triplesmap_select
+  File "/rdflib_r2r/r2r_store.py", line 464, in _triplesmap_select
     scolform, stable = next(ss)
 StopIteration
 
@@ -15,11 +15,11 @@ The above exception was the direct cause of the following exception:
 Traceback (most recent call last):
   File "/tests/test_rdb2rdf.py", line 115, in test_rdb2rdf
     tuple(g_made)
-  File "/opt/miniconda3/envs/rdf/lib/python3.9/site-packages/rdflib/graph.py", line 530, in triples
-    for (_s, _p, _o), cg in self.__store.triples((s, p, o), context=self):  # type: ignore  [arg-type]
-  File "/rdflib_r2r/r2r_store.py", line 634, in triples
+  File "/Library/Frameworks/Python.framework/Versions/3.9/lib/python3.9/site-packages/rdflib/graph.py", line 594, in triples
+    for (_s, _p, _o), cg in self.__store.triples((s, p, o), context=self):
+  File "/rdflib_r2r/r2r_store.py", line 654, in triples
     query, (s,p,o,g) = self.queryPattern(metadata, pattern)
-  File "/rdflib_r2r/r2r_store.py", line 580, in queryPattern
+  File "/rdflib_r2r/r2r_store.py", line 600, in queryPattern
     querysubforms += list(self._triplesmap_select(metadata, tmap, pattern))
 RuntimeError: generator raised StopIteration
 
