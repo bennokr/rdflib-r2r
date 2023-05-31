@@ -1,7 +1,7 @@
 """
-Run tests from [https://www.w3.org/TR/2012/NOTE-rdb2rdf-test-cases-20120814/]
+Run tests from [http://wbsg.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/ExploreUseCase/] and [http://wifo5-03.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/BusinessIntelligenceUseCase/]
 
-Downloaded from [https://dvcs.w3.org/hg/rdb2rdf-tests/raw-file/default/rdb2rdf-ts.zip]
+Downloaded from [http://wbsg.informatik.uni-mannheim.de/bizer/berlinsparqlbenchmark/spec/Dataset/]
 """
 
 import pathlib
