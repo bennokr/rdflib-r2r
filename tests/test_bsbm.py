@@ -138,7 +138,7 @@ def normalize(results):
 
 @pytest.mark.timeout(TIMEOUT)
 @pytest.mark.parametrize("testcase", TESTS, ids=[t.id for t in TESTS])
-@pytest.mark.parametrize("engine_name", ["sqlite"])  # ["sqlite", "duckdb"]
+@pytest.mark.parametrize("engine_name", ["sqlite", "duckdb"])
 def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
     test_out = pathlib.Path(f"test-results/{engine_name}-bsbm/")
     test_out.mkdir(parents=True, exist_ok=True)

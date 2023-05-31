@@ -4,3 +4,4 @@ natsort
 parse
 duckdb
 duckdb-engine
+pytest-timeout
