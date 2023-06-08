@@ -586,7 +586,7 @@ class R2RStore(Store):
         """
         querysubforms: List[SelectSubForm] = []
         # Triple Maps produce select queries
-        for tmap in self.mapping.graph[: RDF.type : rr.TriplesMap]:
+        for tmap in self.mapping.graph[: RDF.type : rr.TriplesMap]: # TODO: get rid of rr.TriplesMap because it might not be explicitly stated in the mapping
             if restrict_tmaps and (tmap not in restrict_tmaps):
                 mg = self.mapping.graph
                 refs = set(
@@ -715,9 +715,13 @@ class R2RStore(Store):
                 restriction = set()
                 # Find triple map restrictions based on types
                 if (not isinstance(qo, Variable)) and (qp == RDF.type):
-                    for tmap in mg[: RDF.type : rr.TriplesMap]:
-                        if qo in mg[mg.value(tmap, rr.subjectMap) : rr["class"]]:
-                            restriction.add(tmap)
+#                     for tmap in mg[: RDF.type : rr.TriplesMap]: # loop over subjects (== mg.subjects(RDF.type, rr.TriplesMap))
+#                         sm = mg.value(tmap, rr.subjectMap) # get object (== next(mg.objects(tmap, rr.subjectMap)))
+#                         if qo in mg[sm : rr["class"]]: # check if qo is in objects ( == (qo in mg.objects(sm, rr.class)) if it wasn't a syntax error) 
+#                             restriction.add(tmap)
+                    for sm in mg[ : rr["class"] : qo]:
+                       tmap = next(mg[: rr.subjectMap : sm])
+                       restriction.add(tmap)
                 # Find triple map restrictions based on predicates
                 for pomap in mg[: rr.predicate : qp]:
                     # Other triple maps that share this pred-obj map
