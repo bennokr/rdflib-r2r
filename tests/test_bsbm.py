@@ -12,6 +12,7 @@ from typing import NamedTuple
 import random
 from natsort import natsorted
 import math
+import sys, os
 
 import pytest
 import rdflib
@@ -19,7 +20,8 @@ from rdflib.namespace import RDF, DC, Namespace
 from rdflib.compare import to_isomorphic, graph_diff
 from rdflib.util import from_n3
 
-from .util import setup_engine, create_database
+sys.path.append( os.path.dirname(os.path.realpath(__file__)) )
+from util import setup_engine, create_database
 from rdflib_r2r import R2RStore, R2RMapping, optimize_sparql, reset_sparql
 from sqlalchemy.engine import Engine
 
@@ -29,7 +31,13 @@ review = Namespace("http://purl.org/stuff/rev#Review")
 bsbm = Namespace("http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/")
 
 PATH = pathlib.Path(__file__).parent / "BSBM"
-print(PATH)
+if not PATH.exists():
+    import zipfile
+    fzip = pathlib.Path(__file__).parent / "BSBM.zip"
+    with zipfile.ZipFile(fzip, 'r') as zip_ref:
+        zip_ref.extractall(fzip.parent)
+    
+
 TIMEOUT = 60
 
 @pytest.fixture(scope="module")
@@ -140,7 +148,7 @@ def normalize(results):
 @pytest.mark.parametrize("testcase", TESTS, ids=[t.id for t in TESTS])
 @pytest.mark.parametrize("engine_name", ["sqlite", "duckdb"])
 def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
-    test_out = pathlib.Path(f"test-results/{engine_name}-bsbm/")
+    test_out = pathlib.Path(f"docs/test-results/{engine_name}-bsbm/")
     test_out.mkdir(parents=True, exist_ok=True)
     test_file = test_out.joinpath(f"{testcase.id}.md")
     report = f"# {testcase.id}\n{get_test_hyperlink(testcase.id)}\n\n"
@@ -163,7 +171,7 @@ def test_bsbm(testcase: TestCase, engine_name: str, path, dbs):
 
         import pickle
         cache_params = {}
-        cachefile = pathlib.Path("test-results/bsbm-params.pickle")
+        cachefile = pathlib.Path("docs/test-results/bsbm-params.pickle")
         if cachefile.exists():
             cache_params = pickle.load(cachefile.open('rb'))
 
@@ -271,7 +279,7 @@ def test_synthesis(module_results_df):
         "xpassed": "❗️",
         "timeout": "⏱",
     }
-    testdir = pathlib.Path("test-results/")
+    testdir = pathlib.Path("docs/test-results/")
     testdir.mkdir(parents=True, exist_ok=True)
 
     def get_status_link(row):
@@ -284,6 +292,6 @@ def test_synthesis(module_results_df):
     df["status"] = df.apply(get_status_link, axis=1)
 
     with testdir.joinpath("bsbm.md").open("w") as fw:
-        print("# Test results\n", file=fw)
+        print("# BSBM Test results\n", file=fw)
         df = df[["engine_name", "link", "status", "duration_ms"]]
         print(df.to_markdown(index=False), file=fw)

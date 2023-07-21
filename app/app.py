@@ -18,7 +18,10 @@ import rdflib
 rdb2rdftest = rdflib.Namespace("http://purl.org/NET/rdb2rdf-test#")
 from rdflib_r2r import R2RStore, R2RMapping
 
+import app_deploy
+
 app = Flask(__name__)
+app.add_url_rule('/update_server', methods=['POST'], view_func=app_deploy.update)
 
 def get_sql_mapping(categories, example, only_schema=False):
     schema, mapping = "", None
@@ -50,7 +53,7 @@ def get_sql_mapping(categories, example, only_schema=False):
 @app.route("/")
 def index():
     example = request.args.get("example", "")
-    schema = ""
+    schema, mapping = "", None
     sparql = 'select ?s ?p ?o where {?s ?p ?o}'
     if example:
         schema, mapping = get_sql_mapping(categories, example, only_schema=True)

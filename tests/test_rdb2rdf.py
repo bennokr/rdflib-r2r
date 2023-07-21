@@ -9,6 +9,8 @@ import logging
 import re
 import pathlib
 from typing import NamedTuple
+import sys, os
+
 
 import pytest
 import rdflib
@@ -16,7 +18,8 @@ from rdflib.namespace import RDF, Namespace
 from rdflib.compare import to_isomorphic, graph_diff
 from rdflib.util import from_n3
 
-from .util import setup_engine, create_database
+sys.path.append( os.path.dirname(os.path.realpath(__file__)) )
+from util import setup_engine, create_database
 from rdflib_r2r import R2RStore, R2RMapping
 
 test = Namespace("http://www.w3.org/2006/03/test-description#")
@@ -24,6 +27,12 @@ dcterms = Namespace("http://purl.org/dc/elements/1.1/")
 rdb2rdftest = Namespace("http://purl.org/NET/rdb2rdf-test#")
 base = Namespace("http://www.w3.org/2001/sw/rdb2rdf/test-cases/#")
 
+PATH = pathlib.Path(__file__).parent / "rdb2rdf-ts"
+if not PATH.exists():
+    import zipfile
+    fzip = pathlib.Path(__file__).parent / "rdb2rdf-ts.zip"
+    with zipfile.ZipFile(fzip, 'r') as zip_ref:
+        zip_ref.extractall(fzip.parent)
 
 class TestCase(NamedTuple):
     id: str
@@ -65,7 +74,7 @@ def yield_database_testcases(path: pathlib.Path):
 
 PATHS = sorted(
     path
-    for path in pathlib.Path(__file__).parent.joinpath("rdb2rdf-ts").iterdir()
+    for path in PATH.iterdir()
     if path.name[0] != "."
 )
 
@@ -86,7 +95,7 @@ def nopattern(pytestconfig):
 @pytest.mark.parametrize("testcase", TESTS, ids=[t.id for t in TESTS])
 @pytest.mark.parametrize("engine_name", ["sqlite", "duckdb"])
 def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: bool):
-    test_out = pathlib.Path(f'test-results/{engine_name}-rdb2rdf/')
+    test_out = pathlib.Path(f'docs/test-results/{engine_name}-rdb2rdf/')
     test_out.mkdir(parents=True, exist_ok=True)
     test_file = test_out.joinpath(f"{testcase.id}.md")
     report = f"# {testcase.id}\n"
@@ -223,7 +232,7 @@ def test_synthesis(module_results_df):
     }
     logging.warn(("statuses", set(df["status"])))
 
-    testdir = pathlib.Path('test-results/')
+    testdir = pathlib.Path('docs/test-results/')
     testdir.mkdir(parents=True, exist_ok=True)
 
     def get_status_link(row):
@@ -235,6 +244,6 @@ def test_synthesis(module_results_df):
     df["status"] = df.apply(get_status_link, axis=1)
 
     with testdir.joinpath("rdb2rdf.md").open("w") as fw:
-        print("# Test results\n", file=fw)
+        print("# RDB2RDF Test results\n", file=fw)
         df = df[["engine_name", "link", "status", "duration_ms", "title"]]
         print(df.to_markdown(index=False), file=fw)
