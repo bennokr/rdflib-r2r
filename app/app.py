@@ -5,13 +5,14 @@ import html
 
 basedir = os.path.dirname(os.path.realpath(__file__))
 test_path = pathlib.Path( basedir ).parent / 'tests'
-sys.path.append( test_path )
-import tests.test_rdb2rdf
-import tests.test_bsbm
-import tests.util
+sys.path.append( str(test_path) )
+
+import test_rdb2rdf
+import test_bsbm
+import util
 categories = {
-    'RDB2RDF': tests.test_rdb2rdf.TESTS,
-    'BSBM': tests.test_bsbm.TESTS
+    'RDB2RDF': test_rdb2rdf.TESTS,
+    'BSBM': test_bsbm.TESTS
 }
 
 import rdflib
@@ -97,7 +98,7 @@ def make_sql():
     sql, mapping = get_sql_mapping(categories, example, only_schema=False)
     con = sqlite3.connect('')
     cur = con.executescript(sql)
-    db = tests.util.setup_engine('sqlite', creator = lambda: con)
+    db = util.setup_engine('sqlite', creator = lambda: con)
     if mapping is None:
         mapping = R2RMapping.from_db(db)
     ns = mapping.graph.namespace_manager
