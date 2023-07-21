@@ -2,3 +2,6 @@ rdflib>=6.0.0
 sqlalchemy
 natsort
 parse
+duckdb
+duckdb-engine
+pytest-timeout
