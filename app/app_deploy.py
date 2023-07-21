@@ -30,11 +30,11 @@ def update():
         if not is_valid_signature(x_hub_signature, request.data, w_secret):
             logging.warning('Deploy signature failed: {sig}'.format(sig=x_hub_signature))
             abort(abort_code)
-        if request.get_json().get('ref') != 'refs/heads/master':
+        if request.get_json().get('ref') != 'refs/heads/main':
             logging.warning('Deploy request for wrong ref')
             abort(abort_code)
         
-        basedir = os.path.dirname(os.path.realpath(__file__))
+        basedir =  os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
         repo = git.Repo(basedir)
         origin = repo.remotes.origin
         pull_info = origin.pull()
