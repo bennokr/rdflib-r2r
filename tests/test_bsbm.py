@@ -19,7 +19,7 @@ from rdflib.namespace import RDF, DC, Namespace
 from rdflib.compare import to_isomorphic, graph_diff
 from rdflib.util import from_n3
 
-from util import setup_engine, create_database
+from .util import setup_engine, create_database
 from rdflib_r2r import R2RStore, R2RMapping, optimize_sparql, reset_sparql
 from sqlalchemy.engine import Engine
 
@@ -28,7 +28,8 @@ dcterms = Namespace("http://purl.org/dc/elements/1.1/")
 review = Namespace("http://purl.org/stuff/rev#Review")
 bsbm = Namespace("http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/")
 
-PATH = pathlib.Path("tests/BSBM")
+PATH = pathlib.Path(__file__).parent / "BSBM"
+print(PATH)
 TIMEOUT = 60
 
 @pytest.fixture(scope="module")
@@ -59,7 +60,6 @@ def dbs(path: pathlib.Path):
 
 
 def yield_testcases(path: pathlib.Path):
-
     qpath = path.joinpath("queries")
     for t in ["bi", "explore"]:
         tpath = qpath.joinpath(t)

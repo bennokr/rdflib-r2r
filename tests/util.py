@@ -3,7 +3,7 @@ import logging
 from sqlalchemy import create_engine
 
 
-def setup_engine(name, echo=False):
+def setup_engine(name, echo=False, creator=None):
     if name == "sqlite":
         import sqlite3
 
@@ -20,6 +20,7 @@ def setup_engine(name, echo=False):
             },
             # native_datetime=False, # breaks rdb2rdf test D016
             native_datetime=True, # breaks BSBM test 3
+            creator = creator,
         )
 
     if name == "duckdb":

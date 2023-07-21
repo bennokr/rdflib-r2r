@@ -16,7 +16,7 @@ from rdflib.namespace import RDF, Namespace
 from rdflib.compare import to_isomorphic, graph_diff
 from rdflib.util import from_n3
 
-from util import setup_engine, create_database
+from .util import setup_engine, create_database
 from rdflib_r2r import R2RStore, R2RMapping
 
 test = Namespace("http://www.w3.org/2006/03/test-description#")
