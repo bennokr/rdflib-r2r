@@ -6,6 +6,7 @@ It provides a virtual knowledge graph view of a relational database and allows f
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/bennokr/rdflib-r2r/HEAD)
 
+[Demo](http://rdflibr2r.eu.pythonanywhere.com)
 ## Background
 
 The Resource Description Framework (RDF) is a widely used framework for modeling and exchanging data on the web. It provides a flexible and extensible data model that allows data to be represented as a directed graph, where nodes represent entities, and edges represent relationships between them. However, many data sources, such as relational databases, do not natively support RDF. This is where R2RML comes in.
