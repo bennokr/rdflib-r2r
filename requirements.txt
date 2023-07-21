@@ -6,3 +6,4 @@ duckdb
 duckdb-engine
 pytest-timeout
 GitPython
+sqlparse
