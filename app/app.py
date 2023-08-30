@@ -54,9 +54,10 @@ def get_sql_mapping(categories, example, only_schema=False):
 @app.route("/")
 def index():
     example = request.args.get("example", "")
+    sparql = request.args.get("sparql", 'select ?s ?p ?o where {?s ?p ?o}')
+    sql = request.args.get("sql", '')
+
     schema, mapping = "", None
-    sparql = 'select ?s ?p ?o where {?s ?p ?o}'
-    sql = ''
     if example:
         schema, mapping = get_sql_mapping(categories, example, only_schema=True)
 

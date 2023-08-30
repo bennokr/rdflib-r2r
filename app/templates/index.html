@@ -2,14 +2,15 @@
 <html>
 <head><title>RDB2RDF demo</title></head>
 <style>
-body { font-family: sans-serif; }
-#main {margin: 0 auto; max-width: 1000px;}
-textarea { width: 100%; box-sizing: border-box; height: 24em }
-.collapsible {
+    body { font-family: sans-serif; }
+    #main {margin: 0 auto; max-width: 1000px;}
+    textarea { width: 100%; box-sizing: border-box; height: 24em }
+    .collapsible {
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.2s ease-out;
     }
+    #error { background: #fdd; border: 2px solid red; display:none;  }
 </style>
 <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
@@ -19,27 +20,56 @@ textarea { width: 100%; box-sizing: border-box; height: 24em }
     });
   </script>
 <script type="text/javascript">
-    function make_sql() {
-        sparql = document.getElementById('sparql').value;
-        example = document.getElementById('example').value;
-        document.getElementById('spinner').style.visibility = 'visible';
+    function updateURLParameter(url, param, paramVal){
+        var newAdditionalURL = "";
+        var tempArray = url.split("?");
+        var baseURL = tempArray[0];
+        var additionalURL = tempArray[1];
+        var temp = "";
+        if (additionalURL) {
+            tempArray = additionalURL.split("&");
+            for (var i=0; i<tempArray.length; i++){
+                if(tempArray[i].split('=')[0] != param){
+                    newAdditionalURL += temp + tempArray[i];
+                    temp = "&";
+                }
+            }
+        }
 
-        url = window.location.href.split(/[?#]/)[0] + '/make_sql?' + new URLSearchParams({example:example, sparql:sparql});
-        fetch(url).then(response => response.text()).then(data => {
-            document.getElementById('sql').value = data;
-            document.getElementById('spinner').style.visibility = 'hidden';
-        })
+        var rows_txt = temp + "" + param + "=" + paramVal;
+        return baseURL + "?" + newAdditionalURL + rows_txt;
     }
 
-    function run_sql() {
-        sql = document.getElementById('sql').value;
+
+    function action(name, in_el, out_el ) {
+
+        value = document.getElementById(in_el).value;
+        window.history.replaceState('', '', updateURLParameter(window.location.href, in_el, value));
+
         example = document.getElementById('example').value;
         document.getElementById('spinner').style.visibility = 'visible';
+        document.getElementById('error').style.display = 'none';
 
-        fetch(window.location.href.split(/[?#]/)[0] + '/run_sql?' + new URLSearchParams({example:example, sql:sql}))
-        .then(response => response.text()).then(data => {
-            document.getElementById('result').innerHTML = data;
-            document.getElementById('spinner').style.visibility = 'hidden';
+        params = new URLSearchParams({example:example, [in_el]:value});
+        url = window.location.href.split(/[?#]/)[0] + '/'+name+'?' + params;
+        fetch(url).then(response => {
+            if (response.ok) {
+                response.text().then(data => {
+                    out_el = document.getElementById(out_el);
+                    if (out_el.nodeName == "textarea") {
+                        out_el.value = data;
+                    } else {
+                        out_el.innerHTML = data;
+                    }
+                    document.getElementById('spinner').style.visibility = 'hidden';
+                })
+            } else {
+                response.text().then(data => {
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('error').innerHTML = data;
+                    document.getElementById('spinner').style.visibility = 'hidden';
+                })
+            }
         })
     }
 
@@ -98,15 +128,16 @@ textarea { width: 100%; box-sizing: border-box; height: 24em }
             <textarea id="sparql" placeholder="select * where { ?s ?p ?o } limit 10 ">
                 {{- sparql -}}
             </textarea>
-            <button type="button" onclick="make_sql()">Generate SQL →</button>
+            <button type="button" onclick="action('make_sql', 'sparql', 'sql')">Generate SQL →</button>
         </div>
         <div style="width:50%">
             <h3>SQL</h3>
             <textarea id="sql">{{- sql -}}</textarea>
-            <button type="button" onclick="run_sql()">Execute SQL ↓</button>
+            <button type="button" onclick="action('run_sql', 'sql', 'result')">Execute SQL ↓</button>
         </div>
     </div>
     <p><img src="static/load.gif" id="spinner" style="height:1em; visibility:hidden; "/></p>
+    <div id="error"></div>
     <pre id="result"></pre>
 </div>
 </body>
