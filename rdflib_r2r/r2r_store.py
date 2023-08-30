@@ -1048,7 +1048,7 @@ class R2RStore(Store):
         subforms, allcols = ColForm.to_subforms_columns(*colforms)
         where = [eq for cs in var_colforms.values() for eq in ColForm.equal(*cs)]
 
-        outer = select(*allcols1).outerjoin(
+        outer = select(*query1.c, *query2.c).outerjoin(
             query2, 
             onclause=sql_and(*where)
         )

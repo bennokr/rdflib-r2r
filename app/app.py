@@ -56,6 +56,7 @@ def index():
     example = request.args.get("example", "")
     schema, mapping = "", None
     sparql = 'select ?s ?p ?o where {?s ?p ?o}'
+    sql = ''
     if example:
         schema, mapping = get_sql_mapping(categories, example, only_schema=True)
 
@@ -90,6 +91,7 @@ def index():
         mermaid=mermaid,
         mapping=mapping.graph.serialize() if mapping else '',
         sparql=sparql,
+        sql=sql,
     )
 
 @app.route("/make_sql")
