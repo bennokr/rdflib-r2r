@@ -12,7 +12,7 @@ from typing import Iterable, List, Tuple, Union, Dict
 from rdflib import Graph, URIRef, Literal, BNode
 from rdflib.namespace import RDF, XSD, Namespace
 
-from sqlalchemy import text, table, literal_column, types as sqltypes
+from sqlalchemy import MetaData, text, table, literal_column, types as sqltypes
 from sqlalchemy import or_ as sql_or, and_ as sql_and
 from sqlalchemy.sql.expression import ClauseElement
 
@@ -73,8 +73,11 @@ class R2RMapping:
         mg = Graph(base=baseuri)
 
         with db.connect() as conn:
+            metadata = MetaData()
+            metadata.reflect(conn)
+            
             tmaps = {}
-            for tablename in db.dialect.get_table_names(conn, schema="main"):
+            for tablename, table in metadata.tables.items():
                 tmap = tmaps.setdefault(tablename, BNode())
                 mg.add([tmap, RDF.type, rr.TriplesMap])
                 logtable = BNode()
@@ -89,6 +92,8 @@ class R2RMapping:
                 # duckdb returns the wrong primary keys!
                 # see https://github.com/Mause/duckdb_engine/issues/594
                 pk = db.dialect.get_pk_constraint(conn, tablename, schema="main")
+                logging.warn(f'table:{list(table.primary_key)}')
+                logging.warn(f'get_pk_constraint:{pk}')
                 if pk and any(pk.values()):
                     if pk['name']:
                         # for duckdb, the "constrained_columns" is wrong

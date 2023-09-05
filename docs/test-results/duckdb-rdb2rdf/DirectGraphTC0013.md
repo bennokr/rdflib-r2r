@@ -14,11 +14,6 @@ FROM
           NULL AS g
    FROM "Person"
    UNION ALL SELECT '_:Person#' || CAST(CAST("Person".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Person#ID>' AS p,
-                    '"' || CAST(CAST("Person"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
-                    NULL AS g
-   FROM "Person"
-   UNION ALL SELECT '_:Person#' || CAST(CAST("Person".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Person#DateOfBirth>' AS p,
                     "Person"."DateOfBirth" AS o,
                     NULL AS g
@@ -26,6 +21,11 @@ FROM
    UNION ALL SELECT '_:Person#' || CAST(CAST("Person".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Person#Name>' AS p,
                     "Person"."Name" AS o,
+                    NULL AS g
+   FROM "Person"
+   UNION ALL SELECT '_:Person#' || CAST(CAST("Person".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/Person#ID>' AS p,
+                    '"' || CAST(CAST("Person"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
                     NULL AS g
    FROM "Person") AS anon_1
 ```

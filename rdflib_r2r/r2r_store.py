@@ -546,6 +546,9 @@ class R2RStore(Store):
             n3col = '"' + value + ('"^^' + dt)
             n3col.original = dbcol
             return n3col
+        
+        ## TODO: create n3 literal for integers!
+
         return dbcol
 
     def union_spog_querysubforms(self, *queryforms) -> GenerativeSelectSubForm:
@@ -565,10 +568,14 @@ class R2RStore(Store):
         _, _, o_cols, *_ = zip(*[q.exported_columns for q in queries])
         kwargs = lambda c: tuple((k, v) for k, v in vars(c).items() if k[0] != "_")
         o_types = set((c.type.__class__, kwargs(c.type)) for c in o_cols)
+        logging.warn(f"UNION types: {o_types}")
+
         if len(o_types) > 1:
             for qi, query in enumerate(queries):
                 s, p, o, g = query.exported_columns
+                logging.warn(f"object column: {o} type: {o.type}")
                 queries[qi] = query.with_only_columns(*[s, p, self.col_n3(o), g])
+        
         return union_all(*queries), subforms
 
     def queryPattern(
@@ -648,8 +655,7 @@ class R2RStore(Store):
         result_count = 0
         with self.db.connect() as conn:
             metadata = MetaData()
-            if "duckdb" not in type(self.db.dialect).__module__:
-                metadata.reflect(self.db)
+            metadata.reflect(self.db)
 
             query, (s,p,o,g) = self.queryPattern(metadata, pattern)
             if isinstance(query, CompoundSelect):
@@ -670,7 +676,6 @@ class R2RStore(Store):
 
             # logging.warn('final query:' + sql_pretty(query))
             rows = list(conn.execute(query))
-
             for s, p, o, g in rows:
                 gnode = from_n3(g)
                 snode = self.make_node(s)
@@ -704,8 +709,7 @@ class R2RStore(Store):
         bgp = set(bgp)
 
         metadata = MetaData()
-        if "duckdb" not in type(self.db.dialect).__module__:
-            metadata.reflect(self.db)
+        metadata.reflect(self.db)
 
         # Optimize DB table restrictions in queries
         mg = self.mapping.graph
@@ -1010,6 +1014,7 @@ class R2RStore(Store):
             allcols2.append(e2.label(str(v)))
         query1 = select(*allcols1)
         query2 = select(*allcols2)
+
         return union_all(query1, query2), var_sf
 
     def querySlice(self, conn: Connection, part) -> SelectVarSubForm:
