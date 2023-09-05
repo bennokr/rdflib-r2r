@@ -14,11 +14,6 @@ FROM
           NULL AS g
    FROM "Student"
    UNION ALL SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Student#FirstName>' AS p,
-                    "Student"."FirstName" AS o,
-                    NULL AS g
-   FROM "Student"
-   UNION ALL SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Student#ID>' AS p,
                     '"' || CAST(CAST("Student"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
                     NULL AS g
@@ -26,6 +21,11 @@ FROM
    UNION ALL SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Student#LastName>' AS p,
                     "Student"."LastName" AS o,
+                    NULL AS g
+   FROM "Student"
+   UNION ALL SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/Student#FirstName>' AS p,
+                    "Student"."FirstName" AS o,
                     NULL AS g
    FROM "Student") AS anon_1
 ```

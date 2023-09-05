@@ -14,13 +14,10 @@ FROM
           NULL AS g
    FROM "Source"
    UNION ALL SELECT '_:Source#' || CAST(CAST("Source".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Source#ref-attrA;attrB>' AS p,
-                    '_:Target#' || CAST(CAST("Target_ref".rowid AS VARCHAR) AS VARCHAR) AS o,
+                    '<http://example.com/base/Source#ID>' AS p,
+                    '"' || CAST(CAST("Source"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
                     NULL AS g
-   FROM "Target" AS "Target_ref",
-        "Source"
-   WHERE "Source"."attrA" = "Target_ref"."key2attr2"
-     AND "Source"."attrB" = "Target_ref"."key2attr1"
+   FROM "Source"
    UNION ALL SELECT '_:Source#' || CAST(CAST("Source".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Source#attrB>' AS p,
                     "Source"."attrB" AS o,
@@ -32,18 +29,16 @@ FROM
                     NULL AS g
    FROM "Source"
    UNION ALL SELECT '_:Source#' || CAST(CAST("Source".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Source#ID>' AS p,
-                    '"' || CAST(CAST("Source"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    '<http://example.com/base/Source#ref-attrA;attrB>' AS p,
+                    '_:Target#' || CAST(CAST("Target_ref".rowid AS VARCHAR) AS VARCHAR) AS o,
                     NULL AS g
-   FROM "Source"
+   FROM "Target" AS "Target_ref",
+        "Source"
+   WHERE "Source"."attrA" = "Target_ref"."key2attr2"
+     AND "Source"."attrB" = "Target_ref"."key2attr1"
    UNION ALL SELECT '_:Target#' || CAST(CAST("Target".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
                     '<http://example.com/base/Target>' AS o,
-                    NULL AS g
-   FROM "Target"
-   UNION ALL SELECT '_:Target#' || CAST(CAST("Target".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Target#key2attr2>' AS p,
-                    "Target"."key2attr2" AS o,
                     NULL AS g
    FROM "Target"
    UNION ALL SELECT '_:Target#' || CAST(CAST("Target".rowid AS VARCHAR) AS VARCHAR) AS s,
@@ -59,6 +54,11 @@ FROM
    UNION ALL SELECT '_:Target#' || CAST(CAST("Target".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Target#key1attr1>' AS p,
                     "Target"."key1attr1" AS o,
+                    NULL AS g
+   FROM "Target"
+   UNION ALL SELECT '_:Target#' || CAST(CAST("Target".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/Target#key2attr2>' AS p,
+                    "Target"."key2attr2" AS o,
                     NULL AS g
    FROM "Target"
    UNION ALL SELECT '_:Target#' || CAST(CAST("Target".rowid AS VARCHAR) AS VARCHAR) AS s,

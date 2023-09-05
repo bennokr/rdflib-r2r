@@ -14,11 +14,6 @@ FROM
           NULL AS g
    FROM "LIKES"
    UNION ALL SELECT '_:LIKES#' || CAST(CAST("LIKES".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/LIKES#id>' AS p,
-                    '"' || CAST(CAST("LIKES"."id" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
-                    NULL AS g
-   FROM "LIKES"
-   UNION ALL SELECT '_:LIKES#' || CAST(CAST("LIKES".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/LIKES#likeType>' AS p,
                     "LIKES"."likeType" AS o,
                     NULL AS g
@@ -28,28 +23,16 @@ FROM
                     "LIKES"."likedObj" AS o,
                     NULL AS g
    FROM "LIKES"
+   UNION ALL SELECT '_:LIKES#' || CAST(CAST("LIKES".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/LIKES#id>' AS p,
+                    '"' || CAST(CAST("LIKES"."id" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    NULL AS g
+   FROM "LIKES"
    UNION ALL SELECT '_:EMP#' || CAST(CAST("EMP".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
                     '<http://example.com/base/EMP>' AS o,
                     NULL AS g
    FROM "EMP"
-   UNION ALL SELECT '_:EMP#' || CAST(CAST("EMP".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/EMP#deptno>' AS p,
-                    '"' || CAST(CAST("EMP"."deptno" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
-                    NULL AS g
-   FROM "EMP"
-   UNION ALL SELECT '_:EMP#' || CAST(CAST("EMP".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/EMP#empno>' AS p,
-                    '"' || CAST(CAST("EMP"."empno" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
-                    NULL AS g
-   FROM "EMP"
-   UNION ALL SELECT '_:EMP#' || CAST(CAST("EMP".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/EMP#ref-deptno>' AS p,
-                    '_:DEPT#' || CAST(CAST("DEPT_ref".rowid AS VARCHAR) AS VARCHAR) AS o,
-                    NULL AS g
-   FROM "EMP",
-        "DEPT" AS "DEPT_ref"
-   WHERE "EMP"."deptno" = "DEPT_ref"."deptno"
    UNION ALL SELECT '_:EMP#' || CAST(CAST("EMP".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/EMP#job>' AS p,
                     "EMP"."job" AS o,
@@ -65,6 +48,23 @@ FROM
                     "EMP"."ename" AS o,
                     NULL AS g
    FROM "EMP"
+   UNION ALL SELECT '_:EMP#' || CAST(CAST("EMP".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/EMP#ref-deptno>' AS p,
+                    '_:DEPT#' || CAST(CAST("DEPT_ref".rowid AS VARCHAR) AS VARCHAR) AS o,
+                    NULL AS g
+   FROM "EMP",
+        "DEPT" AS "DEPT_ref"
+   WHERE "EMP"."deptno" = "DEPT_ref"."deptno"
+   UNION ALL SELECT '_:EMP#' || CAST(CAST("EMP".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/EMP#empno>' AS p,
+                    '"' || CAST(CAST("EMP"."empno" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    NULL AS g
+   FROM "EMP"
+   UNION ALL SELECT '_:EMP#' || CAST(CAST("EMP".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/EMP#deptno>' AS p,
+                    '"' || CAST(CAST("EMP"."deptno" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    NULL AS g
+   FROM "EMP"
    UNION ALL SELECT '_:DEPT#' || CAST(CAST("DEPT".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
                     '<http://example.com/base/DEPT>' AS o,
@@ -76,13 +76,13 @@ FROM
                     NULL AS g
    FROM "DEPT"
    UNION ALL SELECT '_:DEPT#' || CAST(CAST("DEPT".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/DEPT#dname>' AS p,
-                    "DEPT"."dname" AS o,
+                    '<http://example.com/base/DEPT#deptno>' AS p,
+                    '"' || CAST(CAST("DEPT"."deptno" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
                     NULL AS g
    FROM "DEPT"
    UNION ALL SELECT '_:DEPT#' || CAST(CAST("DEPT".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/DEPT#deptno>' AS p,
-                    '"' || CAST(CAST("DEPT"."deptno" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    '<http://example.com/base/DEPT#dname>' AS p,
+                    "DEPT"."dname" AS o,
                     NULL AS g
    FROM "DEPT") AS anon_1
 ```

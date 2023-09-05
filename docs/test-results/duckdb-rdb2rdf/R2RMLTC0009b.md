@@ -14,17 +14,17 @@ FROM
           '<http://example.com/graph/students>' AS g
    FROM "Student"
    UNION ALL SELECT '<http://example.com/resource/student_' || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://xmlns.com/foaf/0.1/name>' AS p,
+                    "Student"."Name" AS o,
+                    '<http://example.com/graph/students>' AS g
+   FROM "Student"
+   UNION ALL SELECT '<http://example.com/resource/student_' || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/ontology/practises>' AS p,
                     '<http://example.com/resource/sport_' || replace(replace(replace(replace(replace(replace(CAST("Sport_ref"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
                     '<http://example.com/graph/practise>' AS g
    FROM "Sport" AS "Sport_ref",
         "Student"
    WHERE "Student"."Sport" = "Sport_ref"."ID"
-   UNION ALL SELECT '<http://example.com/resource/student_' || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://xmlns.com/foaf/0.1/name>' AS p,
-                    "Student"."Name" AS o,
-                    '<http://example.com/graph/students>' AS g
-   FROM "Student"
    UNION ALL SELECT '<http://example.com/resource/sport_' || replace(replace(replace(replace(replace(replace(CAST("Sport"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
                     '<http://example.com/ontology/Sport>' AS o,

@@ -4,8 +4,8 @@ Generation of triples by using IRI value in columns
 
 ## Created SQL query
 ```sql
-SELECT '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
-       '<' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+SELECT '<' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+       '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
        '<http://xmlns.com/foaf/0.1/Person>' AS o
 FROM
   (SELECT "Student"."Name"

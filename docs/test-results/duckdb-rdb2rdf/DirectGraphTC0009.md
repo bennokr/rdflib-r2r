@@ -14,27 +14,27 @@ FROM
           NULL AS g
    FROM "Student"
    UNION ALL SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Student#Name>' AS p,
-                    "Student"."Name" AS o,
-                    NULL AS g
-   FROM "Student"
-   UNION ALL SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Student#ID>' AS p,
                     '"' || CAST(CAST("Student"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
-                    NULL AS g
-   FROM "Student"
-   UNION ALL SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Student#Sport>' AS p,
-                    '"' || CAST(CAST("Student"."Sport" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
                     NULL AS g
    FROM "Student"
    UNION ALL SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Student#ref-Sport>' AS p,
                     '_:Sport#' || CAST(CAST("Sport_ref".rowid AS VARCHAR) AS VARCHAR) AS o,
                     NULL AS g
-   FROM "Sport" AS "Sport_ref",
-        "Student"
+   FROM "Student",
+        "Sport" AS "Sport_ref"
    WHERE "Student"."Sport" = "Sport_ref"."ID"
+   UNION ALL SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/Student#Sport>' AS p,
+                    '"' || CAST(CAST("Student"."Sport" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    NULL AS g
+   FROM "Student"
+   UNION ALL SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/Student#Name>' AS p,
+                    "Student"."Name" AS o,
+                    NULL AS g
+   FROM "Student"
    UNION ALL SELECT '_:Sport#' || CAST(CAST("Sport".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
                     '<http://example.com/base/Sport>' AS o,

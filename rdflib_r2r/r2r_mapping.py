@@ -86,13 +86,18 @@ class R2RMapping:
                 mg.add([s_map, rr["class"], base[iri_safe(tablename)]])
 
                 # TEMPORARY: duckdb hack
+                # duckdb returns the wrong primary keys!
+                # see https://github.com/Mause/duckdb_engine/issues/594
                 pk = db.dialect.get_pk_constraint(conn, tablename, schema="main")
                 if pk and any(pk.values()):
-                    primary_keys = pk["constrained_columns"] or eval(
-                        pk["name"].partition("KEY")[-1]
-                    )
-                    if not (type(primary_keys) in [tuple, list]):
-                        primary_keys = (primary_keys,)
+                    if pk['name']:
+                        # for duckdb, the "constrained_columns" is wrong
+                        # so we extract the key column names from the "name" field
+                        keys = pk["name"].partition("KEY")[-1][1:-1].split(',')
+                        primary_keys = [k.strip() for k in keys]
+                    else:
+                        # sqlite doesn't set the "name" field
+                        primary_keys = pk["constrained_columns"]
                 else:
                     primary_keys = []
 

@@ -4,8 +4,8 @@ Typing resources by relying on rdf:type predicate
 
 ## Created SQL query
 ```sql
-SELECT '<http://example.com/Student/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-       '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
+SELECT '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
+       '<http://example.com/Student/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
        '<http://xmlns.com/foaf/0.1/Person>' AS o
 FROM
   (SELECT "Student"."ID",

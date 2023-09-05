@@ -5,8 +5,8 @@ One column mapping, subject URI generation by using rr:template
 ## Created SQL query
 ```sql
 SELECT '<http://example.com/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-       anon_1."Student"."Name" AS o,
-       '<http://xmlns.com/foaf/0.1/name>' AS p
+       '<http://xmlns.com/foaf/0.1/name>' AS p,
+       anon_1."Student"."Name" AS o
 FROM
   (SELECT "Student"."Name",
           "Student"."Name"

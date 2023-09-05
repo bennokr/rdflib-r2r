@@ -14,8 +14,8 @@ FROM
           NULL AS g
    FROM "IOUs"
    UNION ALL SELECT '_:' || CAST("IOUs"."fname" AS VARCHAR) || '_' || CAST("IOUs"."lname" AS VARCHAR) AS s,
-                    '<http://example.com/base/IOUs#fname>' AS p,
-                    "IOUs"."fname" AS o,
+                    '<http://example.com/base/IOUs#amount>' AS p,
+                    "IOUs"."amount" AS o,
                     NULL AS g
    FROM "IOUs"
    UNION ALL SELECT '_:' || CAST("IOUs"."fname" AS VARCHAR) || '_' || CAST("IOUs"."lname" AS VARCHAR) AS s,
@@ -24,8 +24,8 @@ FROM
                     NULL AS g
    FROM "IOUs"
    UNION ALL SELECT '_:' || CAST("IOUs"."fname" AS VARCHAR) || '_' || CAST("IOUs"."lname" AS VARCHAR) AS s,
-                    '<http://example.com/base/IOUs#amount>' AS p,
-                    "IOUs"."amount" AS o,
+                    '<http://example.com/base/IOUs#fname>' AS p,
+                    "IOUs"."fname" AS o,
                     NULL AS g
    FROM "IOUs") AS anon_1
 ```

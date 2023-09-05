@@ -4,9 +4,9 @@ Two columns mapping, generation of a BlankNode subject by using rr:template and 
 
 ## Created SQL query
 ```sql
-SELECT anon_1."Student"."Name" AS o,
-       '_:students' || CAST(anon_1."Student"."ID" AS VARCHAR) AS s,
-       '<http://xmlns.com/foaf/0.1/name>' AS p
+SELECT '<http://xmlns.com/foaf/0.1/name>' AS p,
+       anon_1."Student"."Name" AS o,
+       '_:students' || CAST(anon_1."Student"."ID" AS VARCHAR) AS s
 FROM
   (SELECT "Student"."Name",
           "Student"."ID"

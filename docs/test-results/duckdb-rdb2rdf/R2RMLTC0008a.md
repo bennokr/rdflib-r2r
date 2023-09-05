@@ -9,8 +9,8 @@ SELECT anon_1.s AS s,
        anon_1.o AS o
 FROM
   (SELECT '<http://example.com/Student/' || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST("Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-          '<http://xmlns.com/foaf/0.1/name>' AS p,
-          "Student"."Name" AS o,
+          '<http://example.com/id>' AS p,
+          "Student"."ID" AS o,
           NULL AS g
    FROM "Student"
    UNION ALL SELECT '<http://example.com/Student/' || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST("Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
@@ -24,8 +24,8 @@ FROM
                     NULL AS g
    FROM "Student"
    UNION ALL SELECT '<http://example.com/Student/' || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST("Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/id>' AS p,
-                    "Student"."ID" AS o,
+                    '<http://xmlns.com/foaf/0.1/name>' AS p,
+                    "Student"."Name" AS o,
                     NULL AS g
    FROM "Student") AS anon_1
 ```

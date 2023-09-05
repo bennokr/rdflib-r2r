@@ -14,8 +14,18 @@ FROM
           NULL AS g
    FROM "Student"
    UNION ALL SELECT '<http://example.com/Student/' || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST("Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
+                    '<http://xmlns.com/foaf/0.1/Person>' AS o,
+                    NULL AS g
+   FROM "Student"
+   UNION ALL SELECT '<http://example.com/Student/' || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST("Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/id>' AS p,
                     "Student"."ID" AS o,
+                    NULL AS g
+   FROM "Student"
+   UNION ALL SELECT '<http://example.com/Student/' || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST("Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://xmlns.com/foaf/0.1/name>' AS p,
+                    "Student"."Name" AS o,
                     NULL AS g
    FROM "Student"
    UNION ALL SELECT '<http://example.com/Student/' || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST("Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
@@ -23,17 +33,7 @@ FROM
                     '<http://example.com/' || replace(replace(replace(replace(replace(replace(CAST("Student_ref"."Sport" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS o,
                     NULL AS g
    FROM "Student",
-        "Student" AS "Student_ref"
-   UNION ALL SELECT '<http://example.com/Student/' || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST("Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
-                    '<http://xmlns.com/foaf/0.1/Person>' AS o,
-                    NULL AS g
-   FROM "Student"
-   UNION ALL SELECT '<http://example.com/Student/' || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST("Student"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://xmlns.com/foaf/0.1/name>' AS p,
-                    "Student"."Name" AS o,
-                    NULL AS g
-   FROM "Student") AS anon_1
+        "Student" AS "Student_ref") AS anon_1
 ```
 
 ## Raw ouput triples
