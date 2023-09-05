@@ -8,7 +8,7 @@ SELECT anon_1.s AS s,
        anon_1.p AS p,
        anon_1.o AS o
 FROM
-  (SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/resource/student_' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+  (SELECT '<http://example.com/resource/student_' || replace(replace(replace(replace(replace(replace(CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
           '<http://example.com/numSport>' AS p,
           "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR".SPORTCOUNT AS o,
           NULL AS g
@@ -17,7 +17,7 @@ FROM
              COUNT("Sport") AS SPORTCOUNT
       FROM "Student"
       GROUP BY "Name") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('http://example.com/resource/student_' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '<http://example.com/resource/student_' || replace(replace(replace(replace(replace(replace(CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://xmlns.com/foaf/0.1/name>' AS p,
                     "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."Name" AS o,
                     NULL AS g
@@ -50,7 +50,7 @@ FAIL
 
 ```
 Traceback (most recent call last):
-  File "/tests/test_rdb2rdf.py", line 174, in test_rdb2rdf
+  File "/tests/test_rdb2rdf.py", line 183, in test_rdb2rdf
     assert iso_made == iso_goal
 AssertionError: assert <Graph identi...rphicGraph'>)> == <Graph identi...rphicGraph'>)>
   Use -v to get more diff

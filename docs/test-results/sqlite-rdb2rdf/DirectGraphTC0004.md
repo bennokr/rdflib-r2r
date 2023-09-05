@@ -14,13 +14,13 @@ FROM
           NULL AS g
    FROM "Student_Sport"
    UNION ALL SELECT '_:Student_Sport#' || CAST(CAST("Student_Sport".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Student_Sport#Sport>' AS p,
-                    "Student_Sport"."Sport" AS o,
+                    '<http://example.com/base/Student_Sport#Student>' AS p,
+                    "Student_Sport"."Student" AS o,
                     NULL AS g
    FROM "Student_Sport"
    UNION ALL SELECT '_:Student_Sport#' || CAST(CAST("Student_Sport".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Student_Sport#Student>' AS p,
-                    "Student_Sport"."Student" AS o,
+                    '<http://example.com/base/Student_Sport#Sport>' AS p,
+                    "Student_Sport"."Sport" AS o,
                     NULL AS g
    FROM "Student_Sport") AS anon_1
 ```

@@ -9,9 +9,14 @@ SELECT anon_1.s AS s,
        anon_1.o AS o
 FROM
   (SELECT '<http://example.com/Patient/' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-          '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
-          '<http://xmlns.com/foaf/0.1/Person>' AS o,
+          '<http://example.com/lastName>' AS p,
+          "Patient"."LastName" AS o,
           NULL AS g
+   FROM "Patient"
+   UNION ALL SELECT '<http://example.com/Patient/' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/firstName>' AS p,
+                    "Patient"."FirstName" AS o,
+                    NULL AS g
    FROM "Patient"
    UNION ALL SELECT '<http://example.com/Patient/' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/id>' AS p,
@@ -19,18 +24,13 @@ FROM
                     NULL AS g
    FROM "Patient"
    UNION ALL SELECT '<http://example.com/Patient/' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
+                    '<http://xmlns.com/foaf/0.1/Person>' AS o,
+                    NULL AS g
+   FROM "Patient"
+   UNION ALL SELECT '<http://example.com/Patient/' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/gender>' AS p,
                     "Patient"."Sex" AS o,
-                    NULL AS g
-   FROM "Patient"
-   UNION ALL SELECT '<http://example.com/Patient/' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/lastName>' AS p,
-                    "Patient"."LastName" AS o,
-                    NULL AS g
-   FROM "Patient"
-   UNION ALL SELECT '<http://example.com/Patient/' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/firstName>' AS p,
-                    "Patient"."FirstName" AS o,
                     NULL AS g
    FROM "Patient") AS anon_1
 ```

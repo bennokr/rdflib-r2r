@@ -4,12 +4,12 @@ Template with table columns with special chars
 
 ## Created SQL query
 ```sql
-SELECT '<http://example.com/name>' AS p,
-       anon_1."Name" AS o,
-       '<http://example.com/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s
+SELECT '<http://example.com/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+       '<http://example.com/name>' AS p,
+       anon_1."Name" AS o
 FROM
-  (SELECT "Country Info"."Name" AS "Name",
-          "Country Info"."Country Code" AS "Country Code",
+  (SELECT "Country Info"."Country Code" AS "Country Code",
+          "Country Info"."Name" AS "Name",
           "Country Info"."Name" AS "Name__1"
    FROM "Country Info") AS anon_1
 ```

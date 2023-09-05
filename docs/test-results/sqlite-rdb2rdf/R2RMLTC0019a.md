@@ -4,8 +4,8 @@ Generation of triples by using IRI value in columns
 
 ## Created SQL query
 ```sql
-SELECT '<' || CAST(anon_1."View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."FirstName" AS VARCHAR) || '>' AS s,
-       '<http://xmlns.com/foaf/0.1/name>' AS p,
+SELECT '<http://xmlns.com/foaf/0.1/name>' AS p,
+       '<' || CAST(anon_1."View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."FirstName" AS VARCHAR) || '>' AS s,
        anon_1."View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."FirstName" AS o
 FROM
   (SELECT "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."FirstName",

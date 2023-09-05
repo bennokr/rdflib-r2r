@@ -4,13 +4,13 @@ Generation of empty triples from referenced columns that have null values
 
 ## Created SQL query
 ```sql
-SELECT '<http://example.com/Person/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."DateOfBirth" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-       anon_1."DateOfBirth" AS o,
+SELECT anon_1."DateOfBirth" AS o,
+       '<http://example.com/Person/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."DateOfBirth" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
        '<http://example.com/BirthDay>' AS p
 FROM
-  (SELECT "Person"."ID" AS "ID",
+  (SELECT "Person"."DateOfBirth" AS "DateOfBirth",
+          "Person"."ID" AS "ID",
           "Person"."Name" AS "Name",
-          "Person"."DateOfBirth" AS "DateOfBirth",
           "Person"."DateOfBirth" AS "DateOfBirth__1"
    FROM "Person") AS anon_1
 ```

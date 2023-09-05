@@ -5,8 +5,8 @@ Template with table columns with special chars and backslashes
 ## Created SQL query
 ```sql
 SELECT '<http://example.com/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-       '<http://example.com/code>' AS p,
-       '{{{ ' || CAST(anon_1."ISO 3166" AS VARCHAR) || ' }' || '}' || '}' AS o
+       '{{{ ' || CAST(anon_1."ISO 3166" AS VARCHAR) || ' }' || '}' || '}' AS o,
+       '<http://example.com/code>' AS p
 FROM
   (SELECT "Country Info"."Country Code" AS "Country Code",
           "Country Info"."Name" AS "Name",

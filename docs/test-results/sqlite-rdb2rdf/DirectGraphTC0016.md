@@ -14,8 +14,18 @@ FROM
           NULL AS g
    FROM "Patient"
    UNION ALL SELECT '<Patient/ID=' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Patient#Weight>' AS p,
-                    "Patient"."Weight" AS o,
+                    '<http://example.com/base/Patient#EntranceDate>' AS p,
+                    '"' || replace(CAST("Patient"."EntranceDate" AS VARCHAR), ' ', 'T') || '"^^<http://www.w3.org/2001/XMLSchema#dateTime>' AS anon_2,
+                    NULL AS g
+   FROM "Patient"
+   UNION ALL SELECT '<Patient/ID=' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/Patient#Sex>' AS p,
+                    "Patient"."Sex" AS o,
+                    NULL AS g
+   FROM "Patient"
+   UNION ALL SELECT '<Patient/ID=' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/Patient#LastName>' AS p,
+                    "Patient"."LastName" AS o,
                     NULL AS g
    FROM "Patient"
    UNION ALL SELECT '<Patient/ID=' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
@@ -29,13 +39,8 @@ FROM
                     NULL AS g
    FROM "Patient"
    UNION ALL SELECT '<Patient/ID=' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Patient#Sex>' AS p,
-                    "Patient"."Sex" AS o,
-                    NULL AS g
-   FROM "Patient"
-   UNION ALL SELECT '<Patient/ID=' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Patient#Height>' AS p,
-                    "Patient"."Height" AS o,
+                    '<http://example.com/base/Patient#Weight>' AS p,
+                    "Patient"."Weight" AS o,
                     NULL AS g
    FROM "Patient"
    UNION ALL SELECT '<Patient/ID=' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
@@ -43,22 +48,17 @@ FROM
                     '"' || CASE "Patient"."PaidInAdvance"
                                WHEN 1 THEN 'true'
                                WHEN 0 THEN 'false'
-                           END || '"^^<http://www.w3.org/2001/XMLSchema#boolean>' AS anon_2,
+                           END || '"^^<http://www.w3.org/2001/XMLSchema#boolean>' AS anon_3,
                                   NULL AS g
    FROM "Patient"
    UNION ALL SELECT '<Patient/ID=' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/Patient#BirthDate>' AS p,
-                    '"' || CAST("Patient"."BirthDate" AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#date>' AS anon_3,
+                    '"' || CAST("Patient"."BirthDate" AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#date>' AS anon_4,
                     NULL AS g
    FROM "Patient"
    UNION ALL SELECT '<Patient/ID=' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Patient#LastName>' AS p,
-                    "Patient"."LastName" AS o,
-                    NULL AS g
-   FROM "Patient"
-   UNION ALL SELECT '<Patient/ID=' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Patient#EntranceDate>' AS p,
-                    '"' || replace(CAST("Patient"."EntranceDate" AS VARCHAR), ' ', 'T') || '"^^<http://www.w3.org/2001/XMLSchema#dateTime>' AS anon_4,
+                    '<http://example.com/base/Patient#Height>' AS p,
+                    "Patient"."Height" AS o,
                     NULL AS g
    FROM "Patient"
    UNION ALL SELECT '<Patient/ID=' || replace(replace(replace(replace(replace(replace(CAST("Patient"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,

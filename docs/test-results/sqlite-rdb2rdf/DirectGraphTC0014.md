@@ -19,13 +19,13 @@ FROM
                     NULL AS g
    FROM "DEPT"
    UNION ALL SELECT '_:DEPT#' || CAST(CAST("DEPT".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/DEPT#dname>' AS p,
-                    "DEPT".dname AS o,
+                    '<http://example.com/base/DEPT#deptno>' AS p,
+                    '"' || CAST(CAST("DEPT".deptno AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
                     NULL AS g
    FROM "DEPT"
    UNION ALL SELECT '_:DEPT#' || CAST(CAST("DEPT".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/DEPT#deptno>' AS p,
-                    '"' || CAST(CAST("DEPT".deptno AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    '<http://example.com/base/DEPT#dname>' AS p,
+                    "DEPT".dname AS o,
                     NULL AS g
    FROM "DEPT"
    UNION ALL SELECT '<EMP/empno=' || replace(replace(replace(replace(replace(replace(CAST("EMP".empno AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
@@ -39,23 +39,23 @@ FROM
                     NULL AS g
    FROM "EMP"
    UNION ALL SELECT '<EMP/empno=' || replace(replace(replace(replace(replace(replace(CAST("EMP".empno AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/EMP#job>' AS p,
-                    "EMP".job AS o,
-                    NULL AS g
-   FROM "EMP"
-   UNION ALL SELECT '<EMP/empno=' || replace(replace(replace(replace(replace(replace(CAST("EMP".empno AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/EMP#ename>' AS p,
-                    "EMP".ename AS o,
-                    NULL AS g
-   FROM "EMP"
-   UNION ALL SELECT '<EMP/empno=' || replace(replace(replace(replace(replace(replace(CAST("EMP".empno AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/EMP#etype>' AS p,
                     "EMP".etype AS o,
                     NULL AS g
    FROM "EMP"
    UNION ALL SELECT '<EMP/empno=' || replace(replace(replace(replace(replace(replace(CAST("EMP".empno AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/EMP#job>' AS p,
+                    "EMP".job AS o,
+                    NULL AS g
+   FROM "EMP"
+   UNION ALL SELECT '<EMP/empno=' || replace(replace(replace(replace(replace(replace(CAST("EMP".empno AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/EMP#deptno>' AS p,
                     '"' || CAST(CAST("EMP".deptno AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    NULL AS g
+   FROM "EMP"
+   UNION ALL SELECT '<EMP/empno=' || replace(replace(replace(replace(replace(replace(CAST("EMP".empno AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/EMP#ename>' AS p,
+                    "EMP".ename AS o,
                     NULL AS g
    FROM "EMP"
    UNION ALL SELECT '<EMP/empno=' || replace(replace(replace(replace(replace(replace(CAST("EMP".empno AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
@@ -76,13 +76,13 @@ FROM
                     NULL AS g
    FROM "LIKES"
    UNION ALL SELECT '_:LIKES#' || CAST(CAST("LIKES".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/LIKES#id>' AS p,
-                    '"' || CAST(CAST("LIKES".id AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    '<http://example.com/base/LIKES#likeType>' AS p,
+                    "LIKES"."likeType" AS o,
                     NULL AS g
    FROM "LIKES"
    UNION ALL SELECT '_:LIKES#' || CAST(CAST("LIKES".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/LIKES#likeType>' AS p,
-                    "LIKES"."likeType" AS o,
+                    '<http://example.com/base/LIKES#id>' AS p,
+                    '"' || CAST(CAST("LIKES".id AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
                     NULL AS g
    FROM "LIKES") AS anon_1
 ```

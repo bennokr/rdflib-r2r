@@ -14,11 +14,6 @@ FROM
           NULL AS g
    FROM "IOUs"
    UNION ALL SELECT '_:' || CAST("IOUs".fname AS VARCHAR) || '_' || CAST("IOUs".lname AS VARCHAR) || '_' || CAST("IOUs".amount AS VARCHAR) AS s,
-                    '<http://example.com/base/IOUs#fname>' AS p,
-                    "IOUs".fname AS o,
-                    NULL AS g
-   FROM "IOUs"
-   UNION ALL SELECT '_:' || CAST("IOUs".fname AS VARCHAR) || '_' || CAST("IOUs".lname AS VARCHAR) || '_' || CAST("IOUs".amount AS VARCHAR) AS s,
                     '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
                     '<http://example.com/base/IOUs>' AS o,
                     NULL AS g
@@ -28,19 +23,24 @@ FROM
                     "IOUs".lname AS o,
                     NULL AS g
    FROM "IOUs"
+   UNION ALL SELECT '_:' || CAST("IOUs".fname AS VARCHAR) || '_' || CAST("IOUs".lname AS VARCHAR) || '_' || CAST("IOUs".amount AS VARCHAR) AS s,
+                    '<http://example.com/base/IOUs#fname>' AS p,
+                    "IOUs".fname AS o,
+                    NULL AS g
+   FROM "IOUs"
    UNION ALL SELECT '_:' || CAST("Lives".fname AS VARCHAR) || '_' || CAST("Lives".lname AS VARCHAR) || '_' || CAST("Lives".city AS VARCHAR) AS s,
                     '<http://example.com/base/IOUs#lname>' AS p,
                     "Lives".lname AS o,
                     NULL AS g
    FROM "Lives"
    UNION ALL SELECT '_:' || CAST("Lives".fname AS VARCHAR) || '_' || CAST("Lives".lname AS VARCHAR) || '_' || CAST("Lives".city AS VARCHAR) AS s,
-                    '<http://example.com/base/IOUs#city>' AS p,
-                    "Lives".city AS o,
+                    '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
+                    '<http://example.com/base/Lives>' AS o,
                     NULL AS g
    FROM "Lives"
    UNION ALL SELECT '_:' || CAST("Lives".fname AS VARCHAR) || '_' || CAST("Lives".lname AS VARCHAR) || '_' || CAST("Lives".city AS VARCHAR) AS s,
-                    '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
-                    '<http://example.com/base/Lives>' AS o,
+                    '<http://example.com/base/IOUs#city>' AS p,
+                    "Lives".city AS o,
                     NULL AS g
    FROM "Lives"
    UNION ALL SELECT '_:' || CAST("Lives".fname AS VARCHAR) || '_' || CAST("Lives".lname AS VARCHAR) || '_' || CAST("Lives".city AS VARCHAR) AS s,

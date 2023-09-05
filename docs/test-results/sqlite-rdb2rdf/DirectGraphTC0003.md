@@ -14,13 +14,13 @@ FROM
           NULL AS g
    FROM "Student"
    UNION ALL SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Student#FirstName>' AS p,
-                    "Student"."FirstName" AS o,
+                    '<http://example.com/base/Student#LastName>' AS p,
+                    "Student"."LastName" AS o,
                     NULL AS g
    FROM "Student"
    UNION ALL SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Student#LastName>' AS p,
-                    "Student"."LastName" AS o,
+                    '<http://example.com/base/Student#FirstName>' AS p,
+                    "Student"."FirstName" AS o,
                     NULL AS g
    FROM "Student"
    UNION ALL SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,

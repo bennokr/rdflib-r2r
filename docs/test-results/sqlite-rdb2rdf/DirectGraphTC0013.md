@@ -19,13 +19,13 @@ FROM
                     NULL AS g
    FROM "Person"
    UNION ALL SELECT '<Person/ID=' || replace(replace(replace(replace(replace(replace(CAST("Person"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Person#ID>' AS p,
-                    '"' || CAST(CAST("Person"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    '<http://example.com/base/Person#Name>' AS p,
+                    "Person"."Name" AS o,
                     NULL AS g
    FROM "Person"
    UNION ALL SELECT '<Person/ID=' || replace(replace(replace(replace(replace(replace(CAST("Person"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Person#Name>' AS p,
-                    "Person"."Name" AS o,
+                    '<http://example.com/base/Person#ID>' AS p,
+                    '"' || CAST(CAST("Person"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
                     NULL AS g
    FROM "Person") AS anon_1
 ```

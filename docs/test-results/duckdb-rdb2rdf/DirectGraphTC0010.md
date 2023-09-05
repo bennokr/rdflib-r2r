@@ -8,84 +8,79 @@ SELECT anon_1.s AS s,
        anon_1.p AS p,
        anon_1.o AS o
 FROM
-  (SELECT CAST('<' AS VARCHAR) || CAST('Country%20Info/Country%20Code=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country Info"."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+  (SELECT '_:Country Info#' || CAST(CAST("Country Info".rowid AS VARCHAR) AS VARCHAR) AS s,
           '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
           '<http://example.com/base/Country%20Info>' AS o,
           NULL AS g
    FROM "Country Info"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Country%20Info/Country%20Code=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country Info"."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '_:Country Info#' || CAST(CAST("Country Info".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/Country%20Info#Country%20Code>' AS p,
+                    '"' || CAST(CAST("Country Info"."Country Code" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    NULL AS g
+   FROM "Country Info"
+   UNION ALL SELECT '_:Country Info#' || CAST(CAST("Country Info".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Country%20Info#ISO%203166>' AS p,
                     "Country Info"."ISO 3166" AS o,
                     NULL AS g
    FROM "Country Info"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Country%20Info/Country%20Code=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country Info"."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
+   UNION ALL SELECT '_:Country Info#' || CAST(CAST("Country Info".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Country%20Info#Name>' AS p,
                     "Country Info"."Name" AS o,
-                    NULL AS g
-   FROM "Country Info"
-   UNION ALL SELECT CAST('<' AS VARCHAR) || CAST('Country%20Info/Country%20Code=' AS VARCHAR) || replace(replace(replace(replace(replace(replace(CAST("Country Info"."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || CAST('>' AS VARCHAR) AS s,
-                    '<http://example.com/base/Country%20Info#Country%20Code>' AS p,
-                    CAST('"' AS VARCHAR) || CAST(CAST("Country Info"."Country Code" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
                     NULL AS g
    FROM "Country Info") AS anon_1
 ```
 
 ## Raw ouput triples
 ```
-<http://example.com/base/Country%20Info/Country%20Code=1> <http://example.com/base/Country%20Info#Country%20Code> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<http://example.com/base/Country%20Info/Country%20Code=1> <http://example.com/base/Country%20Info#ISO%203166> "BO" .
-<http://example.com/base/Country%20Info/Country%20Code=1> <http://example.com/base/Country%20Info#Name> "Bolivia, Plurinational State of" .
-<http://example.com/base/Country%20Info/Country%20Code=1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
-<http://example.com/base/Country%20Info/Country%20Code=2> <http://example.com/base/Country%20Info#Country%20Code> "2"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<http://example.com/base/Country%20Info/Country%20Code=2> <http://example.com/base/Country%20Info#ISO%203166> "IE" .
-<http://example.com/base/Country%20Info/Country%20Code=2> <http://example.com/base/Country%20Info#Name> "Ireland" .
-<http://example.com/base/Country%20Info/Country%20Code=2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
-<http://example.com/base/Country%20Info/Country%20Code=3> <http://example.com/base/Country%20Info#Country%20Code> "3"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<http://example.com/base/Country%20Info/Country%20Code=3> <http://example.com/base/Country%20Info#ISO%203166> "MF" .
-<http://example.com/base/Country%20Info/Country%20Code=3> <http://example.com/base/Country%20Info#Name> "Saint Martin (French part)" .
-<http://example.com/base/Country%20Info/Country%20Code=3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
+_:Country Info#0 <http://example.com/base/Country%20Info#Country%20Code> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:Country Info#0 <http://example.com/base/Country%20Info#ISO%203166> "BO" .
+_:Country Info#0 <http://example.com/base/Country%20Info#Name> "Bolivia, Plurinational State of" .
+_:Country Info#0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
+_:Country Info#1 <http://example.com/base/Country%20Info#Country%20Code> "2"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:Country Info#1 <http://example.com/base/Country%20Info#ISO%203166> "IE" .
+_:Country Info#1 <http://example.com/base/Country%20Info#Name> "Ireland" .
+_:Country Info#1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
+_:Country Info#2 <http://example.com/base/Country%20Info#Country%20Code> "3"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:Country Info#2 <http://example.com/base/Country%20Info#ISO%203166> "MF" .
+_:Country Info#2 <http://example.com/base/Country%20Info#Name> "Saint Martin (French part)" .
+_:Country Info#2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
 ```
 
 ## Triple Diff
 ```diff
-<http://example.com/base/Country%20Info/Country%20Code=1> <http://example.com/base/Country%20Info#Country%20Code> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<http://example.com/base/Country%20Info/Country%20Code=1> <http://example.com/base/Country%20Info#ISO%203166> "BO" .
-<http://example.com/base/Country%20Info/Country%20Code=1> <http://example.com/base/Country%20Info#Name> "Bolivia, Plurinational State of" .
-<http://example.com/base/Country%20Info/Country%20Code=1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
-<http://example.com/base/Country%20Info/Country%20Code=2> <http://example.com/base/Country%20Info#Country%20Code> "2"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<http://example.com/base/Country%20Info/Country%20Code=2> <http://example.com/base/Country%20Info#ISO%203166> "IE" .
-<http://example.com/base/Country%20Info/Country%20Code=2> <http://example.com/base/Country%20Info#Name> "Ireland" .
-<http://example.com/base/Country%20Info/Country%20Code=2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
-<http://example.com/base/Country%20Info/Country%20Code=3> <http://example.com/base/Country%20Info#Country%20Code> "3"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<http://example.com/base/Country%20Info/Country%20Code=3> <http://example.com/base/Country%20Info#ISO%203166> "MF" .
-<http://example.com/base/Country%20Info/Country%20Code=3> <http://example.com/base/Country%20Info#Name> "Saint Martin (French part)" .
-<http://example.com/base/Country%20Info/Country%20Code=3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
+- <http://example.com/base/Country%20Info/Country%20Code=1> <http://example.com/base/Country%20Info#Country%20Code> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+- <http://example.com/base/Country%20Info/Country%20Code=1> <http://example.com/base/Country%20Info#ISO%203166> "BO" .
+- <http://example.com/base/Country%20Info/Country%20Code=1> <http://example.com/base/Country%20Info#Name> "Bolivia, Plurinational State of" .
+- <http://example.com/base/Country%20Info/Country%20Code=1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
+- <http://example.com/base/Country%20Info/Country%20Code=2> <http://example.com/base/Country%20Info#Country%20Code> "2"^^<http://www.w3.org/2001/XMLSchema#integer> .
+- <http://example.com/base/Country%20Info/Country%20Code=2> <http://example.com/base/Country%20Info#ISO%203166> "IE" .
+- <http://example.com/base/Country%20Info/Country%20Code=2> <http://example.com/base/Country%20Info#Name> "Ireland" .
+- <http://example.com/base/Country%20Info/Country%20Code=2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
+- <http://example.com/base/Country%20Info/Country%20Code=3> <http://example.com/base/Country%20Info#Country%20Code> "3"^^<http://www.w3.org/2001/XMLSchema#integer> .
+- <http://example.com/base/Country%20Info/Country%20Code=3> <http://example.com/base/Country%20Info#ISO%203166> "MF" .
+- <http://example.com/base/Country%20Info/Country%20Code=3> <http://example.com/base/Country%20Info#Name> "Saint Martin (French part)" .
+- <http://example.com/base/Country%20Info/Country%20Code=3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
++ _:cb0 <http://example.com/base/Country%20Info#Country%20Code> "3"^^<http://www.w3.org/2001/XMLSchema#integer> .
++ _:cb0 <http://example.com/base/Country%20Info#ISO%203166> "MF" .
++ _:cb0 <http://example.com/base/Country%20Info#Name> "Saint Martin (French part)" .
++ _:cb0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
++ _:cbab6c2c7798d8af874508dbdce5550932f82e00611ad50e54c899adb86732cfa2 <http://example.com/base/Country%20Info#Country%20Code> "2"^^<http://www.w3.org/2001/XMLSchema#integer> .
++ _:cbab6c2c7798d8af874508dbdce5550932f82e00611ad50e54c899adb86732cfa2 <http://example.com/base/Country%20Info#ISO%203166> "IE" .
++ _:cbab6c2c7798d8af874508dbdce5550932f82e00611ad50e54c899adb86732cfa2 <http://example.com/base/Country%20Info#Name> "Ireland" .
++ _:cbab6c2c7798d8af874508dbdce5550932f82e00611ad50e54c899adb86732cfa2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
++ _:cbe540d7ec1ebef7d3a61803420287e23b5c9619364333cd3767b454013a35f6ab <http://example.com/base/Country%20Info#Country%20Code> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
++ _:cbe540d7ec1ebef7d3a61803420287e23b5c9619364333cd3767b454013a35f6ab <http://example.com/base/Country%20Info#ISO%203166> "BO" .
++ _:cbe540d7ec1ebef7d3a61803420287e23b5c9619364333cd3767b454013a35f6ab <http://example.com/base/Country%20Info#Name> "Bolivia, Plurinational State of" .
++ _:cbe540d7ec1ebef7d3a61803420287e23b5c9619364333cd3767b454013a35f6ab <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.com/base/Country%20Info> .
 ```
 
-SUCCES
+FAIL
 
 ```
 Traceback (most recent call last):
-  File "/tests/test_rdb2rdf.py", line 198, in test_rdb2rdf
-    o_triples = sorted(g_made.triples([None, None, o]))
-  File "/opt/miniconda3/envs/rdf/lib/python3.9/site-packages/rdflib/graph.py", line 530, in triples
-    for (_s, _p, _o), cg in self.__store.triples((s, p, o), context=self):  # type: ignore  [arg-type]
-  File "/rdflib_r2r/r2r_store.py", line 652, in triples
-    rows = list(conn.execute(query))
-  File "/opt/miniconda3/envs/rdf/lib/python3.9/site-packages/sqlalchemy/engine/result.py", line 381, in iterrows
-    for row in self._fetchiter_impl():
-  File "/opt/miniconda3/envs/rdf/lib/python3.9/site-packages/sqlalchemy/engine/cursor.py", line 1788, in _fetchiter_impl
-    row = fetchone(self, self.cursor)
-  File "/opt/miniconda3/envs/rdf/lib/python3.9/site-packages/sqlalchemy/engine/cursor.py", line 960, in fetchone
-    self.handle_exception(result, dbapi_cursor, e)
-  File "/opt/miniconda3/envs/rdf/lib/python3.9/site-packages/sqlalchemy/engine/cursor.py", line 941, in handle_exception
-    result.connection._handle_dbapi_exception(
-  File "/opt/miniconda3/envs/rdf/lib/python3.9/site-packages/sqlalchemy/engine/base.py", line 1999, in _handle_dbapi_exception
-    util.raise_(exc_info[1], with_traceback=exc_info[2])
-  File "/opt/miniconda3/envs/rdf/lib/python3.9/site-packages/sqlalchemy/util/compat.py", line 207, in raise_
-    raise exception
-  File "/opt/miniconda3/envs/rdf/lib/python3.9/site-packages/sqlalchemy/engine/cursor.py", line 955, in fetchone
-    row = dbapi_cursor.fetchone()
-duckdb.ConversionException: Conversion Error: Could not convert string 'BO' to INT8
+  File "/tests/test_rdb2rdf.py", line 183, in test_rdb2rdf
+    assert iso_made == iso_goal
+AssertionError: assert <Graph identi...rphicGraph'>)> == <Graph identi...rphicGraph'>)>
+  Use -v to get more diff
 
 ```

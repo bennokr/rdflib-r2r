@@ -9,9 +9,19 @@ SELECT anon_1.s AS s,
        anon_1.o AS o
 FROM
   (SELECT '_:' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR".deptId AS VARCHAR) AS s,
-          '<http://example.com/dept#deptno>' AS p,
-          "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."deptno" AS o,
+          '<http://example.com/dept#name>' AS p,
+          "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."dname" AS o,
           NULL AS g
+   FROM
+     (SELECT ('Department' || "deptno") AS deptId ,
+             "deptno" ,
+             "dname" ,
+             "loc"
+      FROM "DEPT") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"
+   UNION ALL SELECT '_:' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR".deptId AS VARCHAR) AS s,
+                    '<http://example.com/dept#COMPANY>' AS p,
+                    '"EXAMPLE Corporation"' AS o,
+                    NULL AS g
    FROM
      (SELECT ('Department' || "deptno") AS deptId ,
              "deptno" ,
@@ -29,8 +39,8 @@ FROM
              "loc"
       FROM "DEPT") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"
    UNION ALL SELECT '_:' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR".deptId AS VARCHAR) AS s,
-                    '<http://example.com/dept#name>' AS p,
-                    "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."dname" AS o,
+                    '<http://example.com/dept#deptno>' AS p,
+                    "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."deptno" AS o,
                     NULL AS g
    FROM
      (SELECT ('Department' || "deptno") AS deptId ,
@@ -38,64 +48,9 @@ FROM
              "dname" ,
              "loc"
       FROM "DEPT") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"
-   UNION ALL SELECT '_:' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR".deptId AS VARCHAR) AS s,
-                    '<http://example.com/dept#COMPANY>' AS p,
-                    '"EXAMPLE Corporation"' AS o,
-                    NULL AS g
-   FROM
-     (SELECT ('Department' || "deptno") AS deptId ,
-             "deptno" ,
-             "dname" ,
-             "loc"
-      FROM "DEPT") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"
-   UNION ALL SELECT '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".empURI AS VARCHAR) || '>' AS s,
-                    '<http://example.com/emp#emptype>' AS p,
-                    '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".empTypeURI AS VARCHAR) || '>' AS o,
-                    NULL AS g
-   FROM
-     (SELECT ('http://example.com/emp/' || "empno") AS empURI ,
-             "empno" ,
-             "ename" ,
-             ('http://example.com/emp/job/'|| "job") AS jobTypeURI ,
-             "job" ,
-             "deptno" ,
-             ('http://example.com/emp/etype/'|| "etype") AS empTypeURI ,
-             "etype" ,
-             ('http://example.com/graph/'|| "job" || '/' || "etype") AS graphURI
-      FROM "EMP") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"
-   UNION ALL SELECT '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".empURI AS VARCHAR) || '>' AS s,
-                    '<http://example.com/emp#deptNum>' AS p,
-                    "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"."deptno" AS o,
-                    NULL AS g
-   FROM
-     (SELECT ('http://example.com/emp/' || "empno") AS empURI ,
-             "empno" ,
-             "ename" ,
-             ('http://example.com/emp/job/'|| "job") AS jobTypeURI ,
-             "job" ,
-             "deptno" ,
-             ('http://example.com/emp/etype/'|| "etype") AS empTypeURI ,
-             "etype" ,
-             ('http://example.com/graph/'|| "job" || '/' || "etype") AS graphURI
-      FROM "EMP") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"
    UNION ALL SELECT '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".empURI AS VARCHAR) || '>' AS s,
                     '<http://example.com/emp#empno>' AS p,
                     "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"."empno" AS o,
-                    NULL AS g
-   FROM
-     (SELECT ('http://example.com/emp/' || "empno") AS empURI ,
-             "empno" ,
-             "ename" ,
-             ('http://example.com/emp/job/'|| "job") AS jobTypeURI ,
-             "job" ,
-             "deptno" ,
-             ('http://example.com/emp/etype/'|| "etype") AS empTypeURI ,
-             "etype" ,
-             ('http://example.com/graph/'|| "job" || '/' || "etype") AS graphURI
-      FROM "EMP") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"
-   UNION ALL SELECT '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".empURI AS VARCHAR) || '>' AS s,
-                    '<http://example.com/emp#jobtype>' AS p,
-                    '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".jobTypeURI AS VARCHAR) || '>' AS o,
                     NULL AS g
    FROM
      (SELECT ('http://example.com/emp/' || "empno") AS empURI ,
@@ -124,8 +79,75 @@ FROM
              ('http://example.com/graph/'|| "job" || '/' || "etype") AS graphURI
       FROM "EMP") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"
    UNION ALL SELECT '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".empURI AS VARCHAR) || '>' AS s,
-                    '<http://example.com/emp#etype>' AS p,
-                    "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"."etype" AS o,
+                    '<http://example.com/emp#name>' AS p,
+                    "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"."ename" AS o,
+                    NULL AS g
+   FROM
+     (SELECT ('http://example.com/emp/' || "empno") AS empURI ,
+             "empno" ,
+             "ename" ,
+             ('http://example.com/emp/job/'|| "job") AS jobTypeURI ,
+             "job" ,
+             "deptno" ,
+             ('http://example.com/emp/etype/'|| "etype") AS empTypeURI ,
+             "etype" ,
+             ('http://example.com/graph/'|| "job" || '/' || "etype") AS graphURI
+      FROM "EMP") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"
+   UNION ALL SELECT '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".empURI AS VARCHAR) || '>' AS s,
+                    '<http://example.com/emp#deptNum>' AS p,
+                    "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"."deptno" AS o,
+                    NULL AS g
+   FROM
+     (SELECT ('http://example.com/emp/' || "empno") AS empURI ,
+             "empno" ,
+             "ename" ,
+             ('http://example.com/emp/job/'|| "job") AS jobTypeURI ,
+             "job" ,
+             "deptno" ,
+             ('http://example.com/emp/etype/'|| "etype") AS empTypeURI ,
+             "etype" ,
+             ('http://example.com/graph/'|| "job" || '/' || "etype") AS graphURI
+      FROM "EMP") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"
+   UNION ALL SELECT '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".empURI AS VARCHAR) || '>' AS s,
+                    '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
+                    '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".jobTypeURI AS VARCHAR) || '>' AS o,
+                    NULL AS g
+   FROM
+     (SELECT ('http://example.com/emp/' || "empno") AS empURI ,
+             "empno" ,
+             "ename" ,
+             ('http://example.com/emp/job/'|| "job") AS jobTypeURI ,
+             "job" ,
+             "deptno" ,
+             ('http://example.com/emp/etype/'|| "etype") AS empTypeURI ,
+             "etype" ,
+             ('http://example.com/graph/'|| "job" || '/' || "etype") AS graphURI
+      FROM "EMP") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"
+   UNION ALL SELECT '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".empURI AS VARCHAR) || '>' AS s,
+                    '<http://example.com/emp#c_ref_deptno>' AS p,
+                    '_:' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR_ref".deptId AS VARCHAR) AS o,
+                    NULL AS g
+   FROM
+     (SELECT ('http://example.com/emp/' || "empno") AS empURI ,
+             "empno" ,
+             "ename" ,
+             ('http://example.com/emp/job/'|| "job") AS jobTypeURI ,
+             "job" ,
+             "deptno" ,
+             ('http://example.com/emp/etype/'|| "etype") AS empTypeURI ,
+             "etype" ,
+             ('http://example.com/graph/'|| "job" || '/' || "etype") AS graphURI
+      FROM "EMP") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS",
+
+     (SELECT ('Department' || "deptno") AS deptId ,
+             "deptno" ,
+             "dname" ,
+             "loc"
+      FROM "DEPT") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR_ref"
+   WHERE "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"."deptno" = "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR_ref"."deptno"
+   UNION ALL SELECT '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".empURI AS VARCHAR) || '>' AS s,
+                    '<http://example.com/emp#jobtype>' AS p,
+                    '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".jobTypeURI AS VARCHAR) || '>' AS o,
                     NULL AS g
    FROM
      (SELECT ('http://example.com/emp/' || "empno") AS empURI ,
@@ -154,8 +176,8 @@ FROM
              ('http://example.com/graph/'|| "job" || '/' || "etype") AS graphURI
       FROM "EMP") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"
    UNION ALL SELECT '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".empURI AS VARCHAR) || '>' AS s,
-                    '<http://example.com/emp#name>' AS p,
-                    "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"."ename" AS o,
+                    '<http://example.com/emp#etype>' AS p,
+                    "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"."etype" AS o,
                     NULL AS g
    FROM
      (SELECT ('http://example.com/emp/' || "empno") AS empURI ,
@@ -169,30 +191,8 @@ FROM
              ('http://example.com/graph/'|| "job" || '/' || "etype") AS graphURI
       FROM "EMP") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"
    UNION ALL SELECT '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".empURI AS VARCHAR) || '>' AS s,
-                    '<http://example.com/emp#c_ref_deptno>' AS p,
-                    '_:' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR_ref".deptId AS VARCHAR) AS o,
-                    NULL AS g
-   FROM
-     (SELECT ('Department' || "deptno") AS deptId ,
-             "deptno" ,
-             "dname" ,
-             "loc"
-      FROM "DEPT") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR_ref",
-
-     (SELECT ('http://example.com/emp/' || "empno") AS empURI ,
-             "empno" ,
-             "ename" ,
-             ('http://example.com/emp/job/'|| "job") AS jobTypeURI ,
-             "job" ,
-             "deptno" ,
-             ('http://example.com/emp/etype/'|| "etype") AS empTypeURI ,
-             "etype" ,
-             ('http://example.com/graph/'|| "job" || '/' || "etype") AS graphURI
-      FROM "EMP") AS "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"
-   WHERE "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS"."deptno" = "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR_ref"."deptno"
-   UNION ALL SELECT '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".empURI AS VARCHAR) || '>' AS s,
-                    '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
-                    '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".jobTypeURI AS VARCHAR) || '>' AS o,
+                    '<http://example.com/emp#emptype>' AS p,
+                    '<' || CAST("View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BS".empTypeURI AS VARCHAR) || '>' AS o,
                     NULL AS g
    FROM
      (SELECT ('http://example.com/emp/' || "empno") AS empURI ,

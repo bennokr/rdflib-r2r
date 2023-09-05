@@ -14,13 +14,18 @@ FROM
           NULL AS g
    FROM "Source"
    UNION ALL SELECT '<Source/ID=' || replace(replace(replace(replace(replace(replace(CAST("Source"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Source#attrA>' AS p,
-                    substr("Source"."attrA" || '    ', 1, 4) AS o,
+                    '<http://example.com/base/Source#ID>' AS p,
+                    '"' || CAST(CAST("Source"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
                     NULL AS g
    FROM "Source"
    UNION ALL SELECT '<Source/ID=' || replace(replace(replace(replace(replace(replace(CAST("Source"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/Source#attrB>' AS p,
                     substr("Source"."attrB" || '    ', 1, 4) AS o,
+                    NULL AS g
+   FROM "Source"
+   UNION ALL SELECT '<Source/ID=' || replace(replace(replace(replace(replace(replace(CAST("Source"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
+                    '<http://example.com/base/Source#attrA>' AS p,
+                    substr("Source"."attrA" || '    ', 1, 4) AS o,
                     NULL AS g
    FROM "Source"
    UNION ALL SELECT '<Source/ID=' || replace(replace(replace(replace(replace(replace(CAST("Source"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
@@ -31,19 +36,14 @@ FROM
         "Source"
    WHERE "Source"."attrA" = "Target_ref"."key2attr2"
      AND "Source"."attrB" = "Target_ref"."key2attr1"
-   UNION ALL SELECT '<Source/ID=' || replace(replace(replace(replace(replace(replace(CAST("Source"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Source#ID>' AS p,
-                    '"' || CAST(CAST("Source"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
-                    NULL AS g
-   FROM "Source"
    UNION ALL SELECT '<Target/PK=' || replace(replace(replace(replace(replace(replace(CAST("Target"."PK" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
                     '<http://example.com/base/Target>' AS o,
                     NULL AS g
    FROM "Target"
    UNION ALL SELECT '<Target/PK=' || replace(replace(replace(replace(replace(replace(CAST("Target"."PK" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Target#key2attr2>' AS p,
-                    substr("Target".key2attr2 || '    ', 1, 4) AS o,
+                    '<http://example.com/base/Target#key1attr2>' AS p,
+                    substr("Target".key1attr2 || '    ', 1, 4) AS o,
                     NULL AS g
    FROM "Target"
    UNION ALL SELECT '<Target/PK=' || replace(replace(replace(replace(replace(replace(CAST("Target"."PK" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
@@ -57,13 +57,13 @@ FROM
                     NULL AS g
    FROM "Target"
    UNION ALL SELECT '<Target/PK=' || replace(replace(replace(replace(replace(replace(CAST("Target"."PK" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Target#PK>' AS p,
-                    '"' || CAST(CAST("Target"."PK" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    '<http://example.com/base/Target#key2attr2>' AS p,
+                    substr("Target".key2attr2 || '    ', 1, 4) AS o,
                     NULL AS g
    FROM "Target"
    UNION ALL SELECT '<Target/PK=' || replace(replace(replace(replace(replace(replace(CAST("Target"."PK" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Target#key1attr2>' AS p,
-                    substr("Target".key1attr2 || '    ', 1, 4) AS o,
+                    '<http://example.com/base/Target#PK>' AS p,
+                    '"' || CAST(CAST("Target"."PK" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
                     NULL AS g
    FROM "Target") AS anon_1
 ```

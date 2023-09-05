@@ -5,12 +5,12 @@ Three columns mapping, by using a rr:template to produce literal
 ## Created SQL query
 ```sql
 SELECT '<http://xmlns.com/foaf/0.1/name>' AS p,
-       '<http://example.com/Student' || replace(replace(replace(replace(replace(replace(CAST(anon_1."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-       CAST(anon_1."FirstName" AS VARCHAR) || ' ' || CAST(anon_1."LastName" AS VARCHAR) AS o
+       CAST(anon_1."FirstName" AS VARCHAR) || ' ' || CAST(anon_1."LastName" AS VARCHAR) AS o,
+       '<http://example.com/Student' || replace(replace(replace(replace(replace(replace(CAST(anon_1."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s
 FROM
-  (SELECT "Student"."ID" AS "ID",
-          "Student"."FirstName" AS "FirstName",
-          "Student"."LastName" AS "LastName"
+  (SELECT "Student"."FirstName" AS "FirstName",
+          "Student"."LastName" AS "LastName",
+          "Student"."ID" AS "ID"
    FROM "Student") AS anon_1
 ```
 

@@ -19,13 +19,13 @@ FROM
                     NULL AS g
    FROM "Country Info"
    UNION ALL SELECT '<Country%20Info/Country%20Code=' || replace(replace(replace(replace(replace(replace(CAST("Country Info"."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Country%20Info#Country%20Code>' AS p,
-                    '"' || CAST(CAST("Country Info"."Country Code" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    '<http://example.com/base/Country%20Info#ISO%203166>' AS p,
+                    "Country Info"."ISO 3166" AS o,
                     NULL AS g
    FROM "Country Info"
    UNION ALL SELECT '<Country%20Info/Country%20Code=' || replace(replace(replace(replace(replace(replace(CAST("Country Info"."Country Code" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Country%20Info#ISO%203166>' AS p,
-                    "Country Info"."ISO 3166" AS o,
+                    '<http://example.com/base/Country%20Info#Country%20Code>' AS p,
+                    '"' || CAST(CAST("Country Info"."Country Code" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
                     NULL AS g
    FROM "Country Info") AS anon_1
 ```

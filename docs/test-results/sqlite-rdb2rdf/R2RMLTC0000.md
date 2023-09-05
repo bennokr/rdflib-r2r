@@ -4,8 +4,8 @@ one table, one column, zero rows
 
 ## Created SQL query
 ```sql
-SELECT '<http://example.com/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-       '<http://xmlns.com/foaf/0.1/name>' AS p,
+SELECT '<http://xmlns.com/foaf/0.1/name>' AS p,
+       '<http://example.com/' || replace(replace(replace(replace(replace(replace(CAST(anon_1."Name" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
        anon_1."Name" AS o
 FROM
   (SELECT "Student"."Name" AS "Name",

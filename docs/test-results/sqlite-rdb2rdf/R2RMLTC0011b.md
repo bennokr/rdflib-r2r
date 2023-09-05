@@ -9,13 +9,13 @@ SELECT anon_1.s AS s,
        anon_1.o AS o
 FROM
   (SELECT '<http://example.com/student/' || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-          '<http://example.com/lastName>' AS p,
-          "Student"."LastName" AS o,
+          '<http://example.com/firstName>' AS p,
+          "Student"."FirstName" AS o,
           NULL AS g
    FROM "Student"
    UNION ALL SELECT '<http://example.com/student/' || replace(replace(replace(replace(replace(replace(CAST("Student"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/firstName>' AS p,
-                    "Student"."FirstName" AS o,
+                    '<http://example.com/lastName>' AS p,
+                    "Student"."LastName" AS o,
                     NULL AS g
    FROM "Student"
    UNION ALL SELECT '<http://example.com/sport/' || replace(replace(replace(replace(replace(replace(CAST("Sport"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,

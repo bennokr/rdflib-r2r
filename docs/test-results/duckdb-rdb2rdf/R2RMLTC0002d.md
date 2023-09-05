@@ -4,8 +4,8 @@ Two columns mapping, generation of a BlankNode subject by using a SQL Query that
 
 ## Created SQL query
 ```sql
-SELECT '<http://xmlns.com/foaf/0.1/name>' AS p,
-       CAST('_:' AS VARCHAR) || CAST(anon_1."View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR".StudentId AS VARCHAR) AS s,
+SELECT '_:' || CAST(anon_1."View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR".StudentId AS VARCHAR) AS s,
+       '<http://xmlns.com/foaf/0.1/name>' AS p,
        anon_1."View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR"."Name" AS o
 FROM
   (SELECT "View_NB2HI4B2F4XWK6DBNVYGYZJOMNXW2L3CMFZWKL2UOJUXA3DFONGWC4BR".StudentId,

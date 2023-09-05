@@ -19,23 +19,23 @@ FROM
                     NULL AS g
    FROM "Source"
    UNION ALL SELECT '<Source/ID=' || replace(replace(replace(replace(replace(replace(CAST("Source"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Source#ID>' AS p,
-                    '"' || CAST(CAST("Source"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
+                    '<http://example.com/base/Source#ref-attrA;attrB>' AS p,
+                    '_:Target#' || CAST(CAST("Target_ref".rowid AS VARCHAR) AS VARCHAR) AS o,
                     NULL AS g
-   FROM "Source"
+   FROM "Source",
+        "Target" AS "Target_ref"
+   WHERE "Source"."attrA" = "Target_ref"."key2attr2"
+     AND "Source"."attrB" = "Target_ref"."key2attr1"
    UNION ALL SELECT '<Source/ID=' || replace(replace(replace(replace(replace(replace(CAST("Source"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
                     '<http://example.com/base/Source#attrA>' AS p,
                     substr("Source"."attrA" || '    ', 1, 4) AS o,
                     NULL AS g
    FROM "Source"
    UNION ALL SELECT '<Source/ID=' || replace(replace(replace(replace(replace(replace(CAST("Source"."ID" AS VARCHAR), ' ', '%20'), '/', '%2F'), '(', '%28'), ')', '%29'), ',', '%2C'), ':', '%3A') || '>' AS s,
-                    '<http://example.com/base/Source#ref-attrA;attrB>' AS p,
-                    '_:Target#' || CAST(CAST("Target_ref".rowid AS VARCHAR) AS VARCHAR) AS o,
+                    '<http://example.com/base/Source#ID>' AS p,
+                    '"' || CAST(CAST("Source"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
                     NULL AS g
-   FROM "Target" AS "Target_ref",
-        "Source"
-   WHERE "Source"."attrA" = "Target_ref"."key2attr2"
-     AND "Source"."attrB" = "Target_ref"."key2attr1"
+   FROM "Source"
    UNION ALL SELECT '_:Target#' || CAST(CAST("Target".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
                     '<http://example.com/base/Target>' AS o,
@@ -52,6 +52,11 @@ FROM
                     NULL AS g
    FROM "Target"
    UNION ALL SELECT '_:Target#' || CAST(CAST("Target".rowid AS VARCHAR) AS VARCHAR) AS s,
+                    '<http://example.com/base/Target#key2attr1>' AS p,
+                    substr("Target".key2attr1 || '    ', 1, 4) AS o,
+                    NULL AS g
+   FROM "Target"
+   UNION ALL SELECT '_:Target#' || CAST(CAST("Target".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Target#litattr1>' AS p,
                     '"' || CAST(CAST("Target".litattr1 AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
                     NULL AS g
@@ -59,11 +64,6 @@ FROM
    UNION ALL SELECT '_:Target#' || CAST(CAST("Target".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Target#key2attr2>' AS p,
                     substr("Target".key2attr2 || '    ', 1, 4) AS o,
-                    NULL AS g
-   FROM "Target"
-   UNION ALL SELECT '_:Target#' || CAST(CAST("Target".rowid AS VARCHAR) AS VARCHAR) AS s,
-                    '<http://example.com/base/Target#key2attr1>' AS p,
-                    substr("Target".key2attr1 || '    ', 1, 4) AS o,
                     NULL AS g
    FROM "Target") AS anon_1
 ```

@@ -8,17 +8,17 @@ SELECT anon_1.s AS s,
        anon_1.p AS p,
        anon_1.o AS o
 FROM
-  (SELECT CAST('_:Student#' AS VARCHAR) || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
+  (SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
           '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>' AS p,
           '<http://example.com/base/Student>' AS o,
           NULL AS g
    FROM "Student"
-   UNION ALL SELECT CAST('_:Student#' AS VARCHAR) || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
+   UNION ALL SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Student#ID>' AS p,
-                    CAST('"' AS VARCHAR) || CAST(CAST("Student"."ID" AS VARCHAR) AS VARCHAR) || CAST('"^^<http://www.w3.org/2001/XMLSchema#integer>' AS VARCHAR) AS o,
+                    '"' || CAST(CAST("Student"."ID" AS VARCHAR) AS VARCHAR) || '"^^<http://www.w3.org/2001/XMLSchema#integer>' AS o,
                     NULL AS g
    FROM "Student"
-   UNION ALL SELECT CAST('_:Student#' AS VARCHAR) || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
+   UNION ALL SELECT '_:Student#' || CAST(CAST("Student".rowid AS VARCHAR) AS VARCHAR) AS s,
                     '<http://example.com/base/Student#Name>' AS p,
                     "Student"."Name" AS o,
                     NULL AS g
@@ -58,7 +58,7 @@ FAIL
 
 ```
 Traceback (most recent call last):
-  File "/tests/test_rdb2rdf.py", line 174, in test_rdb2rdf
+  File "/tests/test_rdb2rdf.py", line 183, in test_rdb2rdf
     assert iso_made == iso_goal
 AssertionError: assert <Graph identi...rphicGraph'>)> == <Graph identi...rphicGraph'>)>
   Use -v to get more diff
