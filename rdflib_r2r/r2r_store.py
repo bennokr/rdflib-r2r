@@ -546,7 +546,12 @@ class R2RStore(Store):
             n3col = '"' + value + ('"^^' + dt)
             n3col.original = dbcol
             return n3col
-        
+         if isinstance(dbcol.type, sqltypes.INT):
+            dt = XSD.integer.n3() # if this can run
+            value = sqlfunc.cast(dbcol, sqltypes.VARCHAR)
+            n3col = '"' + value + ('"^^' + dt)
+            n3col.original = dbcol
+            return n3col
         ## TODO: create n3 literal for integers!
 
         return dbcol
