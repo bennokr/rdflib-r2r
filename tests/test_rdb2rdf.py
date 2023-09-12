@@ -171,7 +171,7 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
         report += f"## Raw ouput triples\n```\n{dump_made}\n```\n\n"
         
         report += "## Triple Diff\n```diff\n" + difftxt + "\n```\n\n"
-        report += ('SUCCES' if iso_made == iso_goal else 'FAIL')
+        report += 'Full query: ' + ('SUCCES' if iso_made == iso_goal else 'FAIL')
         test_file.write_text(report)
 
         for li, line in enumerate(dump_nt_sorted(in_both)):
@@ -183,10 +183,12 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
         assert iso_made == iso_goal
 
         if not nopattern:
+            report += '## Pattern tests\n'
             # Test graph pattern filters
             made_triples = sorted(g_made)
             if any(made_triples):
                 g_ss, g_ps, g_os = zip(*made_triples)
+                report += '### Subject Pattern tests\n'
                 for s in sorted(set(g_ss)):
                     if isinstance(s, rdflib.term.BNode):
                         continue
@@ -194,6 +196,8 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
                     assert s_triples, f'subject filter {s}'
                     for s_, _, _ in s_triples:
                         assert s_ == s, 'subject equality'
+
+                report += '### Predicate Pattern tests\n'
                 for p in sorted(set(g_ps)):
                     if isinstance(p, rdflib.term.BNode):
                         continue
@@ -201,6 +205,8 @@ def test_rdb2rdf(testcase: TestCase, engine_name: str, dbecho: bool, nopattern: 
                     assert p_triples, f'predicate filter {p}'
                     for _, p_, _ in p_triples:
                         assert p_ == p, 'predicate equality'
+
+                report += '### Object Pattern tests\n'
                 for o in sorted(set(g_os)):
                     if isinstance(o, rdflib.term.BNode):
                         continue
